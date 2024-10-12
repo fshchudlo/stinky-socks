@@ -1,7 +1,7 @@
 apiVersion: 1
 
 datasources:
-  - name: PostgreSQL
+  - name: stinky-socks-db
     type: postgres
     access: proxy
     url: postgres:5432
