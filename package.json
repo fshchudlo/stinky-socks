@@ -4,7 +4,7 @@
   "description": "App to import DevEx metrics of different kind.",
   "main": "dist/main.js",
   "scripts": {
-    "start": "ts-node src/main.ts",
+    "start": "ts-node src/app.ts",
     "build": "tsc -p tsconfig.json",
     "lint": "eslint ./src --fix",
     "test": "jest",

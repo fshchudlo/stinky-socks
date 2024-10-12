@@ -15,10 +15,10 @@ const AppDataSource = new DataSource({
     logging: false,
 });
 
-async function main() {
+async function runDataImports() {
     console.log("Hello world!");
 }
 
 AppDataSource.initialize()
-    .then(main)
+    .then(runDataImports)
     .catch(error => console.log(error));
