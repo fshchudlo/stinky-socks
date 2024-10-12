@@ -9,7 +9,11 @@
     "lint": "eslint ./src --fix",
     "test": "jest",
     "test:coverage": "jest --coverage",
-    "test:update-snapshots": "jest --updateSnapshot"
+    "test:update-snapshots": "jest --updateSnapshot",
+    "typeorm": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js",
+    "migration:generate": "npm run typeorm migration:generate -- -n",
+    "migration:run": "npm run typeorm migration:run",
+    "migration:revert": "npm run typeorm migration:revert"
   },
   "keywords": [
     "devex",
