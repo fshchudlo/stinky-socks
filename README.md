@@ -5,8 +5,7 @@
 ### Configuring dev environment
 - Install [Node.js and npm](https://nodejs.org) on your machine
 - Run `npm i` from the repo root directory
-- Run Postgres and Grafana by using `assets/docker-compose.yml` file
-- Create an empty database named `stinky-socks`
+- Run Postgres and Grafana by using `docker-compose -f assets/docker-compose.yml up -d` file
 - Create the copy of `.env.example` file, name it `.env` and provide relevant config values.
 - Run ```npm run start```
 

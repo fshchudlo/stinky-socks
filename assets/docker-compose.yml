@@ -1,17 +1,30 @@
-version: '3.7'
+version: '3.8'
 services:
   postgres:
     image: postgres
-    container_name: "postgres"
+    container_name: "stinky-socks-postgres"
     restart: always
     ports:
       - "5432:5432"
     environment:
-      POSTGRES_PASSWORD: CHANGE-ME!
+      POSTGRES_DB: stinky-socks
+      POSTGRES_USER: stinky-socks
+      POSTGRES_PASSWORD: "CHANGE-ME!"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
 
   # http://127.0.0.1:3000
   grafana:
     image: grafana/grafana
+    container_name: "stinky-socks-grafana"
     restart: always
     ports:
       - 3000:3000
+    environment:
+      - GF_SECURITY_ADMIN_USER=stinky-socks
+      - GF_SECURITY_ADMIN_PASSWORD=CHANGE-ME!
+    volumes:
+      - ./grafana-provisioning:/etc/grafana/provisioning  # Mount provisioning folder
+
+volumes:
+  postgres_data:
