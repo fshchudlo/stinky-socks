@@ -2,12 +2,8 @@ import { AppDataSource } from "./app.datasource";
 
 
 async function runDataImports() {
+    await AppDataSource.initialize();
     console.log("🚀 Hello world!");
 }
 
-AppDataSource.initialize()
-    .then(async () => {
-        console.log('🔄 Data Source has been initialized!');
-        await runDataImports();
-    })
-    .catch(error => console.log(error));
+runDataImports().catch(error => console.log(error));
