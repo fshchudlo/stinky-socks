@@ -8,8 +8,6 @@ async function runDataImports() {
 AppDataSource.initialize()
     .then(async () => {
         console.log('🔄 Data Source has been initialized!');
-        await AppDataSource.runMigrations();
-        console.log('📝 Migrations have been run successfully.');
         await runDataImports();
     })
     .catch(error => console.log(error));

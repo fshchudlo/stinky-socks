@@ -15,5 +15,6 @@ export const AppDataSource = new DataSource({
     namingStrategy: new SnakeNamingStrategy(),
     synchronize: false,
     migrations: ["src/metrics-db/migrations/*.ts"],
+    migrationsRun: true,
     logging: false
 });
