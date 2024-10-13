@@ -1,18 +1,121 @@
-import { MigrationInterface, QueryRunner } from "typeorm";
+import { MigrationInterface, QueryRunner, Table, TableForeignKey } from "typeorm";
 
 export class InitialMigration1728847106128 implements MigrationInterface {
-    name = 'InitialMigration1728847106128'
+    name = "InitialMigration1728847106128";
 
     public async up(queryRunner: QueryRunner): Promise<void> {
-        await queryRunner.query(`CREATE TABLE "pull_request_participant" ("id" SERIAL NOT NULL, "project_key" character varying NOT NULL, "repository_name" character varying NOT NULL, "pull_request_number" integer NOT NULL, "participant_name" character varying NOT NULL, "first_comment_date" TIMESTAMP, "first_approval_date" TIMESTAMP, "last_comment_date" TIMESTAMP, "last_approval_date" TIMESTAMP, "comments_count" integer NOT NULL, "is_bot_user" boolean NOT NULL, "is_former_employee" boolean NOT NULL, "projectKey" character varying, "repositoryName" character varying, "pullRequestNumber" integer, CONSTRAINT "PK_32d4c0304fa715c4955daef75e4" PRIMARY KEY ("id"))`);
-        await queryRunner.query(`CREATE TABLE "pull_request" ("project_key" character varying NOT NULL, "repository_name" character varying NOT NULL, "pull_request_number" integer NOT NULL, "team_name" character varying NOT NULL, "author" character varying NOT NULL, "view_url" character varying NOT NULL, "author_is_bot_user" boolean NOT NULL, "author_is_former_employee" boolean NOT NULL, "target_branch" character varying NOT NULL, "opened_date" TIMESTAMP NOT NULL, "initial_commit_date" TIMESTAMP, "last_commit_date" TIMESTAMP NOT NULL, "merged_date" TIMESTAMP NOT NULL, "reviewers_count" integer NOT NULL, "approvals_count" integer NOT NULL, "participants_count" integer NOT NULL, "resolved_tasks_count" integer NOT NULL, "open_tasks_count" integer NOT NULL, "comments_count" integer NOT NULL, "commits_after_first_approval_count" integer NOT NULL, "rebases_count" integer NOT NULL, "diff_size" integer NOT NULL, "tests_were_touched" boolean NOT NULL, CONSTRAINT "PK_288f4d157b3772d8182d539a8d3" PRIMARY KEY ("project_key", "repository_name", "pull_request_number"))`);
-        await queryRunner.query(`ALTER TABLE "pull_request_participant" ADD CONSTRAINT "FK_1b383f5b7c29c8f0a77f40428fe" FOREIGN KEY ("projectKey", "repositoryName", "pullRequestNumber") REFERENCES "pull_request"("project_key","repository_name","pull_request_number") ON DELETE NO ACTION ON UPDATE NO ACTION`);
+        const namingStrategy = queryRunner.connection.namingStrategy;
+        await queryRunner.createTable(
+            new Table({
+                name: "pull_request",
+                columns: [
+                    { name: namingStrategy.columnName("projectKey", undefined, []), type: "varchar", isPrimary: true },
+                    {
+                        name: namingStrategy.columnName("repositoryName", undefined, []),
+                        type: "varchar",
+                        isPrimary: true
+                    },
+                    {
+                        name: namingStrategy.columnName("pullRequestNumber", undefined, []),
+                        type: "int",
+                        isPrimary: true
+                    },
+                    { name: namingStrategy.columnName("teamName", undefined, []), type: "varchar" },
+                    { name: namingStrategy.columnName("author", undefined, []), type: "varchar" },
+                    { name: namingStrategy.columnName("viewURL", undefined, []), type: "varchar" },
+                    { name: namingStrategy.columnName("authorIsBotUser", undefined, []), type: "boolean" },
+                    { name: namingStrategy.columnName("authorIsFormerEmployee", undefined, []), type: "boolean" },
+                    { name: namingStrategy.columnName("targetBranch", undefined, []), type: "varchar" },
+                    { name: namingStrategy.columnName("openedDate", undefined, []), type: "timestamp" },
+                    {
+                        name: namingStrategy.columnName("initialCommitDate", undefined, []),
+                        type: "timestamp",
+                        isNullable: true
+                    },
+                    { name: namingStrategy.columnName("lastCommitDate", undefined, []), type: "timestamp" },
+                    { name: namingStrategy.columnName("mergedDate", undefined, []), type: "timestamp" },
+                    { name: namingStrategy.columnName("reviewersCount", undefined, []), type: "int" },
+                    { name: namingStrategy.columnName("approvalsCount", undefined, []), type: "int" },
+                    { name: namingStrategy.columnName("participantsCount", undefined, []), type: "int" },
+                    { name: namingStrategy.columnName("resolvedTasksCount", undefined, []), type: "int" },
+                    { name: namingStrategy.columnName("openTasksCount", undefined, []), type: "int" },
+                    { name: namingStrategy.columnName("commentsCount", undefined, []), type: "int" },
+                    { name: namingStrategy.columnName("commitsAfterFirstApprovalCount", undefined, []), type: "int" },
+                    { name: namingStrategy.columnName("rebasesCount", undefined, []), type: "int" },
+                    { name: namingStrategy.columnName("diffSize", undefined, []), type: "bigint" },
+                    { name: namingStrategy.columnName("testsWereTouched", undefined, []), type: "boolean" }
+                ]
+            })
+        );
+
+        // Create pull_request_participant table
+        await queryRunner.createTable(
+            new Table({
+                name: "pull_request_participant",
+                columns: [
+                    {
+                        name: namingStrategy.columnName("id", undefined, []),
+                        type: "int",
+                        isPrimary: true,
+                        isGenerated: true,
+                        generationStrategy: "increment"
+                    },
+                    { name: namingStrategy.columnName("projectKey", undefined, []), type: "varchar" },
+                    { name: namingStrategy.columnName("repositoryName", undefined, []), type: "varchar" },
+                    { name: namingStrategy.columnName("pullRequestNumber", undefined, []), type: "int" },
+                    { name: namingStrategy.columnName("participantName", undefined, []), type: "varchar" },
+                    {
+                        name: namingStrategy.columnName("firstCommentDate", undefined, []),
+                        type: "timestamp",
+                        isNullable: true
+                    },
+                    {
+                        name: namingStrategy.columnName("firstApprovalDate", undefined, []),
+                        type: "timestamp",
+                        isNullable: true
+                    },
+                    {
+                        name: namingStrategy.columnName("lastCommentDate", undefined, []),
+                        type: "timestamp",
+                        isNullable: true
+                    },
+                    {
+                        name: namingStrategy.columnName("lastApprovalDate", undefined, []),
+                        type: "timestamp",
+                        isNullable: true
+                    },
+                    { name: namingStrategy.columnName("commentsCount", undefined, []), type: "int" },
+                    { name: namingStrategy.columnName("isBotUser", undefined, []), type: "boolean" },
+                    { name: namingStrategy.columnName("isFormerEmployee", undefined, []), type: "boolean" }
+                ]
+            })
+        );
+
+        // Add foreign key to pull_request_participant
+        await queryRunner.createForeignKey(
+            "pull_request_participant",
+            new TableForeignKey({
+                columnNames: [namingStrategy.columnName("projectKey", undefined, []), namingStrategy.columnName("repositoryName", undefined, []), namingStrategy.columnName("pullRequestNumber", undefined, [])],
+                referencedTableName: "pull_request",
+                referencedColumnNames: [namingStrategy.columnName("projectKey", undefined, []), namingStrategy.columnName("repositoryName", undefined, []), namingStrategy.columnName("pullRequestNumber", undefined, [])],
+                onDelete: "CASCADE"
+            })
+        );
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
-        await queryRunner.query(`ALTER TABLE "pull_request_participant" DROP CONSTRAINT "FK_1b383f5b7c29c8f0a77f40428fe"`);
-        await queryRunner.query(`DROP TABLE "pull_request"`);
-        await queryRunner.query(`DROP TABLE "pull_request_participant"`);
+        // Drop foreign key
+        const table = await queryRunner.getTable("pull_request_participant");
+        const foreignKey = table!.foreignKeys.find(
+            (fk) => fk.columnNames.indexOf("pull_request_number") !== -1
+        );
+        if (foreignKey) {
+            await queryRunner.dropForeignKey("pull_request_participant", foreignKey);
+        }
+
+        // Drop tables
+        await queryRunner.dropTable("pull_request_participant");
+        await queryRunner.dropTable("pull_request");
     }
 
 }
