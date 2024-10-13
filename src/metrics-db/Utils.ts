@@ -4,32 +4,21 @@ export const Utils = {
     },
     Bitbucket: {
         getActivitiesOf(activities: any[], userName: string): any[] {
-            return activities.filter(
-                (a) => Utils.normalizeUserName(a.user.name) === Utils.normalizeUserName(userName)
-            );
+            return activities.filter(a => Utils.normalizeUserName(a.user.name) === Utils.normalizeUserName(userName));
         },
-
-        getHumanComments(activities: any[], botUsers: string[]): any[] {
-            return activities.filter(
-                (a) =>
-                    a.action === "COMMENTED" &&
-                    !botUsers.includes(Utils.normalizeUserName(a.user.name))
-            );
+        getHumanActivities(activities: any[], botUsers: string[], actionType: "COMMENTED" | "APPROVED" | "RESCOPED" | undefined = undefined): any[] {
+            return activities
+                .filter(a => !actionType || a.action === actionType)
+                .filter(a => !botUsers.includes(Utils.normalizeUserName(a.user.name)));
         },
 
         getApprovers(activities: any[], botUsers: string[]): Set<string> {
-            const approvers = activities.filter(
-                (a) =>
-                    a.action === "APPROVED" &&
-                    !botUsers.includes(Utils.normalizeUserName(a.user.name))
-            );
+            const approvers = Utils.Bitbucket.getHumanActivities(activities, botUsers, "APPROVED");
             return new Set(approvers.map((a) => Utils.normalizeUserName(a.user.name)));
         },
 
         getRebases(activities: any[]): any[] {
-            return activities.filter(
-                (a) => a.action === "RESCOPED" && a.fromHash !== a.previousFromHash
-            );
+            return activities.filter(a => a.action === "RESCOPED" && a.fromHash !== a.previousFromHash);
         },
 
         getDiffSize(diffData: any): number {

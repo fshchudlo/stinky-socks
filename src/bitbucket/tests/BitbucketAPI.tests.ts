@@ -5,10 +5,10 @@ import { Utils } from "../../metrics-db/Utils";
 
 describe('BitbucketAPI 𝑰𝒏𝒕𝒆𝒈𝒓𝒂𝒕𝒊𝒐𝒏 Test', () => {
     it.skip('should fetch pull requests history', async () => {
-        const sut = new BitbucketAPI(AppConfig.Bitbucket.API_URL, AppConfig.Bitbucket.API_TOKEN);
+        const projectKey = 'TEST';
+        const repositorySlug = 'test';
 
-        const projectKey = 'LPS';
-        const repositorySlug = 'core.key-administrator';
+        const sut = new BitbucketAPI(AppConfig.Bitbucket.API_URL, AppConfig.Bitbucket.API_TOKEN);
 
         const pullRequestsHistory =await sut.getPullRequestsHistory(projectKey, repositorySlug)
         expect(pullRequestsHistory).not.toHaveLength(0);

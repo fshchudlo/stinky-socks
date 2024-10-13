@@ -79,64 +79,82 @@ export class PullRequest {
     })
     participants: PullRequestParticipant[];
 
-    static fromBitbucket(teamTraits: TeamTraits,
-                         pullRequestData: any,
-                         activities: any[],
-                         commits: any[],
-                         diff: any): PullRequest {
+    static fromBitbucket(teamTraits: TeamTraits, pullRequestData: any, activities: any[], commits: any[], diff: any): PullRequest {
+        return new PullRequest()
+            .initializeBaseProperties(teamTraits, pullRequestData)
+            .initializeDates(pullRequestData, commits)
+            .calculateApprovalAndReviewStats(pullRequestData, activities, teamTraits)
+            .calculateTaskStats(pullRequestData)
+            .calculateCommitStats(commits, activities, diff, teamTraits)
+            .buildParticipants(pullRequestData, activities, teamTraits);
+    }
 
-        const entity = new PullRequest();
-        entity.teamName = teamTraits.teamName;
-        entity.projectKey = pullRequestData.toRef.repository.project.key;
-        entity.repositoryName = pullRequestData.toRef.repository.slug;
-        entity.pullRequestNumber = pullRequestData.id;
-        entity.author = Utils.normalizeUserName(pullRequestData.author.user.name);
-        entity.viewURL = pullRequestData.links.self[0].href;
-        entity.authorIsBotUser = teamTraits.botUsers.includes(entity.author);
-        entity.authorIsFormerEmployee = teamTraits.formerEmployees.includes(entity.author);
+    private initializeBaseProperties(teamTraits: TeamTraits, pullRequestData: any): PullRequest {
+        this.teamName = teamTraits.teamName;
+        this.projectKey = pullRequestData.toRef.repository.project.key;
+        this.repositoryName = pullRequestData.toRef.repository.slug;
+        this.pullRequestNumber = pullRequestData.id;
+        this.author = Utils.normalizeUserName(pullRequestData.author.user.name);
+        this.viewURL = pullRequestData.links.self[0].href;
+        this.authorIsBotUser = teamTraits.botUsers.includes(this.author);
+        this.authorIsFormerEmployee = teamTraits.formerEmployees.includes(this.author);
+        this.targetBranch = pullRequestData.toRef.displayId;
+        return this;
+    }
 
-        entity.targetBranch = pullRequestData.toRef.displayId;
-        entity.openedDate = new Date(pullRequestData.createdDate);
-        entity.mergedDate = new Date(pullRequestData.closedDate);
-
+    private initializeDates(pullRequestData: any, commits: any[]): PullRequest {
         const commitTimestamps = commits.map((c) => c.authorTimestamp as number);
+
         if (!commitTimestamps.length) {
-            throw new Error("No commits found for pull request");
+            throw new Error(`No commits found for pull request ${pullRequestData.id}`);
         }
 
-        entity.initialCommitDate = new Date(Math.min(...commitTimestamps));
-        entity.lastCommitDate = new Date(Math.max(...commitTimestamps));
+        this.openedDate = new Date(pullRequestData.createdDate);
+        this.mergedDate = new Date(pullRequestData.closedDate);
+        this.initialCommitDate = new Date(Math.min(...commitTimestamps));
+        this.lastCommitDate = new Date(Math.max(...commitTimestamps));
+        return this;
+    }
 
-        entity.reviewersCount = pullRequestData.reviewers.length;
-        entity.participantsCount = pullRequestData.participants.length;
-        entity.approvalsCount = Utils.Bitbucket.getApprovers(activities, teamTraits.botUsers).size;
+    private calculateApprovalAndReviewStats(pullRequestData: any, activities: any[], teamTraits: TeamTraits): PullRequest {
+        this.reviewersCount = pullRequestData.reviewers.length;
+        this.participantsCount = pullRequestData.participants.length;
+        this.approvalsCount = Utils.Bitbucket.getApprovers(activities, teamTraits.botUsers).size;
+        return this;
+    }
 
-        entity.resolvedTasksCount = pullRequestData.properties?.resolvedTaskCount || 0;
-        entity.openTasksCount = pullRequestData.properties?.openTaskCount || 0;
+    private calculateTaskStats(pullRequestData: any): PullRequest {
+        this.resolvedTasksCount = pullRequestData.properties?.resolvedTaskCount || 0;
+        this.openTasksCount = pullRequestData.properties?.openTaskCount || 0;
+        return this;
+    }
 
-        entity.commentsCount = Utils.Bitbucket.getHumanComments(activities, teamTraits.botUsers).length;
-        entity.commitsAfterFirstApprovalCount = commits.filter(
-            (c) => new Date(c.committerTimestamp) > entity.openedDate
+    private calculateCommitStats(commits: any[], activities: any[], diff: any, teamTraits: TeamTraits): PullRequest {
+        this.commentsCount = Utils.Bitbucket.getHumanActivities(activities, teamTraits.botUsers, "COMMENTED").length;
+        this.commitsAfterFirstApprovalCount = commits.filter(
+            (c) => new Date(c.committerTimestamp) > this.openedDate
         ).length;
+        this.rebasesCount = Utils.Bitbucket.getRebases(activities).length;
+        this.diffSize = Utils.Bitbucket.getDiffSize(diff);
+        this.testsWereTouched = teamTraits.testsWereTouched;
+        return this;
+    }
 
-        entity.rebasesCount = Utils.Bitbucket.getRebases(activities).length;
-        entity.diffSize = Utils.Bitbucket.getDiffSize(diff);
-        entity.testsWereTouched = teamTraits.testsWereTouched;
-
+    private buildParticipants(pullRequestData: any, activities: any[], teamTraits: TeamTraits): PullRequest {
         const allParticipants = new Set<string>([
             ...pullRequestData.reviewers.map((r: any) => Utils.normalizeUserName(r.user.name)),
             ...pullRequestData.participants.map((p: any) => Utils.normalizeUserName(p.user.name))
         ]);
 
-        entity.participants = Array.from(allParticipants).map(
-            (participantName) =>
-                PullRequestParticipant.fromBitbucket(
-                    participantName,
-                    pullRequestData,
-                    Utils.Bitbucket.getActivitiesOf(activities, participantName),
-                    teamTraits.botUsers, teamTraits.formerEmployees
-                )
+        this.participants = Array.from(allParticipants).map((participantName) =>
+            PullRequestParticipant.fromBitbucket(
+                participantName,
+                pullRequestData,
+                Utils.Bitbucket.getActivitiesOf(activities, participantName),
+                teamTraits.botUsers,
+                teamTraits.formerEmployees
+            )
         );
-        return entity;
+        return this;
     }
 }
