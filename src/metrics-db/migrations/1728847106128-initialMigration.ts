@@ -7,7 +7,7 @@ export class InitialMigration1728847106128 implements MigrationInterface {
         const namingStrategy = queryRunner.connection.namingStrategy;
         await queryRunner.createTable(
             new Table({
-                name: "pull_request",
+                name: namingStrategy.tableName("PullRequest", undefined),
                 columns: [
                     { name: namingStrategy.columnName("projectKey", undefined, []), type: "varchar", isPrimary: true },
                     {
@@ -48,10 +48,9 @@ export class InitialMigration1728847106128 implements MigrationInterface {
             })
         );
 
-        // Create pull_request_participant table
         await queryRunner.createTable(
             new Table({
-                name: "pull_request_participant",
+                name: namingStrategy.tableName("PullRequestParticipant", undefined),
                 columns: [
                     {
                         name: namingStrategy.columnName("id", undefined, []),
@@ -91,12 +90,11 @@ export class InitialMigration1728847106128 implements MigrationInterface {
             })
         );
 
-        // Add foreign key to pull_request_participant
         await queryRunner.createForeignKey(
-            "pull_request_participant",
+            namingStrategy.tableName("PullRequestParticipant", undefined),
             new TableForeignKey({
                 columnNames: [namingStrategy.columnName("projectKey", undefined, []), namingStrategy.columnName("repositoryName", undefined, []), namingStrategy.columnName("pullRequestNumber", undefined, [])],
-                referencedTableName: "pull_request",
+                referencedTableName: namingStrategy.tableName("PullRequest", undefined),
                 referencedColumnNames: [namingStrategy.columnName("projectKey", undefined, []), namingStrategy.columnName("repositoryName", undefined, []), namingStrategy.columnName("pullRequestNumber", undefined, [])],
                 onDelete: "CASCADE"
             })
@@ -104,18 +102,19 @@ export class InitialMigration1728847106128 implements MigrationInterface {
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
+        const namingStrategy = queryRunner.connection.namingStrategy;
         // Drop foreign key
-        const table = await queryRunner.getTable("pull_request_participant");
+        const table = await queryRunner.getTable(namingStrategy.tableName("PullRequestParticipant", undefined));
         const foreignKey = table!.foreignKeys.find(
-            (fk) => fk.columnNames.indexOf("pull_request_number") !== -1
+            (fk) => fk.columnNames.indexOf(namingStrategy.columnName("pullRequestNumber", undefined, [])) !== -1
         );
         if (foreignKey) {
-            await queryRunner.dropForeignKey("pull_request_participant", foreignKey);
+            await queryRunner.dropForeignKey(namingStrategy.tableName("PullRequestParticipant", undefined), foreignKey);
         }
 
         // Drop tables
-        await queryRunner.dropTable("pull_request_participant");
-        await queryRunner.dropTable("pull_request");
+        await queryRunner.dropTable(namingStrategy.tableName("PullRequestParticipant", undefined));
+        await queryRunner.dropTable(namingStrategy.tableName("PullRequest", undefined));
     }
 
 }
