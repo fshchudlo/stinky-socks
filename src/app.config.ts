@@ -2,6 +2,7 @@ import "dotenv/config";
 import "reflect-metadata";
 
 export const AppConfig = {
+    IS_PRODUCTION: process.env.NODE_ENV === "production",
     MetricsDB: {
         DB_HOST: process.env.DB_HOST,
         DB_PORT: +(process.env.DB_PORT ?? 5432),
