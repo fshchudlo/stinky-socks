@@ -19,6 +19,9 @@ export class PullRequest {
   author: string;
 
   @Column()
+  viewURL: string;
+
+  @Column()
   authorIsBotUser: boolean;
 
   @Column()

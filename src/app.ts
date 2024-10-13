@@ -2,6 +2,7 @@ import { DataSource } from "typeorm";
 import { AppConfig } from "./app.config";
 import { PullRequest } from "./MetricsDB/PullRequest";
 import { PullRequestParticipant } from "./MetricsDB/PullRequestParticipant";
+import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 
 const AppDataSource = new DataSource({
     type: "postgres",
@@ -11,6 +12,7 @@ const AppDataSource = new DataSource({
     password: AppConfig.MetricsDB.DB_PASSWORD,
     database: AppConfig.MetricsDB.DB_NAME,
     entities: [PullRequest, PullRequestParticipant],
+    namingStrategy: new SnakeNamingStrategy(),
     synchronize: true,
     logging: false,
 });
