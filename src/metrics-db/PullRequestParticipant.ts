@@ -41,10 +41,11 @@ export class PullRequestParticipant {
     isFormerEmployee: boolean;
 
     @ManyToOne(() => PullRequest, (pr) => pr.participants)
+    // Waiting for this PR to be merged: https://github.com/typeorm/typeorm/pull/11062
     @JoinColumn([
-        { name: "projectKey", referencedColumnName: "projectKey" },
-        { name: "repositoryName", referencedColumnName: "repositoryName" },
-        { name: "pullRequestNumber", referencedColumnName: "pullRequestNumber" }
+        { name: "project_key", referencedColumnName: "projectKey" },
+        { name: "repository_name", referencedColumnName: "repositoryName" },
+        { name: "pull_request_number", referencedColumnName: "pullRequestNumber" }
     ])
     pullRequest: PullRequest;
 

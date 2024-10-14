@@ -42,7 +42,7 @@ export class BitbucketAPI {
         return result;
     }
 
-    async getPullRequestsHistory(projectKey: string, repositorySlug: string, start = 0, state = "MERGED", order = "NEWEST"): Promise<any[]> {
+    async getPullRequestsHistory(projectKey: string, repositorySlug: string, start = 0, state = "MERGED", order = "OLDEST"): Promise<any[]> {
         const url = `${this.baseUrl}/projects/${projectKey}/repos/${repositorySlug}/pull-requests`;
 
         return await this.getList(url, {

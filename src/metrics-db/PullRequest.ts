@@ -1,7 +1,7 @@
 import { Column, Entity, OneToMany, PrimaryColumn } from "typeorm";
 import { PullRequestParticipant } from "./PullRequestParticipant";
 import { Utils } from "./Utils";
-import { TeamTraits } from "../TeamTraits";
+import { BitbucketPullRequestImportModel } from "../typings";
 
 @Entity()
 export class PullRequest {
@@ -79,80 +79,80 @@ export class PullRequest {
     })
     participants: PullRequestParticipant[];
 
-    static fromBitbucket(teamTraits: TeamTraits, pullRequestData: any, activities: any[], commits: any[], diff: any): PullRequest {
+    static fromBitbucket(model: BitbucketPullRequestImportModel): PullRequest {
         return new PullRequest()
-            .initializeBaseProperties(teamTraits, pullRequestData)
-            .initializeDates(pullRequestData, commits)
-            .calculateApprovalAndReviewStats(pullRequestData, activities, teamTraits)
-            .calculateTaskStats(pullRequestData)
-            .calculateCommitStats(commits, activities, diff, teamTraits)
-            .buildParticipants(pullRequestData, activities, teamTraits);
+            .initializeBaseProperties(model)
+            .initializeDates(model)
+            .calculateApprovalAndReviewStats(model)
+            .calculateTaskStats(model)
+            .calculateCommitStats(model)
+            .buildParticipants(model);
     }
 
-    private initializeBaseProperties(teamTraits: TeamTraits, pullRequestData: any): PullRequest {
-        this.teamName = teamTraits.teamName;
-        this.projectKey = pullRequestData.toRef.repository.project.key;
-        this.repositoryName = pullRequestData.toRef.repository.slug;
-        this.pullRequestNumber = pullRequestData.id;
-        this.author = Utils.normalizeUserName(pullRequestData.author.user.name);
-        this.viewURL = pullRequestData.links.self[0].href;
-        this.authorIsBotUser = teamTraits.botUsers.includes(this.author);
-        this.authorIsFormerEmployee = teamTraits.formerEmployees.includes(this.author);
-        this.targetBranch = pullRequestData.toRef.displayId;
+    private initializeBaseProperties(model: BitbucketPullRequestImportModel): PullRequest {
+        this.teamName = model.teamName;
+        this.projectKey = model.pullRequest.toRef.repository.project.key;
+        this.repositoryName = model.pullRequest.toRef.repository.slug;
+        this.pullRequestNumber = model.pullRequest.id;
+        this.author = Utils.normalizeUserName(model.pullRequest.author.user.name);
+        this.viewURL = model.pullRequest.links.self[0].href;
+        this.authorIsBotUser = model.botUsers.includes(this.author);
+        this.authorIsFormerEmployee = model.formerEmployees.includes(this.author);
+        this.targetBranch = model.pullRequest.toRef.displayId;
         return this;
     }
 
-    private initializeDates(pullRequestData: any, commits: any[]): PullRequest {
-        const commitTimestamps = commits.map((c) => c.authorTimestamp as number);
+    private initializeDates(model: BitbucketPullRequestImportModel): PullRequest {
+        const commitTimestamps = model.commits.map((c) => c.authorTimestamp as number);
 
         if (!commitTimestamps.length) {
-            throw new Error(`No commits found for pull request ${pullRequestData.id}`);
+            throw new Error(`No commits found for pull request ${model.pullRequest.id}`);
         }
 
-        this.openedDate = new Date(pullRequestData.createdDate);
-        this.mergedDate = new Date(pullRequestData.closedDate);
+        this.openedDate = new Date(model.pullRequest.createdDate);
+        this.mergedDate = new Date(model.pullRequest.closedDate);
         this.initialCommitDate = new Date(Math.min(...commitTimestamps));
         this.lastCommitDate = new Date(Math.max(...commitTimestamps));
         return this;
     }
 
-    private calculateApprovalAndReviewStats(pullRequestData: any, activities: any[], teamTraits: TeamTraits): PullRequest {
-        this.reviewersCount = pullRequestData.reviewers.length;
-        this.participantsCount = pullRequestData.participants.length;
-        this.approvalsCount = Utils.Bitbucket.getApprovers(activities, teamTraits.botUsers).size;
+    private calculateApprovalAndReviewStats(model: BitbucketPullRequestImportModel): PullRequest {
+        this.reviewersCount = model.pullRequest.reviewers.length;
+        this.participantsCount = model.pullRequest.participants.length;
+        this.approvalsCount = Utils.Bitbucket.getApprovers(model.pullRequestActivities, model.botUsers).size;
         return this;
     }
 
-    private calculateTaskStats(pullRequestData: any): PullRequest {
-        this.resolvedTasksCount = pullRequestData.properties?.resolvedTaskCount || 0;
-        this.openTasksCount = pullRequestData.properties?.openTaskCount || 0;
+    private calculateTaskStats(model: BitbucketPullRequestImportModel): PullRequest {
+        this.resolvedTasksCount = model.pullRequest.properties?.resolvedTaskCount || 0;
+        this.openTasksCount = model.pullRequest.properties?.openTaskCount || 0;
         return this;
     }
 
-    private calculateCommitStats(commits: any[], activities: any[], diff: any, teamTraits: TeamTraits): PullRequest {
-        this.commentsCount = Utils.Bitbucket.getHumanActivities(activities, teamTraits.botUsers, "COMMENTED").length;
-        this.commitsAfterFirstApprovalCount = commits.filter(
+    private calculateCommitStats(model: BitbucketPullRequestImportModel): PullRequest {
+        this.commentsCount = Utils.Bitbucket.getHumanActivities(model.pullRequestActivities, model.botUsers, "COMMENTED").length;
+        this.commitsAfterFirstApprovalCount = model.commits.filter(
             (c) => new Date(c.committerTimestamp) > this.openedDate
         ).length;
-        this.rebasesCount = Utils.Bitbucket.getRebases(activities).length;
-        this.diffSize = Utils.Bitbucket.getDiffSize(diff);
-        this.testsWereTouched = teamTraits.testsWereTouched;
+        this.rebasesCount = Utils.Bitbucket.getRebases(model.pullRequestActivities).length;
+        this.diffSize = Utils.Bitbucket.getDiffSize(model.diff);
+        this.testsWereTouched = Utils.Bitbucket.testsWereTouched(model.diff);
         return this;
     }
 
-    private buildParticipants(pullRequestData: any, activities: any[], teamTraits: TeamTraits): PullRequest {
+    private buildParticipants(model: BitbucketPullRequestImportModel): PullRequest {
         const allParticipants = new Set<string>([
-            ...pullRequestData.reviewers.map((r: any) => Utils.normalizeUserName(r.user.name)),
-            ...pullRequestData.participants.map((p: any) => Utils.normalizeUserName(p.user.name))
+            ...model.pullRequest.reviewers.map((r: any) => Utils.normalizeUserName(r.user.name)),
+            ...model.pullRequest.participants.map((p: any) => Utils.normalizeUserName(p.user.name))
         ]);
 
         this.participants = Array.from(allParticipants).map((participantName) =>
             PullRequestParticipant.fromBitbucket(
                 participantName,
-                pullRequestData,
-                Utils.Bitbucket.getActivitiesOf(activities, participantName),
-                teamTraits.botUsers,
-                teamTraits.formerEmployees
+                model.pullRequest,
+                Utils.Bitbucket.getActivitiesOf(model.pullRequestActivities, participantName),
+                model.botUsers,
+                model.formerEmployees
             )
         );
         return this;

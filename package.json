@@ -10,9 +10,9 @@
     "test": "jest",
     "test:coverage": "jest --coverage",
     "test:update-snapshots": "jest --updateSnapshot",
-    "migration:generate": "ts-node ./node_modules/typeorm/cli.js migration:generate -d ./src/app.datasource.ts",
-    "migration:run": "ts-node ./node_modules/typeorm/cli.js migration:run -d ./src/app.datasource.ts",
-    "migration:revert": "ts-node ./node_modules/typeorm/cli.js migration:revert -d ./src/app.datasource.ts"
+    "migration:generate": "ts-node ./node_modules/typeorm/cli.js migration:generate -d src/metricsDB.ts",
+    "migration:run": "ts-node ./node_modules/typeorm/cli.js migration:run -d src/metricsDB.ts",
+    "migration:revert": "ts-node ./node_modules/typeorm/cli.js migration:revert -d src/metricsDB.ts"
   },
   "keywords": [
     "devex",

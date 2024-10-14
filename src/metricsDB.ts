@@ -4,7 +4,7 @@ import { PullRequest } from "./metrics-db/PullRequest";
 import { PullRequestParticipant } from "./metrics-db/PullRequestParticipant";
 import { SnakeNamingStrategy } from "typeorm-naming-strategies";
 
-export const AppDataSource = new DataSource({
+export const MetricsDB = new DataSource({
     type: "postgres",
     host: AppConfig.MetricsDB.DB_HOST,
     port: AppConfig.MetricsDB.DB_PORT,
