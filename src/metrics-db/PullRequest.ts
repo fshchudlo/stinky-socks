@@ -109,7 +109,7 @@ export class PullRequest {
             throw new Error(`No commits found for pull request ${model.pullRequest.id}`);
         }
 
-        this.openedDate = new Date(model.pullRequest.createdDate);
+        this.openedDate = this.calculatePrOpenDate(model);
         this.mergedDate = new Date(model.pullRequest.closedDate);
         this.initialCommitDate = new Date(Math.min(...commitTimestamps));
         this.lastCommitDate = new Date(Math.max(...commitTimestamps));
@@ -138,6 +138,23 @@ export class PullRequest {
         this.diffSize = Utils.Bitbucket.getDiffSize(model.diff);
         this.testsWereTouched = Utils.Bitbucket.testsWereTouched(model.diff);
         return this;
+    }
+
+    private calculatePrOpenDate(model: BitbucketPullRequestImportModel): Date {
+        const reviewerAdditions = model.pullRequestActivities.filter(a => "addedReviewers" in a);
+
+        if (reviewerAdditions.length > 0) {
+            const initialReviewersNames = new Set<string>(model.pullRequest.reviewers.map((r: any) => r.user.name).filter((name: string) => !model.botUsers.includes(name)));
+            const addedReviewersNames = new Set<string>(reviewerAdditions.flatMap(a => a.addedReviewers?.map((r: any) => r.name) || []));
+
+            // If all initial reviewers were added after PR was opened
+            if ([...initialReviewersNames].every(name => addedReviewersNames.has(name))) {
+                // Return the date of the earliest activity where reviewers were added
+                const earliestAddingDate = Math.min(...reviewerAdditions.map(activity => activity.createdDate));
+                return new Date(earliestAddingDate);
+            }
+        }
+        return new Date(model.pullRequest.createdDate);
     }
 
     private buildParticipants(model: BitbucketPullRequestImportModel): PullRequest {
