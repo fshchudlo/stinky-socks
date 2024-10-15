@@ -8,7 +8,8 @@ export const appImportConfig = {
             projectKey: "TEST",
             botUserNames: ["bot.user"],
             formerEmployeeNames: ["former.employee"],
-            repositoriesSelector: async (api: BitbucketAPI) => (await api.getProjectRepositories("TEST")).filter(r => !r.slug.startsWith("test")).map((r: any) => r.slug)
+            repositoriesSelector: async (api: BitbucketAPI) => (await api.getProjectRepositories("TEST")).filter(r => !r.slug.startsWith("test")).map((r: any) => r.slug),
+            pullRequestsFilterFn: (pr: any) => pr.openedDate < new Date("2015-01-01")
         } as BitbucketProjectSettings]
     }]
 };

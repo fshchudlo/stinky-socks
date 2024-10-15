@@ -6,9 +6,10 @@ import { PullRequest } from "../metrics-db/PullRequest";
 
 export type BitbucketProjectSettings = {
     projectKey: string;
-    repositoriesSelector: (api: BitbucketAPI) => Promise<string[]>;
     botUserNames: string[];
     formerEmployeeNames: string[];
+    repositoriesSelector: (api: BitbucketAPI) => Promise<string[]>;
+    pullRequestsFilterFn: (pr: any) => boolean
 }
 
 export class BitbucketPullRequestsImporter {
@@ -17,7 +18,7 @@ export class BitbucketPullRequestsImporter {
     private readonly repository: Repository<PullRequest>;
     private readonly projects: BitbucketProjectSettings[];
 
-    constructor(bitbucketAPI: BitbucketAPI, teamName:string, projects: BitbucketProjectSettings[]) {
+    constructor(bitbucketAPI: BitbucketAPI, teamName: string, projects: BitbucketProjectSettings[]) {
         this.bitbucketAPI = bitbucketAPI;
         this.projects = projects;
         this.repository = MetricsDB.getRepository(PullRequest);
@@ -60,8 +61,12 @@ export class BitbucketPullRequestsImporter {
             const pullRequestsResponse = await this.bitbucketAPI.getMergedPullRequests(project.projectKey, repositoryName, start, limit);
 
             for (const bitbucketPullRequest of pullRequestsResponse.values.filter((pr: any) => lastMergeDateOfStoredPRs == null || new Date(pr.closedDate) > lastMergeDateOfStoredPRs)) {
-                await this.savePullRequest(project, repositoryName, bitbucketPullRequest);
-                console.count("🤞 Pull requests processed");
+                if (project.pullRequestsFilterFn(bitbucketPullRequest)) {
+                    await this.savePullRequest(project, repositoryName, bitbucketPullRequest);
+                    console.count("🤞 Pull requests processed");
+                } else {
+                    console.warn(`⚠️ Pull request ${bitbucketPullRequest.id} was filtered out by specified pullRequestsFilterFn function`);
+                }
             }
 
             if (pullRequestsResponse.isLastPage) {
