@@ -4,7 +4,7 @@ import { BitbucketAPI } from "./bitbucket/BitbucketAPI";
 export const appImportConfig = {
     teams: [{
         teamName: "Test Team",
-        formerEmployeesNames: ["former.employee"],
+        formerEmployeeNames: ["former.employee"],
         projects: [{
             projectKey: "TEST",
             botUserNames: ["bot.user"],

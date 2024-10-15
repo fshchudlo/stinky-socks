@@ -2,7 +2,7 @@ import { BitbucketAPI } from "./bitbucket/BitbucketAPI";
 
 export type TeamImportSettings = {
     teamName: string;
-    formerEmployeesNames: string[];
+    formerEmployeeNames: string[];
     projects: TeamProjectSettings[];
 }
 export type TeamProjectSettings = {

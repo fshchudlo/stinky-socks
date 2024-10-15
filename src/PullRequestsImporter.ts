@@ -62,7 +62,7 @@ export class PullRequestsImporter {
         const pullRequestEntity = PullRequest.fromBitbucket({
                 teamName: team.teamName,
                 botUsers: project.botUserNames,
-                formerEmployees: team.formerEmployeesNames,
+                formerEmployees: team.formerEmployeeNames,
                 pullRequest: bitbucketPullRequest,
                 pullRequestActivities: activities,
                 commits,
