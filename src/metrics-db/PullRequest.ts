@@ -103,14 +103,11 @@ export class PullRequest {
     }
 
     private initializeDates(model: BitbucketPullRequestImportModel): PullRequest {
-        const commitTimestamps = model.commits.map((c) => c.authorTimestamp as number);
-
-        if (!commitTimestamps.length) {
-            throw new Error(`No commits found for pull request ${model.pullRequest.id}`);
-        }
 
         this.openedDate = this.calculatePrOpenDate(model);
         this.mergedDate = new Date(model.pullRequest.closedDate);
+
+        const commitTimestamps = model.commits.map((c) => c.authorTimestamp as number);
         this.initialCommitDate = new Date(Math.min(...commitTimestamps));
         this.lastCommitDate = new Date(Math.max(...commitTimestamps));
         return this;

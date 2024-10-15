@@ -52,18 +52,27 @@ export class PullRequestsImporter {
         console.log(`\tImport of ${team.teamName} ${project.projectKey} ${repositoryName} completed`);
     }
 
-    private async savePullRequest(team: TeamImportSettings, project: TeamProjectSettings, repositoryName: string, bitbucketPullRequest: any) {
+    private async savePullRequest(team: TeamImportSettings, project: TeamProjectSettings, repositoryName: string, pullRequest: any) {
         const [activities, commits, diff] = await Promise.all([
-            this.bitbucketAPI.getPullRequestActivities(project.projectKey, repositoryName, bitbucketPullRequest.id),
-            this.bitbucketAPI.getPullRequestCommits(project.projectKey, repositoryName, bitbucketPullRequest.id),
-            this.bitbucketAPI.getPullRequestDiff(project.projectKey, repositoryName, bitbucketPullRequest.id)
+            this.bitbucketAPI.getPullRequestActivities(project.projectKey, repositoryName, pullRequest.id),
+            this.bitbucketAPI.getPullRequestCommits(project.projectKey, repositoryName, pullRequest.id),
+            this.bitbucketAPI.getPullRequestDiff(project.projectKey, repositoryName, pullRequest.id)
         ]);
+
+        /* I'm not sure why, but I've encountered pull requests (PRs) without any commits.
+        * It could have been due to invalid imports or some other issue.
+        * Regardless, this is such a rare case that it can be safely ignored without compromising data integrity.
+        */
+        if (commits.length == 0) {
+            console.log(`\t\tNo commits found for PR ${pullRequest.id}`);
+            return;
+        }
 
         const pullRequestEntity = PullRequest.fromBitbucket({
                 teamName: team.teamName,
                 botUsers: project.botUserNames,
                 formerEmployees: team.formerEmployeeNames,
-                pullRequest: bitbucketPullRequest,
+                pullRequest,
                 pullRequestActivities: activities,
                 commits,
                 diff
