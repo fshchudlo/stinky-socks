@@ -17,39 +17,45 @@ export class PullRequestsImporter {
 
     async importPullRequests() {
         for (const team of this.teams) {
+            console.log(`🔁 Importing pull requests for '${team.teamName}' team`);
+
             for (const project of team.projects) {
+                console.log(`\t🔁 Importing pull requests for '${project.projectKey}' project`);
+
                 for (const repositoryName of await project.repositoriesSelector(this.bitbucketAPI)) {
+                    console.log(`\t\t🔁 Importing pull requests for '${repositoryName}' repository`);
+
+                    const timelogLabel = `\t\t✅ '${repositoryName}' pull requests import completed`;
+                    console.time(timelogLabel);
                     await this.importRepositoryPullRequests(team, project, repositoryName);
+                    console.timeEnd(timelogLabel);
                 }
             }
         }
     }
 
+
+    /**
+     * Unfortunately, the Bitbucket API does not allow filtering or sorting pull requests by merge date.
+     * This can result in data gaps when a pull request remains open for an extended period before being merged.
+     * To avoid missing data, we retrieve all pull requests from the API each time.
+     * This is typically isn't an issue since this is tens of thousands of pull requests at worst and the Bitbucket API performs well
+     * However, if you encounter any problems, consider implementing a reverse import. Start with the most recent pull requests and process them in smaller chunks.
+     */
     private async importRepositoryPullRequests(team: TeamImportSettings, project: TeamProjectSettings, repositoryName: string) {
-        console.log(`\tStarting import of ${team.teamName} ${project.projectKey} ${repositoryName}...`);
+        const limit = 1000;
+        const lastMergeDateOfStoredPRs: Date | null = await this.getPRsCountAndLastMergeDate(team, project, repositoryName);
+        for (let start = 0; ; start += limit) {
+            const pullRequestsResponse = await this.bitbucketAPI.getMergedPullRequests(project.projectKey, repositoryName, start, limit);
 
-        let start = 0;
-        const limit = 1;
-        const lastMergeDateOfStoredPRs: Date | null = await this.getLastMergeDateOfStoredPRs(team, project, repositoryName);
-
-        while (true) {
-            const bitbucketPullRequests = await this.bitbucketAPI.getMergedPullRequests(project.projectKey, repositoryName, start, limit);
-            if (bitbucketPullRequests.length === 0) {
-                break;
-            }
-
-            for (const bitbucketPullRequest of bitbucketPullRequests) {
-
-                if (lastMergeDateOfStoredPRs && lastMergeDateOfStoredPRs >= new Date(bitbucketPullRequest.closedDate)) {
-                    continue;
-                }
-
+            for (const bitbucketPullRequest of pullRequestsResponse.values.filter((pr: any) => lastMergeDateOfStoredPRs == null || new Date(pr.closedDate) > lastMergeDateOfStoredPRs)) {
                 await this.savePullRequest(team, project, repositoryName, bitbucketPullRequest);
             }
 
-            start += limit;
+            if (pullRequestsResponse.isLastPage) {
+                break;
+            }
         }
-        console.log(`\tImport of ${team.teamName} ${project.projectKey} ${repositoryName} completed`);
     }
 
     private async savePullRequest(team: TeamImportSettings, project: TeamProjectSettings, repositoryName: string, pullRequest: any) {
@@ -64,7 +70,7 @@ export class PullRequestsImporter {
         * Regardless, this is such a rare case that it can be safely ignored without compromising data integrity.
         */
         if (commits.length == 0) {
-            console.log(`\t\tNo commits found for PR ${pullRequest.id}`);
+            console.warn(`No commits found for PR ${pullRequest.id}`);
             return;
         }
 
@@ -81,7 +87,7 @@ export class PullRequestsImporter {
         await this.repository.save(pullRequestEntity);
     }
 
-    private async getLastMergeDateOfStoredPRs(team: TeamImportSettings, project: TeamProjectSettings, repositorySlug: string) {
+    private async getPRsCountAndLastMergeDate(team: TeamImportSettings, project: TeamProjectSettings, repositorySlug: string) {
         return (await this.repository
             .createQueryBuilder("pr")
             .select("MAX(pr.mergedDate)", "maxMergeDate")

@@ -1,5 +1,12 @@
 import axios, { AxiosRequestConfig } from "axios";
 
+export type BitbucketPagedResponse = {
+    "size": number;
+    "limit": number;
+    "isLastPage": boolean;
+    "start": number;
+    "values": any[];
+}
 export class BitbucketAPI {
     private readonly baseUrl: string;
     private readonly token: string;
@@ -47,15 +54,15 @@ export class BitbucketAPI {
         return await this.getList(url);
     }
 
-    async getMergedPullRequests(projectKey: string, repositorySlug: string, start: number, limit: number): Promise<any[]> {
+    async getMergedPullRequests(projectKey: string, repositorySlug: string, start: number, limit: number): Promise<BitbucketPagedResponse> {
         const url = `${this.baseUrl}/projects/${projectKey}/repos/${repositorySlug}/pull-requests`;
 
         return (await this.get(url, {
             state: "MERGED",
-            order: "NEWEST",
+            order: "OLDEST",
             start,
             limit
-        })).values;
+        }));
     }
 
     async getPullRequestActivities(projectKey: string, repositorySlug: string, pullRequestId: number): Promise<any[]> {
