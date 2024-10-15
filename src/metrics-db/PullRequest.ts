@@ -1,183 +1,79 @@
 import { Column, Entity, OneToMany, PrimaryColumn } from "typeorm";
 import { PullRequestParticipant } from "./PullRequestParticipant";
-import { BitbucketHelpers } from "./BitbucketHelpers";
-
-export type BitbucketPullRequestImportModel = {
-    teamName: string;
-    botUsers: string[],
-    formerEmployees: string[],
-    pullRequest: any,
-    pullRequestActivities: any[],
-    commits: any[],
-    diff: any
-}
 
 @Entity()
 export class PullRequest {
     @PrimaryColumn()
-    projectKey: string;
+    protected projectKey: string;
 
     @PrimaryColumn()
-    repositoryName: string;
+    protected repositoryName: string;
 
     @PrimaryColumn()
-    pullRequestNumber: number;
+    protected pullRequestNumber: number;
 
     @Column()
-    teamName: string;
+    protected teamName: string;
 
     @Column()
-    author: string;
+    protected author: string;
 
     @Column()
-    viewURL: string;
+    protected viewURL: string;
 
     @Column()
-    authorIsBotUser: boolean;
+    protected authorIsBotUser: boolean;
 
     @Column()
-    authorIsFormerEmployee: boolean;
+    protected authorIsFormerEmployee: boolean;
 
     @Column()
-    targetBranch: string;
+    protected targetBranch: string;
 
     @Column()
-    openedDate: Date;
+    protected openedDate: Date;
 
     @Column({ nullable: true })
-    initialCommitDate?: Date;
+    protected initialCommitDate?: Date;
 
     @Column()
-    lastCommitDate: Date;
+    protected lastCommitDate: Date;
 
     @Column()
-    mergedDate: Date;
+    protected mergedDate: Date;
 
     @Column()
-    reviewersCount: number;
+    protected reviewersCount: number;
 
     @Column()
-    approvalsCount: number;
+    protected approvalsCount: number;
 
     @Column()
-    participantsCount: number;
+    protected participantsCount: number;
 
     @Column()
-    resolvedTasksCount: number;
+    protected resolvedTasksCount: number;
 
     @Column()
-    openTasksCount: number;
+    protected openTasksCount: number;
 
     @Column()
-    commentsCount: number;
+    protected commentsCount: number;
 
     @Column()
-    commitsAfterFirstApprovalCount: number;
+    protected commitsAfterFirstApprovalCount: number;
 
     @Column()
-    rebasesCount: number;
+    protected rebasesCount: number;
 
     @Column()
-    diffSize: number;
+    protected diffSize: number;
 
     @Column()
-    testsWereTouched: boolean;
+    protected testsWereTouched: boolean;
 
     @OneToMany(() => PullRequestParticipant, (participant) => participant.pullRequest, {
         cascade: true
     })
     participants: PullRequestParticipant[];
-
-    static fromBitbucket(model: BitbucketPullRequestImportModel): PullRequest {
-        return new PullRequest()
-            .initializeBaseProperties(model)
-            .initializeDates(model)
-            .calculateApprovalAndReviewStats(model)
-            .calculateTaskStats(model)
-            .calculateCommitStats(model)
-            .buildParticipants(model);
-    }
-
-    private initializeBaseProperties(model: BitbucketPullRequestImportModel): PullRequest {
-        this.teamName = model.teamName;
-        this.projectKey = model.pullRequest.toRef.repository.project.key;
-        this.repositoryName = model.pullRequest.toRef.repository.slug;
-        this.pullRequestNumber = model.pullRequest.id;
-        this.author = BitbucketHelpers.normalizeUserName(model.pullRequest.author.user.name);
-        this.viewURL = model.pullRequest.links.self[0].href;
-        this.authorIsBotUser = model.botUsers.includes(this.author);
-        this.authorIsFormerEmployee = model.formerEmployees.includes(this.author);
-        this.targetBranch = model.pullRequest.toRef.displayId;
-        return this;
-    }
-
-    private initializeDates(model: BitbucketPullRequestImportModel): PullRequest {
-
-        this.openedDate = this.calculatePrOpenDate(model);
-        this.mergedDate = new Date(model.pullRequest.closedDate);
-
-        const commitTimestamps = model.commits.map((c) => c.authorTimestamp as number);
-        this.initialCommitDate = new Date(Math.min(...commitTimestamps));
-        this.lastCommitDate = new Date(Math.max(...commitTimestamps));
-        return this;
-    }
-
-    private calculateApprovalAndReviewStats(model: BitbucketPullRequestImportModel): PullRequest {
-        this.reviewersCount = model.pullRequest.reviewers.length;
-        this.participantsCount = model.pullRequest.participants.length;
-        this.approvalsCount = BitbucketHelpers.getApprovers(model.pullRequestActivities, model.botUsers).size;
-        return this;
-    }
-
-    private calculateTaskStats(model: BitbucketPullRequestImportModel): PullRequest {
-        this.resolvedTasksCount = model.pullRequest.properties?.resolvedTaskCount || 0;
-        this.openTasksCount = model.pullRequest.properties?.openTaskCount || 0;
-        return this;
-    }
-
-    private calculateCommitStats(model: BitbucketPullRequestImportModel): PullRequest {
-        this.commentsCount = BitbucketHelpers.getHumanActivities(model.pullRequestActivities, model.botUsers, "COMMENTED").length;
-        this.commitsAfterFirstApprovalCount = model.commits.filter(
-            (c) => new Date(c.committerTimestamp) > this.openedDate
-        ).length;
-        this.rebasesCount = BitbucketHelpers.getRebases(model.pullRequestActivities).length;
-        this.diffSize = BitbucketHelpers.getDiffSize(model.diff);
-        this.testsWereTouched = BitbucketHelpers.testsWereTouched(model.diff);
-        return this;
-    }
-
-    private calculatePrOpenDate(model: BitbucketPullRequestImportModel): Date {
-        const reviewerAdditions = model.pullRequestActivities.filter(a => "addedReviewers" in a);
-
-        if (reviewerAdditions.length > 0) {
-            const initialReviewersNames = new Set<string>(model.pullRequest.reviewers.map((r: any) => r.user.name).filter((name: string) => !model.botUsers.includes(name)));
-            const addedReviewersNames = new Set<string>(reviewerAdditions.flatMap(a => a.addedReviewers?.map((r: any) => r.name) || []));
-
-            // If all initial reviewers were added after PR was opened
-            if ([...initialReviewersNames].every(name => addedReviewersNames.has(name))) {
-                // Return the date of the earliest activity where reviewers were added
-                const earliestAddingDate = Math.min(...reviewerAdditions.map(activity => activity.createdDate));
-                return new Date(earliestAddingDate);
-            }
-        }
-        return new Date(model.pullRequest.createdDate);
-    }
-
-    private buildParticipants(model: BitbucketPullRequestImportModel): PullRequest {
-        const allParticipants = new Set<string>([
-            ...model.pullRequest.reviewers.map((r: any) => BitbucketHelpers.normalizeUserName(r.user.name)),
-            ...model.pullRequest.participants.map((p: any) => BitbucketHelpers.normalizeUserName(p.user.name))
-        ]);
-
-        this.participants = Array.from(allParticipants).map((participantName) =>
-            PullRequestParticipant.fromBitbucket(
-                participantName,
-                model.pullRequest,
-                BitbucketHelpers.getActivitiesOf(model.pullRequestActivities, participantName),
-                model.botUsers,
-                model.formerEmployees
-            )
-        );
-        return this;
-    }
 }

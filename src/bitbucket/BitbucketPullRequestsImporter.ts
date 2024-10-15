@@ -1,8 +1,9 @@
 import { BitbucketAPI } from "./BitbucketAPI";
 import { TeamImportSettings, TeamProjectSettings } from "../typings";
-import { PullRequest } from "../metrics-db/PullRequest";
+import { BitbucketPullRequest } from "./BitbucketPullRequest";
 import { MetricsDB } from "../metricsDB";
 import { Repository } from "typeorm";
+import { PullRequest } from "../metrics-db/PullRequest";
 
 export class BitbucketPullRequestsImporter {
     private readonly bitbucketAPI: BitbucketAPI;
@@ -84,7 +85,7 @@ export class BitbucketPullRequestsImporter {
             return;
         }
 
-        const pullRequestEntity = PullRequest.fromBitbucket({
+        const pullRequestEntity = new BitbucketPullRequest({
                 teamName: team.teamName,
                 botUsers: project.botUserNames,
                 formerEmployees: team.formerEmployeeNames,
