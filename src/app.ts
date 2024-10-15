@@ -1,5 +1,5 @@
 import { MetricsDB } from "./metricsDB";
-import { BitbucketAPI } from "./bitbucket/BitbucketAPI";
+import { BitbucketAPI } from "./bitbucket/api/BitbucketAPI";
 import { AppConfig } from "./app.config";
 import { BitbucketPullRequestsImporter } from "./bitbucket/BitbucketPullRequestsImporter";
 import { appImportConfig } from "./app.importConfig";
@@ -9,7 +9,15 @@ async function runDataImports() {
     const bitbucketAPI = new BitbucketAPI(AppConfig.Bitbucket.API_URL, AppConfig.Bitbucket.API_TOKEN);
 
     console.log("🚀 Starting Pull Requests import...");
-    await new BitbucketPullRequestsImporter(bitbucketAPI, appImportConfig.teams).importPullRequests();
+
+    console.group();
+    for (const team of appImportConfig.teams) {
+        console.log(`🔁 Importing pull requests for '${team.teamName}' team`);
+        await new BitbucketPullRequestsImporter(bitbucketAPI, team.teamName, team.bitbucketProjects).importPullRequests();
+    }
+    console.groupEnd();
+
+
     console.log("🎉 Pull Requests import completed!");
 }
 

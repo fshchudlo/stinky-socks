@@ -1,5 +1,5 @@
 import { BitbucketHelpers } from "./BitbucketHelpers";
-import { PullRequest } from "../metrics-db/PullRequest";
+import { PullRequest } from "../../metrics-db/PullRequest";
 import { BitbucketPullRequestParticipant } from "./BitbucketPullRequestParticipant";
 
 export type BitbucketPullRequestImportModel = {

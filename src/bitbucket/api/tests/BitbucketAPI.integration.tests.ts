@@ -1,5 +1,5 @@
 import { BitbucketAPI } from "../BitbucketAPI";
-import { AppConfig } from "../../app.config";
+import { AppConfig } from "../../../app.config";
 
 describe("BitbucketAPI 𝑰𝒏𝒕𝒆𝒈𝒓𝒂𝒕𝒊𝒐𝒏 Test", () => {
     it.skip("should fetch pull requests history", async () => {

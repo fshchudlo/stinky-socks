@@ -1,4 +1,4 @@
-import { PullRequestParticipant } from "../metrics-db/PullRequestParticipant";
+import { PullRequestParticipant } from "../../metrics-db/PullRequestParticipant";
 import { BitbucketHelpers } from "./BitbucketHelpers";
 
 export class BitbucketPullRequestParticipant extends PullRequestParticipant {

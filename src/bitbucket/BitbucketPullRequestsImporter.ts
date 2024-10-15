@@ -1,45 +1,47 @@
-import { BitbucketAPI } from "./BitbucketAPI";
-import { TeamImportSettings, TeamProjectSettings } from "../typings";
-import { BitbucketPullRequest } from "./BitbucketPullRequest";
+import { BitbucketAPI } from "./api/BitbucketAPI";
+import { BitbucketPullRequest } from "./entities/BitbucketPullRequest";
 import { MetricsDB } from "../metricsDB";
 import { Repository } from "typeorm";
 import { PullRequest } from "../metrics-db/PullRequest";
 
+export type BitbucketProjectSettings = {
+    projectKey: string;
+    repositoriesSelector: (api: BitbucketAPI) => Promise<string[]>;
+    botUserNames: string[];
+    formerEmployeeNames: string[];
+}
+
 export class BitbucketPullRequestsImporter {
     private readonly bitbucketAPI: BitbucketAPI;
-    private readonly teams: TeamImportSettings[];
+    private readonly teamName: string;
     private readonly repository: Repository<PullRequest>;
+    private readonly projects: BitbucketProjectSettings[];
 
-    constructor(bitbucketAPI: BitbucketAPI, teams: TeamImportSettings[]) {
+    constructor(bitbucketAPI: BitbucketAPI, teamName:string, projects: BitbucketProjectSettings[]) {
         this.bitbucketAPI = bitbucketAPI;
+        this.projects = projects;
         this.repository = MetricsDB.getRepository(PullRequest);
-        this.teams = teams;
+        this.teamName = teamName;
     }
 
     async importPullRequests() {
-        console.group();
-        for (const team of this.teams) {
-            console.log(`🔁 Importing pull requests for '${team.teamName}' team`);
+        for (const project of this.projects) {
+            console.group();
+            console.log(`🔁 Importing pull requests for '${project.projectKey}' project`);
 
-            for (const project of team.projects) {
+            for (const repositoryName of await project.repositoriesSelector(this.bitbucketAPI)) {
                 console.group();
-                console.log(`🔁 Importing pull requests for '${project.projectKey}' project`);
+                console.log(`🔁 Importing pull requests for '${repositoryName}' repository`);
 
-                for (const repositoryName of await project.repositoriesSelector(this.bitbucketAPI)) {
-                    console.group();
-                    console.log(`🔁 Importing pull requests for '${repositoryName}' repository`);
+                const timelogLabel = `✅ '${repositoryName}' pull requests import completed`;
+                console.time(timelogLabel);
+                await this.importRepositoryPullRequests(project, repositoryName);
+                console.timeEnd(timelogLabel);
 
-                    const timelogLabel = `✅ '${repositoryName}' pull requests import completed`;
-                    console.time(timelogLabel);
-                    await this.importRepositoryPullRequests(team, project, repositoryName);
-                    console.timeEnd(timelogLabel);
-
-                    console.groupEnd();
-                }
                 console.groupEnd();
             }
+            console.groupEnd();
         }
-        console.groupEnd();
     }
 
 
@@ -50,15 +52,15 @@ export class BitbucketPullRequestsImporter {
      * This is typically isn't an issue since this is tens of thousands of pull requests at worst and the Bitbucket API performs well
      * However, if you encounter any problems, consider implementing a reverse import. Start with the most recent pull requests and process them in smaller chunks.
      */
-    private async importRepositoryPullRequests(team: TeamImportSettings, project: TeamProjectSettings, repositoryName: string) {
+    private async importRepositoryPullRequests(project: BitbucketProjectSettings, repositoryName: string) {
         console.group();
         const limit = 1000;
-        const lastMergeDateOfStoredPRs: Date | null = await this.getPRsCountAndLastMergeDate(team, project, repositoryName);
+        const lastMergeDateOfStoredPRs: Date | null = await this.getPRsCountAndLastMergeDate(project, repositoryName);
         for (let start = 0; ; start += limit) {
             const pullRequestsResponse = await this.bitbucketAPI.getMergedPullRequests(project.projectKey, repositoryName, start, limit);
 
             for (const bitbucketPullRequest of pullRequestsResponse.values.filter((pr: any) => lastMergeDateOfStoredPRs == null || new Date(pr.closedDate) > lastMergeDateOfStoredPRs)) {
-                await this.savePullRequest(team, project, repositoryName, bitbucketPullRequest);
+                await this.savePullRequest(project, repositoryName, bitbucketPullRequest);
                 console.count("🤞 Pull requests processed");
             }
 
@@ -69,7 +71,7 @@ export class BitbucketPullRequestsImporter {
         console.groupEnd();
     }
 
-    private async savePullRequest(team: TeamImportSettings, project: TeamProjectSettings, repositoryName: string, pullRequest: any) {
+    private async savePullRequest(project: BitbucketProjectSettings, repositoryName: string, pullRequest: any) {
         const [activities, commits, diff] = await Promise.all([
             this.bitbucketAPI.getPullRequestActivities(project.projectKey, repositoryName, pullRequest.id),
             this.bitbucketAPI.getPullRequestCommits(project.projectKey, repositoryName, pullRequest.id),
@@ -86,9 +88,9 @@ export class BitbucketPullRequestsImporter {
         }
 
         const pullRequestEntity = new BitbucketPullRequest({
-                teamName: team.teamName,
+                teamName: this.teamName,
                 botUsers: project.botUserNames,
-                formerEmployees: team.formerEmployeeNames,
+                formerEmployees: project.formerEmployeeNames,
                 pullRequest,
                 pullRequestActivities: activities,
                 commits,
@@ -98,11 +100,11 @@ export class BitbucketPullRequestsImporter {
         await this.repository.save(pullRequestEntity);
     }
 
-    private async getPRsCountAndLastMergeDate(team: TeamImportSettings, project: TeamProjectSettings, repositorySlug: string) {
+    private async getPRsCountAndLastMergeDate(project: BitbucketProjectSettings, repositorySlug: string) {
         return (await this.repository
             .createQueryBuilder("pr")
             .select("MAX(pr.mergedDate)", "maxMergeDate")
-            .where("pr.teamName = :teamName", { teamName: team.teamName })
+            .where("pr.teamName = :teamName", { teamName: this.teamName })
             .andWhere("pr.projectKey = :projectKey", { projectKey: project.projectKey })
             .andWhere("pr.repositoryName = :repositoryName", { repositoryName: repositorySlug })
             .getRawOne())?.maxMergeDate || null;
