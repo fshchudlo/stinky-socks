@@ -1,23 +1,25 @@
+import { BitbucketDiffModel, BitbucketPullRequestActivityModel } from "../api/BitbucketAPI";
+
 export const BitbucketHelpers = {
-        getActivitiesOf(activities: any[], userName: string): any[] {
+        getActivitiesOf(activities: BitbucketPullRequestActivityModel[], userName: string): any[] {
             return activities.filter(a => BitbucketHelpers.normalizeUserName(a.user.name) === BitbucketHelpers.normalizeUserName(userName));
         },
-        getHumanActivities(activities: any[], botUsers: string[], actionType: "COMMENTED" | "APPROVED" | "RESCOPED" | undefined = undefined): any[] {
+        getHumanActivities(activities: BitbucketPullRequestActivityModel[], botUsers: string[], actionType: "COMMENTED" | "APPROVED" | "RESCOPED" | undefined = undefined): any[] {
             return activities
                 .filter(a => !actionType || a.action === actionType)
                 .filter(a => !botUsers.includes(BitbucketHelpers.normalizeUserName(a.user.name)));
         },
 
-        getApprovers(activities: any[], botUsers: string[]): Set<string> {
+        getApprovers(activities: BitbucketPullRequestActivityModel[], botUsers: string[]): Set<string> {
             const approvers = BitbucketHelpers.getHumanActivities(activities, botUsers, "APPROVED");
             return new Set(approvers.map((a) => BitbucketHelpers.normalizeUserName(a.user.name)));
         },
 
-        getRebases(activities: any[]): any[] {
+        getRebases(activities: BitbucketPullRequestActivityModel[]): any[] {
             return activities.filter(a => a.action === "RESCOPED" && a.fromHash !== a.previousFromHash);
         },
 
-        getDiffSize(diffData: any): number {
+        getDiffSize(diffData: BitbucketDiffModel): number {
             let linesChanged = 0;
             diffData.diffs.forEach((d: any) => {
                 if (!d.hunks) return;
