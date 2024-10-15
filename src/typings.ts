@@ -2,13 +2,13 @@ import { BitbucketAPI } from "./bitbucket/BitbucketAPI";
 
 export type TeamImportSettings = {
     teamName: string;
-    formerEmployees: string[];
+    formerEmployeesNames: string[];
     projects: TeamProjectSettings[];
 }
 export type TeamProjectSettings = {
     projectKey: string;
     repositoriesSelector: (api: BitbucketAPI) => Promise<string[]>;
-    botUsers: string[];
+    botUserNames: string[];
 }
 
 export type BitbucketPullRequestImportModel = {

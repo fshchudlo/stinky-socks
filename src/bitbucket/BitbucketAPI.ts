@@ -42,30 +42,34 @@ export class BitbucketAPI {
         return result;
     }
 
-    async getPullRequestsHistory(projectKey: string, repositorySlug: string, start = 0, state = "MERGED", order = "OLDEST"): Promise<any[]> {
+    async getProjectRepositories(projectKey: string): Promise<any[]> {
+        const url = `${this.baseUrl}/projects/${projectKey}/repos/`;
+        return await this.getList(url);
+    }
+
+    async getMergedPullRequests(projectKey: string, repositorySlug: string, start: number, limit: number): Promise<any[]> {
         const url = `${this.baseUrl}/projects/${projectKey}/repos/${repositorySlug}/pull-requests`;
 
-        return await this.getList(url, {
-            withAttributes: true,
-            withProperties: true,
-            state,
-            order,
-            start
-        });
+        return (await this.get(url, {
+            state: "MERGED",
+            order: "NEWEST",
+            start,
+            limit
+        })).values;
     }
 
     async getPullRequestActivities(projectKey: string, repositorySlug: string, pullRequestId: number): Promise<any[]> {
-        const url = `${this.baseUrl}/projects/${projectKey}/repos/${repositorySlug}/pull-requests/${pullRequestId}/activities?limit=1000`;
+        const url = `${this.baseUrl}/projects/${projectKey}/repos/${repositorySlug}/pull-requests/${pullRequestId}/activities`;
         return await this.getList(url);
     }
 
     async getPullRequestCommits(projectKey: string, repositorySlug: string, pullRequestId: number): Promise<any[]> {
-        const url = `${this.baseUrl}/projects/${projectKey}/repos/${repositorySlug}/pull-requests/${pullRequestId}/commits?limit=1000`;
+        const url = `${this.baseUrl}/projects/${projectKey}/repos/${repositorySlug}/pull-requests/${pullRequestId}/commits`;
         return await this.getList(url);
     }
 
     async getPullRequestDiff(projectKey: string, repositorySlug: string, pullRequestId: number): Promise<any> {
-        const url = `${this.baseUrl}/projects/${projectKey}/repos/${repositorySlug}/pull-requests/${pullRequestId}/diff?limit=1000`;
+        const url = `${this.baseUrl}/projects/${projectKey}/repos/${repositorySlug}/pull-requests/${pullRequestId}/diff`;
         return await this.get(url);
     }
 }

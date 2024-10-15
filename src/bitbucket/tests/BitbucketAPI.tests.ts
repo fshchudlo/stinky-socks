@@ -8,7 +8,10 @@ describe("BitbucketAPI 𝑰𝒏𝒕𝒆𝒈𝒓𝒂𝒕𝒊𝒐𝒏 Test", () =>
 
         const sut = new BitbucketAPI(AppConfig.Bitbucket.API_URL, AppConfig.Bitbucket.API_TOKEN);
 
-        const pullRequestsHistory = await sut.getPullRequestsHistory(projectKey, repositorySlug);
+        const repositories = await sut.getProjectRepositories(projectKey);
+        expect(repositories).not.toHaveLength(0);
+
+        const pullRequestsHistory = await sut.getMergedPullRequests(projectKey, repositorySlug, 0, 10);
         expect(pullRequestsHistory).not.toHaveLength(0);
 
         const activities = await sut.getPullRequestActivities(projectKey, repositorySlug, pullRequestsHistory[0].id);
