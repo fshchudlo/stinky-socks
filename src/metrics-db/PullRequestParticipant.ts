@@ -1,6 +1,6 @@
 import { Entity, Column, ManyToOne, JoinColumn, PrimaryGeneratedColumn } from "typeorm";
 import { PullRequest } from "./PullRequest";
-import { Utils } from "./Utils";
+import { BitbucketHelpers } from "./BitbucketHelpers";
 
 @Entity()
 export class PullRequestParticipant {
@@ -72,7 +72,7 @@ export class PullRequestParticipant {
     }
 
     private setCommentStats(participantActivities: any[], botUsers: string[]): PullRequestParticipant {
-        const comments = Utils.Bitbucket.getHumanActivities(participantActivities, botUsers, "COMMENTED");
+        const comments = BitbucketHelpers.Bitbucket.getHumanActivities(participantActivities, botUsers, "COMMENTED");
 
         const commentTimestamps = comments.map((c: any) => c.createdDate as number);
         this.firstCommentDate = commentTimestamps.length ? new Date(Math.min(...commentTimestamps)) : null as any;
@@ -82,7 +82,7 @@ export class PullRequestParticipant {
     }
 
     private setApprovalStats(participantActivities: any[], botUsers: string[]): PullRequestParticipant {
-        const approvals = Utils.Bitbucket.getHumanActivities(participantActivities, botUsers, "APPROVED");
+        const approvals = BitbucketHelpers.Bitbucket.getHumanActivities(participantActivities, botUsers, "APPROVED");
 
         const approvalTimestamps = approvals.map((a: any) => a.createdDate);
         this.firstApprovalDate = approvalTimestamps.length ? new Date(Math.min(...approvalTimestamps)) : null as any;

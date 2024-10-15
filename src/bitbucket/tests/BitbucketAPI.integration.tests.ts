@@ -12,15 +12,15 @@ describe("BitbucketAPI 𝑰𝒏𝒕𝒆𝒈𝒓𝒂𝒕𝒊𝒐𝒏 Test", () =>
         expect(repositories).not.toHaveLength(0);
 
         const pullRequestsHistory = await sut.getMergedPullRequests(projectKey, repositorySlug, 0, 10);
-        expect(pullRequestsHistory).not.toHaveLength(0);
+        expect(pullRequestsHistory.values).not.toHaveLength(0);
 
-        const activities = await sut.getPullRequestActivities(projectKey, repositorySlug, pullRequestsHistory[0].id);
+        const activities = await sut.getPullRequestActivities(projectKey, repositorySlug, pullRequestsHistory.values[0].id);
         expect(activities).not.toHaveLength(0);
 
-        const commits = await sut.getPullRequestCommits(projectKey, repositorySlug, pullRequestsHistory[0].id);
+        const commits = await sut.getPullRequestCommits(projectKey, repositorySlug, pullRequestsHistory.values[0].id);
         expect(commits).not.toHaveLength(0);
 
-        const diff = await sut.getPullRequestDiff(projectKey, repositorySlug, pullRequestsHistory[0].id);
+        const diff = await sut.getPullRequestDiff(projectKey, repositorySlug, pullRequestsHistory.values[0].id);
         expect(diff).not.toBeFalsy();
     });
 });

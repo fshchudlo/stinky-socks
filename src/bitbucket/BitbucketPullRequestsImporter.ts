@@ -1,10 +1,10 @@
-import { BitbucketAPI } from "./bitbucket/BitbucketAPI";
-import { TeamImportSettings, TeamProjectSettings } from "./typings";
-import { PullRequest } from "./metrics-db/PullRequest";
-import { MetricsDB } from "./metricsDB";
+import { BitbucketAPI } from "./BitbucketAPI";
+import { TeamImportSettings, TeamProjectSettings } from "../typings";
+import { PullRequest } from "../metrics-db/PullRequest";
+import { MetricsDB } from "../metricsDB";
 import { Repository } from "typeorm";
 
-export class PullRequestsImporter {
+export class BitbucketPullRequestsImporter {
     private readonly bitbucketAPI: BitbucketAPI;
     private readonly teams: TeamImportSettings[];
     private readonly repository: Repository<PullRequest>;
@@ -16,22 +16,29 @@ export class PullRequestsImporter {
     }
 
     async importPullRequests() {
+        console.group();
         for (const team of this.teams) {
             console.log(`🔁 Importing pull requests for '${team.teamName}' team`);
 
             for (const project of team.projects) {
-                console.log(`\t🔁 Importing pull requests for '${project.projectKey}' project`);
+                console.group();
+                console.log(`🔁 Importing pull requests for '${project.projectKey}' project`);
 
                 for (const repositoryName of await project.repositoriesSelector(this.bitbucketAPI)) {
-                    console.log(`\t\t🔁 Importing pull requests for '${repositoryName}' repository`);
+                    console.group();
+                    console.log(`🔁 Importing pull requests for '${repositoryName}' repository`);
 
-                    const timelogLabel = `\t\t✅ '${repositoryName}' pull requests import completed`;
+                    const timelogLabel = `✅ '${repositoryName}' pull requests import completed`;
                     console.time(timelogLabel);
                     await this.importRepositoryPullRequests(team, project, repositoryName);
                     console.timeEnd(timelogLabel);
+
+                    console.groupEnd();
                 }
+                console.groupEnd();
             }
         }
+        console.groupEnd();
     }
 
 
@@ -43,6 +50,7 @@ export class PullRequestsImporter {
      * However, if you encounter any problems, consider implementing a reverse import. Start with the most recent pull requests and process them in smaller chunks.
      */
     private async importRepositoryPullRequests(team: TeamImportSettings, project: TeamProjectSettings, repositoryName: string) {
+        console.group();
         const limit = 1000;
         const lastMergeDateOfStoredPRs: Date | null = await this.getPRsCountAndLastMergeDate(team, project, repositoryName);
         for (let start = 0; ; start += limit) {
@@ -50,12 +58,14 @@ export class PullRequestsImporter {
 
             for (const bitbucketPullRequest of pullRequestsResponse.values.filter((pr: any) => lastMergeDateOfStoredPRs == null || new Date(pr.closedDate) > lastMergeDateOfStoredPRs)) {
                 await this.savePullRequest(team, project, repositoryName, bitbucketPullRequest);
+                console.count("🤞 Pull requests processed");
             }
 
             if (pullRequestsResponse.isLastPage) {
                 break;
             }
         }
+        console.groupEnd();
     }
 
     private async savePullRequest(team: TeamImportSettings, project: TeamProjectSettings, repositoryName: string, pullRequest: any) {

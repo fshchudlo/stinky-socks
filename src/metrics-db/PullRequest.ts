@@ -1,7 +1,16 @@
 import { Column, Entity, OneToMany, PrimaryColumn } from "typeorm";
 import { PullRequestParticipant } from "./PullRequestParticipant";
-import { Utils } from "./Utils";
-import { BitbucketPullRequestImportModel } from "../typings";
+import { BitbucketHelpers } from "./BitbucketHelpers";
+
+export type BitbucketPullRequestImportModel = {
+    teamName: string;
+    botUsers: string[],
+    formerEmployees: string[],
+    pullRequest: any,
+    pullRequestActivities: any[],
+    commits: any[],
+    diff: any
+}
 
 @Entity()
 export class PullRequest {
@@ -94,7 +103,7 @@ export class PullRequest {
         this.projectKey = model.pullRequest.toRef.repository.project.key;
         this.repositoryName = model.pullRequest.toRef.repository.slug;
         this.pullRequestNumber = model.pullRequest.id;
-        this.author = Utils.normalizeUserName(model.pullRequest.author.user.name);
+        this.author = BitbucketHelpers.normalizeUserName(model.pullRequest.author.user.name);
         this.viewURL = model.pullRequest.links.self[0].href;
         this.authorIsBotUser = model.botUsers.includes(this.author);
         this.authorIsFormerEmployee = model.formerEmployees.includes(this.author);
@@ -116,7 +125,7 @@ export class PullRequest {
     private calculateApprovalAndReviewStats(model: BitbucketPullRequestImportModel): PullRequest {
         this.reviewersCount = model.pullRequest.reviewers.length;
         this.participantsCount = model.pullRequest.participants.length;
-        this.approvalsCount = Utils.Bitbucket.getApprovers(model.pullRequestActivities, model.botUsers).size;
+        this.approvalsCount = BitbucketHelpers.getApprovers(model.pullRequestActivities, model.botUsers).size;
         return this;
     }
 
@@ -127,13 +136,13 @@ export class PullRequest {
     }
 
     private calculateCommitStats(model: BitbucketPullRequestImportModel): PullRequest {
-        this.commentsCount = Utils.Bitbucket.getHumanActivities(model.pullRequestActivities, model.botUsers, "COMMENTED").length;
+        this.commentsCount = BitbucketHelpers.getHumanActivities(model.pullRequestActivities, model.botUsers, "COMMENTED").length;
         this.commitsAfterFirstApprovalCount = model.commits.filter(
             (c) => new Date(c.committerTimestamp) > this.openedDate
         ).length;
-        this.rebasesCount = Utils.Bitbucket.getRebases(model.pullRequestActivities).length;
-        this.diffSize = Utils.Bitbucket.getDiffSize(model.diff);
-        this.testsWereTouched = Utils.Bitbucket.testsWereTouched(model.diff);
+        this.rebasesCount = BitbucketHelpers.getRebases(model.pullRequestActivities).length;
+        this.diffSize = BitbucketHelpers.getDiffSize(model.diff);
+        this.testsWereTouched = BitbucketHelpers.testsWereTouched(model.diff);
         return this;
     }
 
@@ -156,15 +165,15 @@ export class PullRequest {
 
     private buildParticipants(model: BitbucketPullRequestImportModel): PullRequest {
         const allParticipants = new Set<string>([
-            ...model.pullRequest.reviewers.map((r: any) => Utils.normalizeUserName(r.user.name)),
-            ...model.pullRequest.participants.map((p: any) => Utils.normalizeUserName(p.user.name))
+            ...model.pullRequest.reviewers.map((r: any) => BitbucketHelpers.normalizeUserName(r.user.name)),
+            ...model.pullRequest.participants.map((p: any) => BitbucketHelpers.normalizeUserName(p.user.name))
         ]);
 
         this.participants = Array.from(allParticipants).map((participantName) =>
             PullRequestParticipant.fromBitbucket(
                 participantName,
                 model.pullRequest,
-                Utils.Bitbucket.getActivitiesOf(model.pullRequestActivities, participantName),
+                BitbucketHelpers.getActivitiesOf(model.pullRequestActivities, participantName),
                 model.botUsers,
                 model.formerEmployees
             )

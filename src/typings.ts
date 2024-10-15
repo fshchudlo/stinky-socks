@@ -10,13 +10,3 @@ export type TeamProjectSettings = {
     repositoriesSelector: (api: BitbucketAPI) => Promise<string[]>;
     botUserNames: string[];
 }
-
-export type BitbucketPullRequestImportModel = {
-    teamName: string;
-    botUsers: string[],
-    formerEmployees: string[],
-    pullRequest: any,
-    pullRequestActivities: any[],
-    commits: any[],
-    diff: any
-}
