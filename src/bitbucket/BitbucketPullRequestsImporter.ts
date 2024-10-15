@@ -83,15 +83,6 @@ export class BitbucketPullRequestsImporter {
             this.bitbucketAPI.getPullRequestDiff(project.projectKey, repositoryName, pullRequest.id)
         ]);
 
-        /* I'm not sure why, but I've encountered pull requests (PRs) without any commits.
-        * It could have been due to invalid imports or some other issue.
-        * Regardless, this is such a rare case that it can be safely ignored without compromising data integrity.
-        */
-        if (commits.length == 0) {
-            console.warn(`No commits found for PR ${pullRequest.id}`);
-            return;
-        }
-
         const pullRequestEntity = new BitbucketPullRequest({
                 teamName: this.teamName,
                 botUsers: project.botUserNames,
