@@ -46,22 +46,7 @@ export class PullRequest {
     protected reviewersCount: number;
 
     @Column()
-    protected approvalsCount: number;
-
-    @Column()
-    protected participantsCount: number;
-
-    @Column()
-    protected resolvedTasksCount: number;
-
-    @Column()
-    protected openTasksCount: number;
-
-    @Column()
     protected commentsCount: number;
-
-    @Column()
-    protected commitsAfterFirstApprovalCount: number;
 
     @Column()
     protected rebasesCount: number;

@@ -1,6 +1,7 @@
-import { BitbucketHelpers } from "./BitbucketHelpers";
+import { Utils } from "./Utils";
 import { PullRequest } from "../../metrics-db/PullRequest";
 import { BitbucketPullRequestParticipant } from "./BitbucketPullRequestParticipant";
+import { BitbucketDiffModel, BitbucketPullRequestActivityModel } from "../api/BitbucketAPI";
 
 export type BitbucketPullRequestImportModel = {
     teamName: string;
@@ -18,9 +19,8 @@ export class BitbucketPullRequest extends PullRequest {
         this.initializeBaseProperties(model)
             .initializeDates(model)
             .calculateApprovalAndReviewStats(model)
-            .calculateTaskStats(model)
             .calculateCommitStats(model)
-            .buildParticipants(model);
+            .initializeParticipants(model);
     }
 
     private initializeBaseProperties(model: BitbucketPullRequestImportModel): BitbucketPullRequest {
@@ -28,7 +28,7 @@ export class BitbucketPullRequest extends PullRequest {
         this.projectKey = model.pullRequest.toRef.repository.project.key;
         this.repositoryName = model.pullRequest.toRef.repository.slug;
         this.pullRequestNumber = model.pullRequest.id;
-        this.author = BitbucketHelpers.normalizeUserName(model.pullRequest.author.user.name);
+        this.author = Utils.normalizeUserName(model.pullRequest.author.user.name);
         this.viewURL = model.pullRequest.links.self[0].href;
         this.authorIsBotUser = model.botUsers.includes(this.author);
         this.authorIsFormerEmployee = model.formerEmployees.includes(this.author);
@@ -49,39 +49,28 @@ export class BitbucketPullRequest extends PullRequest {
 
     private calculateApprovalAndReviewStats(model: BitbucketPullRequestImportModel): BitbucketPullRequest {
         this.reviewersCount = model.pullRequest.reviewers.length;
-        this.participantsCount = model.pullRequest.participants.length;
-        this.approvalsCount = BitbucketHelpers.getApprovers(model.pullRequestActivities, model.botUsers).size;
-        return this;
-    }
-
-    private calculateTaskStats(model: BitbucketPullRequestImportModel): BitbucketPullRequest {
-        this.resolvedTasksCount = model.pullRequest.properties?.resolvedTaskCount || 0;
-        this.openTasksCount = model.pullRequest.properties?.openTaskCount || 0;
         return this;
     }
 
     private calculateCommitStats(model: BitbucketPullRequestImportModel): BitbucketPullRequest {
-        this.commentsCount = BitbucketHelpers.getHumanActivities(model.pullRequestActivities, model.botUsers, "COMMENTED").length;
-        this.commitsAfterFirstApprovalCount = model.commits.filter(
-            (c) => new Date(c.committerTimestamp) > this.openedDate
-        ).length;
-        this.rebasesCount = BitbucketHelpers.getRebases(model.pullRequestActivities).length;
-        this.diffSize = BitbucketHelpers.getDiffSize(model.diff);
-        this.testsWereTouched = BitbucketHelpers.testsWereTouched(model.diff);
+        this.commentsCount = Utils.getHumanActivities(model.pullRequestActivities, model.botUsers, "COMMENTED").length;
+        this.rebasesCount = BitbucketPullRequest.getRebases(model.pullRequestActivities).length;
+        this.diffSize = BitbucketPullRequest.getDiffSize(model.diff);
+        this.testsWereTouched = BitbucketPullRequest.testsWereTouched(model.diff);
         return this;
     }
 
-    private buildParticipants(model: BitbucketPullRequestImportModel): BitbucketPullRequest {
+    private initializeParticipants(model: BitbucketPullRequestImportModel): BitbucketPullRequest {
         const allParticipants = new Set<string>([
-            ...model.pullRequest.reviewers.map((r: any) => BitbucketHelpers.normalizeUserName(r.user.name)),
-            ...model.pullRequest.participants.map((p: any) => BitbucketHelpers.normalizeUserName(p.user.name))
+            ...model.pullRequest.reviewers.map((r: any) => Utils.normalizeUserName(r.user.name)),
+            ...model.pullRequest.participants.map((p: any) => Utils.normalizeUserName(p.user.name))
         ]);
 
         this.participants = Array.from(allParticipants).map((participantName) =>
             new BitbucketPullRequestParticipant(
                 participantName,
                 model.pullRequest,
-                BitbucketHelpers.getActivitiesOf(model.pullRequestActivities, participantName),
+                BitbucketPullRequest.getActivitiesOf(model.pullRequestActivities, participantName),
                 model.botUsers,
                 model.formerEmployees
             )
@@ -104,5 +93,31 @@ export class BitbucketPullRequest extends PullRequest {
             }
         }
         return new Date(model.pullRequest.createdDate);
+    }
+    private static getActivitiesOf(activities: BitbucketPullRequestActivityModel[], userName: string): any[] {
+        return activities.filter(a => Utils.normalizeUserName(a.user.name) === Utils.normalizeUserName(userName));
+    }
+
+
+    private static getRebases(activities: BitbucketPullRequestActivityModel[]): any[] {
+        return activities.filter(a => a.action === "RESCOPED" && a.fromHash !== a.previousFromHash);
+    }
+
+    private static getDiffSize(diffData: BitbucketDiffModel): number {
+        let linesChanged = 0;
+        diffData.diffs.forEach((d: any) => {
+            if (!d.hunks) return;
+            d.hunks.forEach((hunk: any) => {
+                hunk.segments.forEach((segment: any) => {
+                    if (segment.type === "ADDED" || segment.type === "DELETED") {
+                        linesChanged += segment.lines.length;
+                    }
+                });
+            });
+        });
+        return linesChanged;
+    }
+    private static testsWereTouched(prDiff: any): boolean {
+        return prDiff.diffs.some((diff: any) => diff.destination?.toString.includes("test"));
     }
 }

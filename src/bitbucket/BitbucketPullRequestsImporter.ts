@@ -56,7 +56,7 @@ export class BitbucketPullRequestsImporter {
     private async importRepositoryPullRequests(project: BitbucketProjectSettings, repositoryName: string) {
         console.group();
         const limit = 1000;
-        const lastMergeDateOfStoredPRs: Date | null = await this.getPRsCountAndLastMergeDate(project, repositoryName);
+        const lastMergeDateOfStoredPRs: Date | null = await this.getPRsCountAndLastMergeDate(project.projectKey, repositoryName);
         for (let start = 0; ; start += limit) {
             const pullRequestsResponse = await this.bitbucketAPI.getMergedPullRequests(project.projectKey, repositoryName, start, limit);
 
@@ -96,12 +96,12 @@ export class BitbucketPullRequestsImporter {
         await this.repository.save(pullRequestEntity);
     }
 
-    private async getPRsCountAndLastMergeDate(project: BitbucketProjectSettings, repositorySlug: string) {
+    private async getPRsCountAndLastMergeDate(projectKey: string, repositorySlug: string) {
         return (await this.repository
             .createQueryBuilder("pr")
             .select("MAX(pr.mergedDate)", "maxMergeDate")
             .where("pr.teamName = :teamName", { teamName: this.teamName })
-            .andWhere("pr.projectKey = :projectKey", { projectKey: project.projectKey })
+            .andWhere("pr.projectKey = :projectKey", { projectKey: projectKey })
             .andWhere("pr.repositoryName = :repositoryName", { repositoryName: repositorySlug })
             .getRawOne())?.maxMergeDate || null;
     }

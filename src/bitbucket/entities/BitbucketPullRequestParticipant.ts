@@ -1,5 +1,5 @@
 import { PullRequestParticipant } from "../../metrics-db/PullRequestParticipant";
-import { BitbucketHelpers } from "./BitbucketHelpers";
+import { Utils } from "./Utils";
 
 export class BitbucketPullRequestParticipant extends PullRequestParticipant {
     constructor(participantName: string, pullRequestData: any, participantActivities: any[], botUsers: string[], formerEmployees: string[]) {
@@ -24,7 +24,7 @@ export class BitbucketPullRequestParticipant extends PullRequestParticipant {
     }
 
     private setCommentStats(participantActivities: any[], botUsers: string[]): BitbucketPullRequestParticipant {
-        const comments = BitbucketHelpers.getHumanActivities(participantActivities, botUsers, "COMMENTED");
+        const comments = Utils.getHumanActivities(participantActivities, botUsers, "COMMENTED");
 
         const commentTimestamps = comments.map((c: any) => c.createdDate as number);
         this.firstCommentDate = commentTimestamps.length ? new Date(Math.min(...commentTimestamps)) : null as any;
@@ -34,7 +34,7 @@ export class BitbucketPullRequestParticipant extends PullRequestParticipant {
     }
 
     private setApprovalStats(participantActivities: any[], botUsers: string[]): BitbucketPullRequestParticipant {
-        const approvals = BitbucketHelpers.getHumanActivities(participantActivities, botUsers, "APPROVED");
+        const approvals = Utils.getHumanActivities(participantActivities, botUsers, "APPROVED");
 
         const approvalTimestamps = approvals.map((a: any) => a.createdDate);
         this.firstApprovalDate = approvalTimestamps.length ? new Date(Math.min(...approvalTimestamps)) : null as any;
