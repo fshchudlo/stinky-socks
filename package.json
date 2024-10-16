@@ -23,7 +23,6 @@
   "author": "Fedor Shchudlo",
   "license": "Apache 2.0",
   "dependencies": {
-    "@octokit/rest": "^21.0.2",
     "axios": "^1.7.7",
     "dotenv": "^16.4.5",
     "pg": "^8.13.0",

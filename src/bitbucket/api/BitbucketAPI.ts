@@ -49,7 +49,7 @@ export class BitbucketAPI {
         return result;
     }
 
-    async getProjectRepositories(projectKey: string): Promise<any[]> {
+    async fetchAllRepositories(projectKey: string): Promise<any[]> {
         const url = `${this.baseUrl}/projects/${projectKey}/repos/`;
         return await this.getList(url);
     }

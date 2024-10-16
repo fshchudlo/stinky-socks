@@ -3,6 +3,9 @@ import "reflect-metadata";
 
 export const AppConfig = {
     IS_PRODUCTION: process.env.NODE_ENV === "production",
+    Github: {
+        API_TOKEN: process.env.GITHUB_API_TOKEN as string,
+    },
     Bitbucket: {
         API_URL: process.env.BITBUCKET_API_URL as string,
         API_TOKEN: process.env.BITBUCKET_API_TOKEN as string,

@@ -2,7 +2,7 @@ import { Entity, Column, ManyToOne, JoinColumn, PrimaryGeneratedColumn } from "t
 import { PullRequest } from "./PullRequest";
 
 @Entity()
-export class PullRequestParticipant {
+export abstract class PullRequestParticipant {
     @PrimaryGeneratedColumn()
     protected id: number;
 

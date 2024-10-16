@@ -2,7 +2,7 @@ import { Column, Entity, OneToMany, PrimaryColumn } from "typeorm";
 import { PullRequestParticipant } from "./PullRequestParticipant";
 
 @Entity()
-export class PullRequest {
+export abstract class PullRequest {
     @PrimaryColumn()
     protected projectKey: string;
 
