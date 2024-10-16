@@ -18,7 +18,6 @@ export class BitbucketPullRequest extends PullRequest {
         super();
         this.initializeBaseProperties(model)
             .initializeDates(model)
-            .calculateApprovalAndReviewStats(model)
             .calculateCommitStats(model)
             .initializeParticipants(model);
     }
@@ -33,22 +32,18 @@ export class BitbucketPullRequest extends PullRequest {
         this.authorIsBotUser = model.botUsers.includes(this.author);
         this.authorIsFormerEmployee = model.formerEmployees.includes(this.author);
         this.targetBranch = model.pullRequest.toRef.displayId;
+        this.reviewersCount = model.pullRequest.reviewers.length;
         return this;
     }
 
     private initializeDates(model: BitbucketPullRequestImportModel): BitbucketPullRequest {
-
         this.openedDate = this.calculatePrOpenDate(model);
         this.mergedDate = new Date(model.pullRequest.closedDate);
 
         const commitTimestamps = model.commits.map((c) => c.authorTimestamp as number);
         this.initialCommitDate = new Date(Math.min(...commitTimestamps));
         this.lastCommitDate = new Date(Math.max(...commitTimestamps));
-        return this;
-    }
 
-    private calculateApprovalAndReviewStats(model: BitbucketPullRequestImportModel): BitbucketPullRequest {
-        this.reviewersCount = model.pullRequest.reviewers.length;
         return this;
     }
 
@@ -98,7 +93,6 @@ export class BitbucketPullRequest extends PullRequest {
         return activities.filter(a => Utils.normalizeUserName(a.user.name) === Utils.normalizeUserName(userName));
     }
 
-
     private static getRebases(activities: BitbucketPullRequestActivityModel[]): any[] {
         return activities.filter(a => a.action === "RESCOPED" && a.fromHash !== a.previousFromHash);
     }
@@ -117,6 +111,7 @@ export class BitbucketPullRequest extends PullRequest {
         });
         return linesChanged;
     }
+
     private static testsWereTouched(prDiff: any): boolean {
         return prDiff.diffs.some((diff: any) => diff.destination?.toString.includes("test"));
     }
