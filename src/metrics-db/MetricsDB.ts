@@ -1,7 +1,7 @@
 import { DataSource } from "typeorm";
-import { AppConfig } from "./app.config";
-import { PullRequest } from "./metrics-db/PullRequest";
-import { PullRequestParticipant } from "./metrics-db/PullRequestParticipant";
+import { AppConfig } from "../app.config";
+import { PullRequest } from "./PullRequest";
+import { PullRequestParticipant } from "./PullRequestParticipant";
 import { SnakeNamingStrategy } from "typeorm-naming-strategies";
 
 export const MetricsDB = new DataSource({

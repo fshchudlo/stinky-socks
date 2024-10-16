@@ -1,4 +1,4 @@
-import { MetricsDB } from "./metricsDB";
+import { MetricsDB } from "./metrics-db/MetricsDB";
 import { BitbucketAPI } from "./bitbucket/api/BitbucketAPI";
 import { AppConfig } from "./app.config";
 import { BitbucketPullRequestsImporter } from "./bitbucket/BitbucketPullRequestsImporter";

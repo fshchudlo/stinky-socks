@@ -1,6 +1,6 @@
 import { BitbucketAPI } from "./api/BitbucketAPI";
 import { BitbucketPullRequest } from "./entities/BitbucketPullRequest";
-import { MetricsDB } from "../metricsDB";
+import { MetricsDB } from "../metrics-db/MetricsDB";
 import { Repository } from "typeorm";
 import { PullRequest } from "../metrics-db/PullRequest";
 
