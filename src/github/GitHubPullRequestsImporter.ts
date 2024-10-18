@@ -51,6 +51,13 @@ export class GitHubPullRequestsImporter {
 
             for (const pullRequest of pullRequestsChunk.filter((pr: any) => !!pr.merged_at)
                 .filter((pr: any) => lastMergeDateOfStoredPRs == null || new Date(pr.merged_at) > lastMergeDateOfStoredPRs)) {
+                console.count(`📥 ${repositoryName}: pull requests processed`);
+                if (!pullRequest.merged_at) {
+                    continue;
+                }
+                if (lastMergeDateOfStoredPRs != null && new Date(pullRequest.merged_at) <= lastMergeDateOfStoredPRs) {
+                    continue;
+                }
 
                 if (this.project.pullRequestsFilterFn(pullRequest)) {
                     await this.savePullRequest(this.project, repositoryName, pullRequest);
@@ -60,6 +67,7 @@ export class GitHubPullRequestsImporter {
             }
 
             if (pullRequestsChunk.length < pageSize) {
+                console.countReset(`📥 ${repositoryName}: pull requests processed`);
                 break;
             }
             pageNumber++;

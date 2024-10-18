@@ -7,6 +7,7 @@ export type BitbucketPagedResponse<T> = {
     "start": number;
     "values": T[];
 }
+
 export class BitbucketAPI {
     private readonly baseUrl: string;
     private readonly token: string;
@@ -80,12 +81,11 @@ export class BitbucketAPI {
         return await this.get(url);
     }
 }
+
 export type BitbucketPullRequestModel = {
     id: number;
     author: {
-        user: {
-            name: string;
-        };
+        user: BitbucketUserModel;
     };
     toRef: {
         repository: {
@@ -102,14 +102,10 @@ export type BitbucketPullRequestModel = {
         }[];
     };
     reviewers: {
-        user: {
-            name: string;
-        };
+        user: BitbucketUserModel;
     }[];
     participants: {
-        user: {
-            name: string;
-        };
+        user: BitbucketUserModel;
     }[];
     properties?: {
         resolvedTaskCount?: number;
@@ -120,12 +116,8 @@ export type BitbucketPullRequestModel = {
 }
 export type BitbucketPullRequestActivityModel = {
     createdDate: number;
-    addedReviewers?: {
-        name: string;
-    }[];
-    user: {
-        name: string;
-    };
+    addedReviewers?: BitbucketUserModel[];
+    user: BitbucketUserModel;
     action?: string;
     fromHash?: string;
     previousFromHash?: string;
@@ -145,4 +137,7 @@ export type BitbucketDiffModel = {
             }[];
         }[];
     }[];
+};
+export type BitbucketUserModel = {
+    slug: string;
 };

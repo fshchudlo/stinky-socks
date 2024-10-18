@@ -6,8 +6,8 @@ import { PullRequest } from "../metrics-db/PullRequest";
 
 export type BitbucketProjectSettings = {
     projectKey: string;
-    botUserNames: string[];
-    formerEmployeeNames: string[];
+    botUserSlugs: string[];
+    formerEmployeeSlugs: string[];
     repositoriesSelector: (api: BitbucketAPI) => Promise<string[]>;
     pullRequestsFilterFn: (pr: any) => boolean,
     auth: {
@@ -58,7 +58,12 @@ export class BitbucketPullRequestsImporter {
         for (let start = 0; ; start += limit) {
             const pullRequestsChunk = await this.bitbucketAPI.getMergedPullRequests(this.project.projectKey, repositoryName, start, limit);
 
-            for (const pullRequest of pullRequestsChunk.values.filter((pr: any) => lastMergeDateOfStoredPRs == null || new Date(pr.closedDate) > lastMergeDateOfStoredPRs)) {
+            for (const pullRequest of pullRequestsChunk.values) {
+                console.count(`📥 ${repositoryName}: pull requests processed`);
+                if (lastMergeDateOfStoredPRs != null && new Date(pullRequest.closedDate) <= lastMergeDateOfStoredPRs) {
+                    continue;
+                }
+
                 if (this.project.pullRequestsFilterFn(pullRequest)) {
                     await this.savePullRequest(this.project, repositoryName, pullRequest);
                 } else {
@@ -67,6 +72,7 @@ export class BitbucketPullRequestsImporter {
             }
 
             if (pullRequestsChunk.isLastPage) {
+                console.countReset(`📥 ${repositoryName}: pull requests processed`);
                 break;
             }
         }
@@ -82,8 +88,8 @@ export class BitbucketPullRequestsImporter {
 
         const pullRequestEntity = new BitbucketPullRequest({
                 teamName: this.teamName,
-                botUsers: project.botUserNames,
-                formerEmployees: project.formerEmployeeNames,
+                botUserSlugs: project.botUserSlugs,
+                formerEmployeeSlugs: project.formerEmployeeSlugs,
                 pullRequest,
                 pullRequestActivities: activities,
                 commits,

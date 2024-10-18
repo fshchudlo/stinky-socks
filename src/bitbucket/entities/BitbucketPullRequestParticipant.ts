@@ -2,12 +2,12 @@ import { PullRequestParticipant } from "../../metrics-db/PullRequestParticipant"
 import { Utils } from "./Utils";
 
 export class BitbucketPullRequestParticipant extends PullRequestParticipant {
-    constructor(participantName: string, pullRequestData: any, participantActivities: any[], botUsers: string[], formerEmployees: string[]) {
+    constructor(participantName: string, pullRequestData: any, participantActivities: any[], botUserSlugs: string[], formerEmployeeSlugs: string[]) {
         super();
         this.initializeBaseProperties(participantName, pullRequestData)
-            .setUserStatus(botUsers, formerEmployees)
-            .setCommentStats(participantActivities, botUsers)
-            .setApprovalStats(participantActivities, botUsers);
+            .setUserStatus(botUserSlugs, formerEmployeeSlugs)
+            .setCommentStats(participantActivities, botUserSlugs)
+            .setApprovalStats(participantActivities, botUserSlugs);
     }
     private initializeBaseProperties(participantName: string, pullRequestData: any): BitbucketPullRequestParticipant {
         this.projectKey = pullRequestData.toRef.repository.project.key;
@@ -17,14 +17,14 @@ export class BitbucketPullRequestParticipant extends PullRequestParticipant {
         return this;
     }
 
-    private setUserStatus(botUsers: string[], formerEmployees: string[]): BitbucketPullRequestParticipant {
-        this.isBotUser = botUsers.includes(this.participantName);
-        this.isFormerEmployee = formerEmployees.includes(this.participantName);
+    private setUserStatus(botUserSlugs: string[], formerEmployeeSlugs: string[]): BitbucketPullRequestParticipant {
+        this.isBotUser = botUserSlugs.includes(this.participantName);
+        this.isFormerEmployee = formerEmployeeSlugs.includes(this.participantName);
         return this;
     }
 
-    private setCommentStats(participantActivities: any[], botUsers: string[]): BitbucketPullRequestParticipant {
-        const comments = Utils.getHumanActivities(participantActivities, botUsers, "COMMENTED");
+    private setCommentStats(participantActivities: any[], botUserSlugs: string[]): BitbucketPullRequestParticipant {
+        const comments = Utils.getHumanActivities(participantActivities, botUserSlugs, "COMMENTED");
 
         const commentTimestamps = comments.map((c: any) => c.createdDate as number);
         this.firstCommentDate = commentTimestamps.length ? new Date(Math.min(...commentTimestamps)) : null as any;
@@ -33,8 +33,8 @@ export class BitbucketPullRequestParticipant extends PullRequestParticipant {
         return this;
     }
 
-    private setApprovalStats(participantActivities: any[], botUsers: string[]): BitbucketPullRequestParticipant {
-        const approvals = Utils.getHumanActivities(participantActivities, botUsers, "APPROVED");
+    private setApprovalStats(participantActivities: any[], botUserSlugs: string[]): BitbucketPullRequestParticipant {
+        const approvals = Utils.getHumanActivities(participantActivities, botUserSlugs, "APPROVED");
 
         const approvalTimestamps = approvals.map((a: any) => a.createdDate);
         this.firstApprovalDate = approvalTimestamps.length ? new Date(Math.min(...approvalTimestamps)) : null as any;
