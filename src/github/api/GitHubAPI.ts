@@ -59,4 +59,13 @@ export class GitHubAPI {
             per_page
         });
     }
+    async getPullRequestActivities(owner: string, repo: string, pullRequestId: number): Promise<any[]> {
+        const url = `${this.baseUrl}/repos/${owner}/${repo}/issues/${pullRequestId}/timeline`
+        return await this.getFullList(url);
+    }
+
+    async getPullRequestFiles(owner: string, repo: string, pullRequestId: number) {
+        const url = `${this.baseUrl}/repos/${owner}/${repo}/pulls/${pullRequestId}/files`
+        return await this.getFullList(url);
+    }
 }

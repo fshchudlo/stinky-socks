@@ -2,6 +2,7 @@ import { GitHubAPI } from "./api/GitHubAPI";
 import { Repository } from "typeorm";
 import { PullRequest } from "../metrics-db/PullRequest";
 import { MetricsDB } from "../metrics-db/MetricsDB";
+import { GithubPullRequest } from "./entities/GithubPullRequest";
 
 export type GithubProjectSettings = {
     projectKey: string;
@@ -49,8 +50,7 @@ export class GitHubPullRequestsImporter {
         while (true) {
             const pullRequestsChunk = await this.gitHubAPI.getClosedPullRequests(this.project.projectKey, repositoryName, pageNumber, pageSize);
 
-            for (const pullRequest of pullRequestsChunk.filter((pr: any) => !!pr.merged_at)
-                .filter((pr: any) => lastMergeDateOfStoredPRs == null || new Date(pr.merged_at) > lastMergeDateOfStoredPRs)) {
+            for (const pullRequest of pullRequestsChunk) {
                 console.count(`📥 ${repositoryName}: pull requests processed`);
                 if (!pullRequest.merged_at) {
                     continue;
@@ -76,6 +76,19 @@ export class GitHubPullRequestsImporter {
     }
 
     private async savePullRequest(project: GithubProjectSettings, repositoryName: string, pullRequest: any) {
-        console.error(`Method not implemented. ${project}, ${repositoryName}, ${pullRequest}`);
+        const [activities, files] = await Promise.all([
+            this.gitHubAPI.getPullRequestActivities(project.projectKey, repositoryName, pullRequest.number),
+            this.gitHubAPI.getPullRequestFiles(project.projectKey, repositoryName, pullRequest.number)
+        ]);
+        const pullRequestEntity = new GithubPullRequest({
+                teamName: this.teamName,
+                botUserNames: project.botUserNames,
+                formerEmployeeNames: project.formerEmployeeNames,
+                pullRequest,
+                pullRequestActivities: activities,
+                files
+            }
+        );
+        await this.repository.save(pullRequestEntity);
     }
 }
