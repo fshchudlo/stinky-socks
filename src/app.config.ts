@@ -3,9 +3,6 @@ import "reflect-metadata";
 
 export const AppConfig = {
     IS_PRODUCTION: process.env.NODE_ENV === "production",
-    Github: {
-        API_TOKEN: process.env.GITHUB_API_TOKEN as string,
-    },
     MetricsDB: {
         DB_HOST: process.env.DB_HOST,
         DB_PORT: +(process.env.DB_PORT ?? 5432),

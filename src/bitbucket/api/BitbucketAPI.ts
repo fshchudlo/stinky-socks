@@ -30,7 +30,7 @@ export class BitbucketAPI {
         throw new Error(`Error executing request for ${url} message: ${response.statusText}`);
     }
 
-    private async getList(url: string, params: any = undefined): Promise<any[]> {
+    private async getFullList(url: string, params: any = undefined): Promise<any[]> {
         const requestParams = {
             start: params?.start ?? 0,
             limit: params?.limit ?? 100,
@@ -51,7 +51,7 @@ export class BitbucketAPI {
 
     async fetchAllRepositories(projectKey: string): Promise<any[]> {
         const url = `${this.baseUrl}/projects/${projectKey}/repos/`;
-        return await this.getList(url);
+        return await this.getFullList(url);
     }
 
     async getMergedPullRequests(projectKey: string, repositorySlug: string, start: number, limit: number): Promise<BitbucketPagedResponse<BitbucketPullRequestModel>> {
@@ -67,12 +67,12 @@ export class BitbucketAPI {
 
     async getPullRequestActivities(projectKey: string, repositorySlug: string, pullRequestId: number): Promise<BitbucketPullRequestActivityModel[]> {
         const url = `${this.baseUrl}/projects/${projectKey}/repos/${repositorySlug}/pull-requests/${pullRequestId}/activities`;
-        return await this.getList(url);
+        return await this.getFullList(url);
     }
 
     async getPullRequestCommits(projectKey: string, repositorySlug: string, pullRequestId: number): Promise<BitbucketCommitModel[]> {
         const url = `${this.baseUrl}/projects/${projectKey}/repos/${repositorySlug}/pull-requests/${pullRequestId}/commits`;
-        return await this.getList(url);
+        return await this.getFullList(url);
     }
 
     async getPullRequestDiff(projectKey: string, repositorySlug: string, pullRequestId: number): Promise<BitbucketDiffModel> {

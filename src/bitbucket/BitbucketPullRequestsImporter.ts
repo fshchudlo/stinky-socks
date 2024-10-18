@@ -54,20 +54,19 @@ export class BitbucketPullRequestsImporter {
     private async importRepositoryPullRequests(repositoryName: string) {
         console.group();
         const limit = 1000;
-        const lastMergeDateOfStoredPRs: Date | null = await this.getPRsCountAndLastMergeDate(this.project.projectKey, repositoryName);
+        const lastMergeDateOfStoredPRs: Date | null = await MetricsDB.getPRsCountAndLastMergeDate(this.teamName, this.project.projectKey, repositoryName);
         for (let start = 0; ; start += limit) {
-            const pullRequestsResponse = await this.bitbucketAPI.getMergedPullRequests(this.project.projectKey, repositoryName, start, limit);
+            const pullRequestsChunk = await this.bitbucketAPI.getMergedPullRequests(this.project.projectKey, repositoryName, start, limit);
 
-            for (const bitbucketPullRequest of pullRequestsResponse.values.filter((pr: any) => lastMergeDateOfStoredPRs == null || new Date(pr.closedDate) > lastMergeDateOfStoredPRs)) {
-                if (this.project.pullRequestsFilterFn(bitbucketPullRequest)) {
-                    await this.savePullRequest(this.project, repositoryName, bitbucketPullRequest);
-                    console.count("🤞 Pull requests processed");
+            for (const pullRequest of pullRequestsChunk.values.filter((pr: any) => lastMergeDateOfStoredPRs == null || new Date(pr.closedDate) > lastMergeDateOfStoredPRs)) {
+                if (this.project.pullRequestsFilterFn(pullRequest)) {
+                    await this.savePullRequest(this.project, repositoryName, pullRequest);
                 } else {
-                    console.warn(`⚠️ Pull request ${bitbucketPullRequest.id} was filtered out by specified pullRequestsFilterFn function`);
+                    console.warn(`⚠️ Pull request ${pullRequest.id} was filtered out by specified pullRequestsFilterFn function`);
                 }
             }
 
-            if (pullRequestsResponse.isLastPage) {
+            if (pullRequestsChunk.isLastPage) {
                 break;
             }
         }
@@ -92,15 +91,5 @@ export class BitbucketPullRequestsImporter {
             }
         );
         await this.repository.save(pullRequestEntity);
-    }
-
-    private async getPRsCountAndLastMergeDate(projectKey: string, repositorySlug: string) {
-        return (await this.repository
-            .createQueryBuilder("pr")
-            .select("MAX(pr.mergedDate)", "maxMergeDate")
-            .where("pr.teamName = :teamName", { teamName: this.teamName })
-            .andWhere("pr.projectKey = :projectKey", { projectKey: projectKey })
-            .andWhere("pr.repositoryName = :repositoryName", { repositoryName: repositorySlug })
-            .getRawOne())?.maxMergeDate || null;
     }
 }

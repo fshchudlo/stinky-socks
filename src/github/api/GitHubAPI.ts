@@ -22,22 +22,35 @@ export class GitHubAPI {
         throw new Error(`Error executing request for ${url} message: ${response.statusText}`);
     }
 
-    async fetchAllRepositories(orgName: string): Promise<string[]> {
-        const repositories: any[] = [];
-        let page = 1;
+    private async getFullList(url: string, params: any = undefined): Promise<any[]> {
+        const requestParams = {
+            page: params?.page ?? 1,
+            per_page: params?.per_page ?? 100,
+            ...params
+        };
+
+        const result: any[] = [];
+        let response = await this.get(url, requestParams);
+        result.push(...response);
 
         while (true) {
-            const response = await this.get(`https://api.github.com/orgs/${orgName}/repos`, {
-                per_page: 100,
-                page: page
-            });
+            response = await this.get(url, requestParams);
 
-            repositories.push(...response.filter((repo: any) => !repo.archived && !repo.archived));
+            result.push(...response);
 
             if (response.length < 100)
                 break;
-            page++;
+            params.page++;
         }
-        return repositories;
+        return result;
+    }
+
+    async fetchAllRepositories(orgName: string): Promise<any[]> {
+        const repositories = await this.getFullList(`https://api.github.com/orgs/${orgName}/repos`);
+        return repositories.filter((repo: any) => !repo.archived && !repo.archived);
+    }
+
+    async getMergedPullRequests(projectKey: string, repositoryName: string, start: number, limit: number): Promise<any[]> {
+        throw new Error(`Method not implemented. ${projectKey}, ${repositoryName}, ${start}, ${limit}`);
     }
 }
