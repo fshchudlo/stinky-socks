@@ -1,5 +1,4 @@
 import "dotenv/config";
-import "reflect-metadata";
 
 export const AppConfig = {
     IS_PRODUCTION: process.env.NODE_ENV === "production",

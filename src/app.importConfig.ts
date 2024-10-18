@@ -1,3 +1,4 @@
+import "dotenv/config";
 import { BitbucketProjectSettings } from "./bitbucket/BitbucketPullRequestsImporter";
 import { GithubProjectSettings } from "./github/GitHubPullRequestsImporter";
 
@@ -36,3 +37,4 @@ export const appImportConfig = {
         }]
     } as TeamImportSettings]
 };
+

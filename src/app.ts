@@ -1,3 +1,5 @@
+import "reflect-metadata";
+
 import { MetricsDB } from "./metrics-db/MetricsDB";
 import { BitbucketAPI } from "./bitbucket/api/BitbucketAPI";
 import { BitbucketPullRequestsImporter } from "./bitbucket/BitbucketPullRequestsImporter";
