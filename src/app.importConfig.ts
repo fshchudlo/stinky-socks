@@ -1,6 +1,7 @@
 import "dotenv/config";
 import { BitbucketProjectSettings } from "./bitbucket/BitbucketPullRequestsImporter";
 import { GithubProjectSettings } from "./github/GitHubPullRequestsImporter";
+import { BitbucketPullRequestModel } from "./bitbucket/api/BitbucketAPI";
 
 export type TeamImportSettings = {
     teamName: string;
@@ -33,8 +34,9 @@ export const appImportConfig = {
             botUserNames: ["bot.user"],
             formerEmployeeNames: ["former.employee"],
             repositoriesSelector: async (api: BitbucketAPI) => (await api.fetchAllRepositories("TEST")).filter(r => !r.slug.startsWith("test")).map((r: any) => r.slug),
-            pullRequestsFilterFn: (pr: any) => pr.openedDate < new Date("2015-01-01")
+            pullRequestsFilterFn: (pr: BitbucketPullRequestModel) => new Date(pr.createdDate) < new Date("2015-01-01")
         }]
     } as TeamImportSettings]
 };
+
 

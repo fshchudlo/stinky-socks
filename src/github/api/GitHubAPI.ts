@@ -2,6 +2,7 @@ import axios, { AxiosRequestConfig } from "axios";
 
 export class GitHubAPI {
     private readonly token: string;
+    private readonly baseUrl = "https://api.github.com";
 
     constructor(token: string) {
         this.token = token;
@@ -38,17 +39,24 @@ export class GitHubAPI {
 
             if (response.length < pageSize)
                 break;
-            params.page++;
+            requestParams.page++;
         }
         return result;
     }
 
-    async fetchAllRepositories(orgName: string): Promise<any[]> {
-        const repositories = await this.getFullList(`https://api.github.com/orgs/${orgName}/repos`);
+    async fetchAllRepositories(owner: string): Promise<any[]> {
+        const repositories = await this.getFullList(`${this.baseUrl}/orgs/${owner}/repos`);
         return repositories.filter((repo: any) => !repo.archived && !repo.disabled);
     }
 
-    async getMergedPullRequests(projectKey: string, repositoryName: string, start: number, limit: number): Promise<any[]> {
-        throw new Error(`Method not implemented. ${projectKey}, ${repositoryName}, ${start}, ${limit}`);
+    async getClosedPullRequests(owner: string, repo: string, page: number, per_page: number): Promise<any[]> {
+        const url = `${this.baseUrl}/repos/${owner}/${repo}/pulls`;
+        return await this.get(url, {
+            state: "closed",
+            sort: "created",
+            direction: "asc",
+            page,
+            per_page
+        });
     }
 }

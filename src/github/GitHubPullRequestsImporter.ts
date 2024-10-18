@@ -47,9 +47,11 @@ export class GitHubPullRequestsImporter {
         let pageNumber = 1;
         const lastMergeDateOfStoredPRs: Date | null = await MetricsDB.getPRsCountAndLastMergeDate(this.teamName, this.project.projectKey, repositoryName);
         while (true) {
-            const pullRequestsChunk = await this.gitHubAPI.getMergedPullRequests(this.project.projectKey, repositoryName, pageNumber, pageSize);
+            const pullRequestsChunk = await this.gitHubAPI.getClosedPullRequests(this.project.projectKey, repositoryName, pageNumber, pageSize);
 
-            for (const pullRequest of pullRequestsChunk.filter((pr: any) => lastMergeDateOfStoredPRs == null || new Date(pr.closedDate) > lastMergeDateOfStoredPRs)) {
+            for (const pullRequest of pullRequestsChunk.filter((pr: any) => !!pr.merged_at)
+                .filter((pr: any) => lastMergeDateOfStoredPRs == null || new Date(pr.merged_at) > lastMergeDateOfStoredPRs)) {
+
                 if (this.project.pullRequestsFilterFn(pullRequest)) {
                     await this.savePullRequest(this.project, repositoryName, pullRequest);
                 } else {
@@ -66,6 +68,6 @@ export class GitHubPullRequestsImporter {
     }
 
     private async savePullRequest(project: GithubProjectSettings, repositoryName: string, pullRequest: any) {
-        throw new Error(`Method not implemented. ${project}, ${repositoryName}, ${pullRequest}`);
+        console.error(`Method not implemented. ${project}, ${repositoryName}, ${pullRequest}`);
     }
 }
