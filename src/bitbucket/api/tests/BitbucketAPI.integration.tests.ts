@@ -1,12 +1,14 @@
 import { BitbucketAPI } from "../BitbucketAPI";
-import { AppConfig } from "../../../app.config";
+import { appImportConfig } from "../../../app.importConfig";
 
 describe("BitbucketAPI 𝑰𝒏𝒕𝒆𝒈𝒓𝒂𝒕𝒊𝒐𝒏 Test", () => {
     it.skip("should fetch pull requests history", async () => {
         const projectKey = "TEST";
         const repositorySlug = "test";
 
-        const sut = new BitbucketAPI(AppConfig.Bitbucket.API_URL, AppConfig.Bitbucket.API_TOKEN);
+        const apiCreds = appImportConfig.teams.flatMap(t => t.bitbucketProjects)[0].auth;
+
+        const sut = new BitbucketAPI(apiCreds.apiUrl, apiCreds.apiToken);
 
         const repositories = await sut.fetchAllRepositories(projectKey);
         expect(repositories).not.toHaveLength(0);

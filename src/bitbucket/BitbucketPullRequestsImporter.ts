@@ -9,38 +9,36 @@ export type BitbucketProjectSettings = {
     botUserNames: string[];
     formerEmployeeNames: string[];
     repositoriesSelector: (api: BitbucketAPI) => Promise<string[]>;
-    pullRequestsFilterFn: (pr: any) => boolean
+    pullRequestsFilterFn: (pr: any) => boolean,
+    auth: {
+        apiUrl: string;
+        apiToken: string;
+    }
 }
 
 export class BitbucketPullRequestsImporter {
     private readonly bitbucketAPI: BitbucketAPI;
     private readonly teamName: string;
     private readonly repository: Repository<PullRequest>;
-    private readonly projects: BitbucketProjectSettings[];
+    private readonly project: BitbucketProjectSettings;
 
-    constructor(bitbucketAPI: BitbucketAPI, teamName: string, projects: BitbucketProjectSettings[]) {
+    constructor(bitbucketAPI: BitbucketAPI, teamName: string, project: BitbucketProjectSettings) {
         this.bitbucketAPI = bitbucketAPI;
-        this.projects = projects;
+        this.project = project;
         this.repository = MetricsDB.getRepository(PullRequest);
         this.teamName = teamName;
     }
 
     async importPullRequests() {
-        for (const project of this.projects) {
+        for (const repositoryName of await this.project.repositoriesSelector(this.bitbucketAPI)) {
             console.group();
-            console.log(`🔁 Importing pull requests for '${project.projectKey}' project`);
+            console.log(`🔁 Importing pull requests for '${repositoryName}' repository`);
 
-            for (const repositoryName of await project.repositoriesSelector(this.bitbucketAPI)) {
-                console.group();
-                console.log(`🔁 Importing pull requests for '${repositoryName}' repository`);
+            const timelogLabel = `✅ '${repositoryName}' pull requests import completed`;
+            console.time(timelogLabel);
+            await this.importRepositoryPullRequests(repositoryName);
+            console.timeEnd(timelogLabel);
 
-                const timelogLabel = `✅ '${repositoryName}' pull requests import completed`;
-                console.time(timelogLabel);
-                await this.importRepositoryPullRequests(project, repositoryName);
-                console.timeEnd(timelogLabel);
-
-                console.groupEnd();
-            }
             console.groupEnd();
         }
     }
@@ -53,16 +51,16 @@ export class BitbucketPullRequestsImporter {
      * This is typically isn't an issue since this is tens of thousands of pull requests at worst and the Bitbucket API performs well
      * However, if you encounter any problems, consider implementing a reverse import. Start with the most recent pull requests and process them in smaller chunks.
      */
-    private async importRepositoryPullRequests(project: BitbucketProjectSettings, repositoryName: string) {
+    private async importRepositoryPullRequests(repositoryName: string) {
         console.group();
         const limit = 1000;
-        const lastMergeDateOfStoredPRs: Date | null = await this.getPRsCountAndLastMergeDate(project.projectKey, repositoryName);
+        const lastMergeDateOfStoredPRs: Date | null = await this.getPRsCountAndLastMergeDate(this.project.projectKey, repositoryName);
         for (let start = 0; ; start += limit) {
-            const pullRequestsResponse = await this.bitbucketAPI.getMergedPullRequests(project.projectKey, repositoryName, start, limit);
+            const pullRequestsResponse = await this.bitbucketAPI.getMergedPullRequests(this.project.projectKey, repositoryName, start, limit);
 
             for (const bitbucketPullRequest of pullRequestsResponse.values.filter((pr: any) => lastMergeDateOfStoredPRs == null || new Date(pr.closedDate) > lastMergeDateOfStoredPRs)) {
-                if (project.pullRequestsFilterFn(bitbucketPullRequest)) {
-                    await this.savePullRequest(project, repositoryName, bitbucketPullRequest);
+                if (this.project.pullRequestsFilterFn(bitbucketPullRequest)) {
+                    await this.savePullRequest(this.project, repositoryName, bitbucketPullRequest);
                     console.count("🤞 Pull requests processed");
                 } else {
                     console.warn(`⚠️ Pull request ${bitbucketPullRequest.id} was filtered out by specified pullRequestsFilterFn function`);
