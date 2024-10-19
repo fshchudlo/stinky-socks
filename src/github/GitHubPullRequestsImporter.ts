@@ -62,7 +62,7 @@ export class GitHubPullRequestsImporter {
                 if (this.project.pullRequestsFilterFn(pullRequest)) {
                     await this.savePullRequest(this.project, repositoryName, pullRequest);
                 } else {
-                    console.warn(`⚠️ Pull request ${pullRequest.id} was filtered out by specified pullRequestsFilterFn function`);
+                    console.warn(`⚠️ Pull request ${pullRequest.number} was filtered out by specified pullRequestsFilterFn function`);
                 }
             }
 

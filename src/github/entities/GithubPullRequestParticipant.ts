@@ -1,14 +1,15 @@
 import { PullRequestParticipant } from "../../metrics-db/PullRequestParticipant";
-import { Utils } from "./Utils";
+import getHumanComments from "./getHumanComments";
 
 export class GithubPullRequestParticipant extends PullRequestParticipant {
-    constructor(participantName: string, pullRequestData: any, participantActivities: any[], botUserSlugs: string[], formerEmployeeSlugs: string[]) {
+    constructor(participantName: string, pullRequestData: any, participantActivities: any[], botUserNames: string[], formerEmployeeNames: string[]) {
         super();
         this.initializeBaseProperties(participantName, pullRequestData)
-            .setUserStatus(botUserSlugs, formerEmployeeSlugs)
-            .setCommentStats(participantActivities, botUserSlugs)
-            .setApprovalStats(participantActivities, botUserSlugs);
+            .setUserStatus(botUserNames, formerEmployeeNames)
+            .setCommentStats(participantActivities, botUserNames)
+            .setApprovalStats(participantActivities, botUserNames);
     }
+
     private initializeBaseProperties(participantName: string, pullRequestData: any): GithubPullRequestParticipant {
         this.projectKey = pullRequestData.base.repo.owner.login;
         this.repositoryName = pullRequestData.base.repo.name;
@@ -17,26 +18,28 @@ export class GithubPullRequestParticipant extends PullRequestParticipant {
         return this;
     }
 
-    private setUserStatus(botUserSlugs: string[], formerEmployeeSlugs: string[]): GithubPullRequestParticipant {
-        this.isBotUser = botUserSlugs.includes(this.participantName);
-        this.isFormerEmployee = formerEmployeeSlugs.includes(this.participantName);
+    private setUserStatus(botUserNames: string[], formerEmployeeNames: string[]): GithubPullRequestParticipant {
+        this.isBotUser = botUserNames.includes(this.participantName);
+        this.isFormerEmployee = formerEmployeeNames.includes(this.participantName);
         return this;
     }
 
-    private setCommentStats(participantActivities: any[], botUserSlugs: string[]): GithubPullRequestParticipant {
-        const comments = Utils.getHumanComments(participantActivities, botUserSlugs);
+    private setCommentStats(participantActivities: any[], botUserNames: string[]): GithubPullRequestParticipant {
+        const comments = getHumanComments(participantActivities, botUserNames);
 
-        const commentTimestamps = comments.map((c: any) => c.createdDate as number);
+        const commentTimestamps = comments.map((c: any) => new Date(c.submitted_at).getTime());
         this.firstCommentDate = commentTimestamps.length ? new Date(Math.min(...commentTimestamps)) : null as any;
         this.lastCommentDate = commentTimestamps.length ? new Date(Math.max(...commentTimestamps)) : null as any;
         this.commentsCount = comments.length;
         return this;
     }
 
-    private setApprovalStats(participantActivities: any[], botUserSlugs: string[]): GithubPullRequestParticipant {
-        const approvals = Utils.getHumanActivities(participantActivities, botUserSlugs, "APPROVED");
+    private setApprovalStats(participantActivities: any[], botUserNames: string[]): GithubPullRequestParticipant {
+        const approvals = participantActivities
+            .filter(a => a.event === "reviewed" && a.state === "approved")
+            .filter(a => !botUserNames.includes(a.user.login));
 
-        const approvalTimestamps = approvals.map((a: any) => a.createdDate);
+        const approvalTimestamps = approvals.map((a: any) => new Date(a.submitted_at).getTime());
         this.firstApprovalDate = approvalTimestamps.length ? new Date(Math.min(...approvalTimestamps)) : null as any;
         this.lastApprovalDate = approvalTimestamps.length ? new Date(Math.max(...approvalTimestamps)) : null as any;
         return this;

@@ -1,4 +1,4 @@
-import { Utils } from "./Utils";
+import getHumanActivities from "./getHumanActivities";
 import { PullRequest } from "../../metrics-db/PullRequest";
 import { BitbucketPullRequestParticipant } from "./BitbucketPullRequestParticipant";
 import {
@@ -53,7 +53,7 @@ export class BitbucketPullRequest extends PullRequest {
     }
 
     private calculateCommitStats(model: ImportModel): BitbucketPullRequest {
-        this.commentsCount = Utils.getHumanActivities(model.pullRequestActivities, model.botUserSlugs, "COMMENTED").length;
+        this.commentsCount = getHumanActivities(model.pullRequestActivities, model.botUserSlugs, "COMMENTED").length;
         this.diffSize = BitbucketPullRequest.getDiffSize(model.diff);
         this.testsWereTouched = BitbucketPullRequest.testsWereTouched(model.diff);
         return this;

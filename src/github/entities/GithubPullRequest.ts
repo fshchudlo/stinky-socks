@@ -1,5 +1,5 @@
 import { PullRequest } from "../../metrics-db/PullRequest";
-import { Utils } from "./Utils";
+import getHumanComments from "./getHumanComments";
 import { GithubPullRequestParticipant } from "./GithubPullRequestParticipant";
 
 export type ImportModel = {
@@ -46,7 +46,7 @@ export class GithubPullRequest extends PullRequest {
     }
 
     private calculateCommitStats(model: ImportModel): GithubPullRequest {
-        this.commentsCount = Utils.getHumanComments(model.pullRequestActivities, model.botUserNames).length;
+        this.commentsCount = getHumanComments(model.pullRequestActivities, model.botUserNames).length;
         this.diffSize = model.files.reduce((acc: any, file: any) => acc + file.changes, 0);
         this.testsWereTouched = model.files.some((f: any) => f.filename.toLowerCase().includes("test"));
         return this;
@@ -54,8 +54,8 @@ export class GithubPullRequest extends PullRequest {
 
     private initializeParticipants(model: ImportModel): GithubPullRequest {
         const allParticipants = new Set<string>([
-            ...model.pullRequest.reviewers.map((r: any) => r.user.slug),
-            ...model.pullRequest.participants.map((p: any) => p.user.slug)
+            ...model.pullRequest.requested_reviewers.map((r: any) => r.login),
+            ...model.pullRequest.assignees.map((p: any) => p.login)
         ]);
 
         this.participants = Array.from(allParticipants).map((participantName) =>
@@ -71,17 +71,18 @@ export class GithubPullRequest extends PullRequest {
     }
 
     private calculatePrOpenDate(model: ImportModel): Date {
+        const readyForReviewEvent = model.pullRequestActivities.filter(a => a.event == "ready_for_review");
+        if (readyForReviewEvent.length > 0) {
+            const earliestDate = Math.min(...readyForReviewEvent.map(a => new Date(a.created_at).getTime()));
+            return new Date(earliestDate);
+        }
+
         const reviewerAdditions = model.pullRequestActivities.filter(a => a.event == "review_requested");
-
         if (reviewerAdditions.length > 0) {
-            throw new Error(`Method not implemented`);
-            const initialReviewersSlugs = new Set<string>(model.pullRequest.reviewers.map((r: any) => r.user.slug).filter((s: any) => !model.botUserNames.includes(s)));
-            const addedReviewersSlugs = new Set<string>(reviewerAdditions.flatMap(a => a.addedReviewers?.map((r: any) => r.slug) || []));
-
-            // If all initial reviewers were added after PR was opened
-            if ([...initialReviewersSlugs].every(s => addedReviewersSlugs.has(s))) {
-                // Return the date of the earliest activity where reviewers were added
-                const earliestAddingDate = Math.min(...reviewerAdditions.map(activity => activity.createdDate));
+            const initialReviewers = reviewerAdditions.filter(a => a.created_at == model.pullRequest.created_at).map((r: any) => r.requested_reviewer.login).filter((s: any) => !model.botUserNames.includes(s));
+            // If all reviewers were added after PR was opened
+            if (initialReviewers.length == 0) {
+                const earliestAddingDate = Math.min(...reviewerAdditions.map(activity => new Date(activity.created_at).getTime()));
                 return new Date(earliestAddingDate);
             }
         }
@@ -89,6 +90,6 @@ export class GithubPullRequest extends PullRequest {
     }
 
     private static getActivitiesOf(activities: any[], userName: string): any[] {
-        return activities.filter(a => a.user.login === userName);
+        return activities.filter(a => (a.actor || a.author || a.user).login === userName);
     }
 }
