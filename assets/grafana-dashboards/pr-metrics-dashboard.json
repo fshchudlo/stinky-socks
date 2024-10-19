@@ -3336,10 +3336,10 @@
           {
             "selected": false,
             "text": "Author",
-            "value": "author"
+            "value": "author.nickname"
           }
         ],
-        "query": "Repository : repository_name, Author : author",
+        "query": "Repository : repository_name, Author : author.nickname",
         "queryValue": "",
         "skipUrlSync": false,
         "type": "custom"
