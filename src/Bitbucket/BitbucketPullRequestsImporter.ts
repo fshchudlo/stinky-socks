@@ -31,8 +31,7 @@ export class BitbucketPullRequestsImporter {
 
     async importPullRequests() {
         for (const repositoryName of await this.project.repositoriesSelector(this.bitbucketAPI)) {
-            console.group();
-            console.log(`🔁 Importing pull requests for '${repositoryName}' repository`);
+            console.group(`🔁 Importing pull requests for '${repositoryName}' repository`);
 
             const timelogLabel = `✅ '${repositoryName}' pull requests import completed`;
             console.time(timelogLabel);
@@ -52,7 +51,6 @@ export class BitbucketPullRequestsImporter {
      * However, if you encounter any problems, consider implementing a reverse import. Start with the most recent pull requests and process them in smaller chunks.
      */
     private async importRepositoryPullRequests(repositoryName: string) {
-        console.group();
         const limit = 1000;
         const lastMergeDateOfStoredPRs: Date | null = await MetricsDB.getPRsCountAndLastMergeDate(this.teamName, this.project.projectKey, repositoryName);
         for (let start = 0; ; start += limit) {
@@ -76,7 +74,6 @@ export class BitbucketPullRequestsImporter {
                 break;
             }
         }
-        console.groupEnd();
     }
 
     private async savePullRequest(project: BitbucketProjectSettings, repositoryName: string, pullRequest: BitbucketPullRequestModel) {

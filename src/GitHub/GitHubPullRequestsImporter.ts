@@ -30,8 +30,7 @@ export class GitHubPullRequestsImporter {
 
     async importPullRequests() {
         for (const repositoryName of await this.project.repositoriesSelector(this.gitHubAPI)) {
-            console.group();
-            console.log(`🔁 Importing pull requests for '${repositoryName}' repository`);
+            console.group(`🔁 Importing pull requests for '${repositoryName}' repository`);
 
             const timelogLabel = `✅ '${repositoryName}' pull requests import completed`;
             console.time(timelogLabel);
@@ -43,7 +42,6 @@ export class GitHubPullRequestsImporter {
     }
 
     private async importRepositoryPullRequests(repositoryName: string) {
-        console.group();
         const pageSize = 100;
         let pageNumber = 1;
         const lastMergeDateOfStoredPRs: Date | null = await MetricsDB.getPRsCountAndLastMergeDate(this.teamName, this.project.owner, repositoryName);
@@ -72,7 +70,6 @@ export class GitHubPullRequestsImporter {
             }
             pageNumber++;
         }
-        console.groupEnd();
     }
 
     private async savePullRequest(project: GitHubProjectSettings, repositoryName: string, pullRequest: GitHubPullRequestModel) {

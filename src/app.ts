@@ -9,9 +9,7 @@ import { GitHubAPI } from "./GitHub/api/GitHubAPI";
 
 async function runDataImports() {
     await MetricsDB.initialize();
-    console.log("🚀 Starting Pull Requests import...");
-
-    console.group();
+    console.group("🚀 Starting Pull Requests import...");
     for (const team of appImportConfig.teams) {
         console.log(`🔁 Importing pull requests for '${team.teamName}' team`);
 
@@ -27,8 +25,7 @@ async function runDataImports() {
 
 async function importBitbucketProjects(team: TeamImportSettings) {
     for (const bitbucketProject of team.bitbucketProjects) {
-        console.group();
-        console.log(`🔁 Importing pull requests for '${bitbucketProject.projectKey}' project`);
+        console.group(`🔁 Importing pull requests for '${bitbucketProject.projectKey}' project`);
 
         const bitbucketAPI = new BitbucketAPI(bitbucketProject.auth.apiUrl, bitbucketProject.auth.apiToken);
         await new BitbucketPullRequestsImporter(bitbucketAPI, team.teamName, bitbucketProject).importPullRequests();
@@ -40,8 +37,7 @@ async function importBitbucketProjects(team: TeamImportSettings) {
 
 async function importGitHubPullRequests(team: TeamImportSettings) {
     for (const gitHubProject of team.gitHubProjects) {
-        console.group();
-        console.log(`🔁 Importing pull requests for '${gitHubProject.owner}' project`);
+        console.group(`🔁 Importing pull requests for '${gitHubProject.owner}' project`);
 
         const gitHubAPI = new GitHubAPI(gitHubProject.auth.apiToken);
         await new GitHubPullRequestsImporter(gitHubAPI, team.teamName, gitHubProject).importPullRequests();
