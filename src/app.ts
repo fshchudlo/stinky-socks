@@ -9,7 +9,10 @@ import { GitHubAPI } from "./GitHub/api/GitHubAPI";
 
 async function runDataImports() {
     await MetricsDB.initialize();
+    const timelogLabel = `🎉 Teams data import completed!`;
+    console.time(timelogLabel);
     console.group("🚀 Starting Pull Requests import...");
+
     for (const team of appImportConfig.teams) {
         console.log(`🔁 Importing pull requests for '${team.teamName}' team`);
 
@@ -17,13 +20,15 @@ async function runDataImports() {
 
         await importGitHubPullRequests(team);
     }
+
     console.groupEnd();
-
-
-    console.log("🎉 Pull Requests import completed!");
+    console.timeEnd(timelogLabel);
 }
 
 async function importBitbucketProjects(team: TeamImportSettings) {
+    const timelogLabel = `🎉 Bitbucket pull requests import completed!`;
+    console.time(timelogLabel);
+
     for (const bitbucketProject of team.bitbucketProjects) {
         console.group(`🔁 Importing pull requests for '${bitbucketProject.projectKey}' project`);
 
@@ -33,9 +38,13 @@ async function importBitbucketProjects(team: TeamImportSettings) {
         console.log(`🔁 Import of pull requests for '${bitbucketProject.projectKey}' project completed`);
         console.groupEnd();
     }
+    console.timeEnd(timelogLabel);
 }
 
 async function importGitHubPullRequests(team: TeamImportSettings) {
+    const timelogLabel = `🎉 GitHub pull requests import completed!`;
+    console.time(timelogLabel);
+
     for (const gitHubProject of team.gitHubProjects) {
         console.group(`🔁 Importing pull requests for '${gitHubProject.owner}' project`);
 
@@ -45,6 +54,7 @@ async function importGitHubPullRequests(team: TeamImportSettings) {
         console.log(`🔁 Import of pull requests for '${gitHubProject.owner}' project completed`);
         console.groupEnd();
     }
+    console.timeEnd(timelogLabel);
 }
 
 runDataImports().catch(error => console.log(error));
