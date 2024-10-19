@@ -3022,7 +3022,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "#EAB839",
@@ -3407,9 +3408,14 @@
             "selected": false,
             "text": "Quarters",
             "value": "3M"
+          },
+          {
+            "selected": false,
+            "text": "Years",
+            "value": "1y"
           }
         ],
-        "query": "Days : 1d,  Weeks : 1w, Months : 1M, Quarters : 3M",
+        "query": "Days : 1d,  Weeks : 1w, Months : 1M, Quarters : 3M, Years : 1y",
         "queryValue": "",
         "skipUrlSync": false,
         "type": "custom"
