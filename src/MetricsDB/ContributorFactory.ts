@@ -2,6 +2,7 @@ import { Contributor } from "./Contributor";
 import { MetricsDB } from "./MetricsDB";
 import { Repository } from "typeorm";
 import { createCache } from "cache-manager";
+import { AppConfig } from "../app.config";
 
 const adjectives = [
     "Brave", "Clever", "Witty", "Kind", "Fierce", "Happy", "Jolly", "Sneaky", "Bouncy", "Dizzy",
@@ -33,6 +34,7 @@ export class ContributorFactory {
         isFormerEmployee: boolean
     }): Promise<Contributor> {
         const cacheKey = `${teamName}-${login}`;
+        login = AppConfig.userNameNormalizerFn(login);
 
         return await contributorsCache.wrap(cacheKey, async () => {
             let contributor = await contributorRepo.findOne({ where: { teamName: teamName, login } });

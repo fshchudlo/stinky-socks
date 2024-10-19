@@ -8,7 +8,7 @@
 - Run `npm i` from the repo root directory
 - Run Postgres and Grafana by using `docker-compose -f assets/docker-compose.yml up -d` file
 - Create the copy of `.env.example` file, name it `.env` and provide relevant config values.
-- Fill `./src/app.importCconfig.ts` with values relevant to you.
+- Fill `./src/app.importConfig.ts` with values relevant to you.
     - 💡 You can use `git update-index --assume-unchanged ./src/app.importCconfig.ts` to prevent occasional commits of
       your config
 - Run ```npm run start``` to initiate the import of the data
