@@ -24,7 +24,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 455,
+  "id": 1,
   "links": [],
   "liveNow": false,
   "panels": [
@@ -2189,7 +2189,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT\n   CASE\n      WHEN diff_size<100 THEN 20 * round(diff_size / 20)\n      WHEN diff_size<500 THEN 100 * round(diff_size / 100)\n      ELSE 1000 * round(diff_size / 1000)\n   END as \"Diff size\",\n   AVG(EXTRACT(EPOCH FROM (merged_date-opened_date))) AS \"Approval speed\"\nFROM pull_request\nWHERE $__timeFilter(opened_date)\n   AND (COALESCE($team_name) IS NULL OR team_name IN ($team_name))\n   AND (COALESCE($repository_name) IS NULL OR repository_name IN ($repository_name))   \n   AND (COALESCE($pr_author) IS NULL OR author IN ($pr_author))\n   AND ('$include_bots_activities'='Yes' OR NOT author_is_bot_user)\nGROUP BY 1\nORDER BY \"Diff size\"",
+          "rawSql": "SELECT\n   CASE\n      WHEN diff_size<100 THEN 50 * round(diff_size / 50)\n      WHEN diff_size<500 THEN 100 * round(diff_size / 100)\n      ELSE 1000 * round(diff_size / 1000)\n   END as \"Diff size\",\n   AVG(EXTRACT(EPOCH FROM (merged_date-opened_date))) AS \"Approval speed\"\nFROM pull_request\nWHERE $__timeFilter(opened_date)\n   AND (COALESCE($team_name) IS NULL OR team_name IN ($team_name))\n   AND (COALESCE($repository_name) IS NULL OR repository_name IN ($repository_name))   \n   AND (COALESCE($pr_author) IS NULL OR author IN ($pr_author))\n   AND ('$include_bots_activities'='Yes' OR NOT author_is_bot_user)\nGROUP BY 1\nORDER BY \"Diff size\"",
           "refId": "A",
           "sql": {
             "columns": [
