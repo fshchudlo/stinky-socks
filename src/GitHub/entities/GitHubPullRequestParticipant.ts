@@ -1,32 +1,30 @@
 import { PullRequestParticipant } from "../../MetricsDB/PullRequestParticipant";
 import getHumanComments from "./getHumanComments";
 import { GitHubPullRequestActivityModel, GitHubPullRequestModel } from "../api/GitHubAPI";
+import { ContributorFactory } from "../../MetricsDB/ContributorFactory";
 
 export class GitHubPullRequestParticipant extends PullRequestParticipant {
-    constructor(teamName: string, participantName: string, pullRequestData: GitHubPullRequestModel, participantActivities: GitHubPullRequestActivityModel[], botUserNames: string[], formerEmployeeNames: string[]) {
-        super();
-        this.initializeBaseProperties(teamName, participantName, pullRequestData)
-            .setUserStatus(botUserNames, formerEmployeeNames)
+    async init(teamName: string, participantName: string, pullRequestData: GitHubPullRequestModel, participantActivities: GitHubPullRequestActivityModel[], botUserNames: string[], formerEmployeeNames: string[]) {
+        return (await this.initializeBaseProperties(teamName, participantName, pullRequestData, botUserNames, formerEmployeeNames))
             .setCommentStats(participantActivities, botUserNames)
             .setApprovalStats(participantActivities, botUserNames);
     }
 
-    private initializeBaseProperties(teamName: string, participantName: string, pullRequestData: GitHubPullRequestModel): GitHubPullRequestParticipant {
+    private async initializeBaseProperties(teamName: string, participantName: string, pullRequestData: GitHubPullRequestModel, botUserNames: string[], formerEmployeeNames: string[]) {
         this.teamName = teamName;
         this.projectKey = pullRequestData.base.repo.owner.login;
         this.repositoryName = pullRequestData.base.repo.name;
         this.pullRequestNumber = pullRequestData.number;
-        this.participantName = participantName;
+        this.participant = await ContributorFactory.fetchContributor({
+            teamName: teamName,
+            login: participantName,
+            isBotUser: botUserNames.includes(participantName),
+            isFormerEmployee: formerEmployeeNames.includes(participantName)
+        });
         return this;
     }
 
-    private setUserStatus(botUserNames: string[], formerEmployeeNames: string[]): GitHubPullRequestParticipant {
-        this.isBotUser = botUserNames.includes(this.participantName);
-        this.isFormerEmployee = formerEmployeeNames.includes(this.participantName);
-        return this;
-    }
-
-    private setCommentStats(participantActivities: GitHubPullRequestActivityModel[], botUserNames: string[]): GitHubPullRequestParticipant {
+    private setCommentStats(participantActivities: GitHubPullRequestActivityModel[], botUserNames: string[]) {
         const comments = getHumanComments(participantActivities, botUserNames);
 
         const commentTimestamps = comments.map(c => new Date(c.submitted_at!).getTime());
@@ -36,7 +34,7 @@ export class GitHubPullRequestParticipant extends PullRequestParticipant {
         return this;
     }
 
-    private setApprovalStats(participantActivities: GitHubPullRequestActivityModel[], botUserNames: string[]): GitHubPullRequestParticipant {
+    private setApprovalStats(participantActivities: GitHubPullRequestActivityModel[], botUserNames: string[]) {
         const approvals = participantActivities
             .filter(a => a.event === "reviewed" && a.state === "approved")
             .filter(a => !botUserNames.includes(a.user.login));

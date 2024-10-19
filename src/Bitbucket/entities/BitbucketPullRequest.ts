@@ -21,13 +21,13 @@ export type ImportModel = {
 
 export class BitbucketPullRequest extends PullRequest {
     public async init(model: ImportModel): Promise<BitbucketPullRequest> {
-        return (await this.initializeBaseProperties(model))
+        return await (await this.initializeBaseProperties(model))
             .initializeDates(model)
             .calculateCommitStats(model)
             .initializeParticipants(model);
     }
 
-    private async initializeBaseProperties(model: ImportModel): Promise<BitbucketPullRequest> {
+    private async initializeBaseProperties(model: ImportModel) {
         this.teamName = model.teamName;
         this.projectKey = model.pullRequest.toRef.repository.project.key;
         this.repositoryName = model.pullRequest.toRef.repository.slug;
@@ -46,7 +46,7 @@ export class BitbucketPullRequest extends PullRequest {
         return this;
     }
 
-    private initializeDates(model: ImportModel): BitbucketPullRequest {
+    private initializeDates(model: ImportModel) {
         this.openedDate = this.calculatePrOpenDate(model);
         this.mergedDate = new Date(model.pullRequest.closedDate);
 
@@ -57,29 +57,30 @@ export class BitbucketPullRequest extends PullRequest {
         return this;
     }
 
-    private calculateCommitStats(model: ImportModel): BitbucketPullRequest {
+    private calculateCommitStats(model: ImportModel) {
         this.commentsCount = getHumanActivities(model.pullRequestActivities, model.botUserSlugs, "COMMENTED").length;
         this.diffSize = BitbucketPullRequest.getDiffSize(model.diff);
         this.testsWereTouched = BitbucketPullRequest.testsWereTouched(model.diff);
         return this;
     }
 
-    private initializeParticipants(model: ImportModel): BitbucketPullRequest {
+    private async initializeParticipants(model: ImportModel) {
         const allParticipants = new Set<string>([
             ...model.pullRequest.reviewers.map(r => r.user.slug),
             ...model.pullRequest.participants.map(p => p.user.slug)
         ]);
 
-        this.participants = Array.from(allParticipants).map((participantName) =>
-            new BitbucketPullRequestParticipant(
+        this.participants = [];
+        for (const participantName of Array.from(allParticipants)) {
+            this.participants.push(await new BitbucketPullRequestParticipant().init(
                 model.teamName,
                 participantName,
                 model.pullRequest,
                 BitbucketPullRequest.getActivitiesOf(model.pullRequestActivities, participantName),
                 model.botUserSlugs,
                 model.formerEmployeeSlugs
-            )
-        );
+            ));
+        }
         return this;
     }
 
@@ -100,7 +101,7 @@ export class BitbucketPullRequest extends PullRequest {
         return new Date(model.pullRequest.createdDate);
     }
 
-    private static getActivitiesOf(activities: BitbucketPullRequestActivityModel[], userName: string): BitbucketPullRequestActivityModel[] {
+    private static getActivitiesOf(activities: BitbucketPullRequestActivityModel[], userName: string) {
         return activities.filter(a => a.user.slug === userName);
     }
 
@@ -119,7 +120,7 @@ export class BitbucketPullRequest extends PullRequest {
         return linesChanged;
     }
 
-    private static testsWereTouched(prDiff: BitbucketDiffModel): boolean {
+    private static testsWereTouched(prDiff: BitbucketDiffModel) {
         return prDiff.diffs.some(diff => diff.destination?.toString.includes("test"));
     }
 }

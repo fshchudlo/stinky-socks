@@ -19,9 +19,6 @@ export abstract class PullRequestParticipant {
     @Column()
     protected pullRequestNumber: number;
 
-    @Column()
-    protected participantName: string;
-
     @Column({ nullable: true })
     protected firstCommentDate?: Date;
 
@@ -36,12 +33,6 @@ export abstract class PullRequestParticipant {
 
     @Column()
     protected commentsCount: number;
-
-    @Column()
-    protected isBotUser: boolean;
-
-    @Column()
-    protected isFormerEmployee: boolean;
 
     @ManyToOne(() => PullRequest, (pr) => pr.participants, { onDelete: "CASCADE" })
     // ⚠️ remove snake naming after this bugfix merge: https://github.com/typeorm/typeorm/pull/11062

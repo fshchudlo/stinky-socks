@@ -15,13 +15,13 @@ export type ImportModel = {
 
 export class GitHubPullRequest extends PullRequest {
     public async init(model: ImportModel) {
-        return (await this.initializeBaseProperties(model))
+        return await (await this.initializeBaseProperties(model))
             .initializeDates(model)
             .calculateCommitStats(model)
             .initializeParticipants(model);
     }
 
-    private async initializeBaseProperties(model: ImportModel): Promise<GitHubPullRequest> {
+    private async initializeBaseProperties(model: ImportModel) {
         this.teamName = model.teamName;
         this.projectKey = model.pullRequest.base.repo.owner.login;
         this.repositoryName = model.pullRequest.base.repo.name;
@@ -41,7 +41,7 @@ export class GitHubPullRequest extends PullRequest {
         return this;
     }
 
-    private initializeDates(model: ImportModel): GitHubPullRequest {
+    private initializeDates(model: ImportModel) {
         this.openedDate = this.calculatePrOpenDate(model);
         this.mergedDate = new Date(model.pullRequest.merged_at);
 
@@ -52,29 +52,29 @@ export class GitHubPullRequest extends PullRequest {
         return this;
     }
 
-    private calculateCommitStats(model: ImportModel): GitHubPullRequest {
+    private calculateCommitStats(model: ImportModel) {
         this.commentsCount = getHumanComments(model.pullRequestActivities, model.botUserNames).length;
         this.diffSize = model.files.reduce((acc, file) => acc + file.changes, 0);
         this.testsWereTouched = model.files.some(file => file.filename.toLowerCase().includes("test"));
         return this;
     }
 
-    private initializeParticipants(model: ImportModel): GitHubPullRequest {
+    private async initializeParticipants(model: ImportModel) {
         const allParticipants = new Set<string>([
             ...model.pullRequest.requested_reviewers.map(r => r.login),
             ...model.pullRequest.assignees.map(p => p.login)
         ]);
-
-        this.participants = Array.from(allParticipants).map((participantName) =>
-            new GitHubPullRequestParticipant(
+        this.participants = [];
+        for (const participantName of Array.from(allParticipants)) {
+            this.participants.push(await new GitHubPullRequestParticipant().init(
                 model.teamName,
                 participantName,
                 model.pullRequest,
                 GitHubPullRequest.getActivitiesOf(model.pullRequestActivities, participantName),
                 model.botUserNames,
                 model.formerEmployeeNames
-            )
-        );
+            ));
+        }
         return this;
     }
 
@@ -97,7 +97,7 @@ export class GitHubPullRequest extends PullRequest {
         return new Date(model.pullRequest.created_at);
     }
 
-    private static getActivitiesOf(activities: GitHubPullRequestActivityModel[], userName: string): GitHubPullRequestActivityModel[] {
+    private static getActivitiesOf(activities: GitHubPullRequestActivityModel[], userName: string) {
         return activities.filter(a => (a.actor || a.author || a.user).login === userName);
     }
 }
