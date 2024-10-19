@@ -1,10 +1,14 @@
 import { Entity, Column, ManyToOne, JoinColumn, PrimaryGeneratedColumn } from "typeorm";
 import { PullRequest } from "./PullRequest";
+import { Contributor } from "./Contributor";
 
 @Entity()
 export abstract class PullRequestParticipant {
     @PrimaryGeneratedColumn()
     protected id: number;
+
+    @Column()
+    protected teamName: string;
 
     @Column()
     protected projectKey: string;
@@ -39,7 +43,7 @@ export abstract class PullRequestParticipant {
     @Column()
     protected isFormerEmployee: boolean;
 
-    @ManyToOne(() => PullRequest, (pr) => pr.participants)
+    @ManyToOne(() => PullRequest, (pr) => pr.participants, { onDelete: "CASCADE" })
     // ⚠️ remove snake naming after this bugfix merge: https://github.com/typeorm/typeorm/pull/11062
     @JoinColumn([
         { name: "project_key", referencedColumnName: "projectKey" },
@@ -47,5 +51,9 @@ export abstract class PullRequestParticipant {
         { name: "pull_request_number", referencedColumnName: "pullRequestNumber" }
     ])
     pullRequest: PullRequest;
+
+    @ManyToOne(() => Contributor, (participant) => participant.participations, { onDelete: "CASCADE" })
+    @JoinColumn()
+    participant: Contributor;
 }
   

@@ -1,4 +1,4 @@
-import { PullRequest } from "../../metrics-db/PullRequest";
+import { PullRequest } from "../../MetricsDB/PullRequest";
 import getHumanComments from "./getHumanComments";
 import { GitHubPullRequestParticipant } from "./GitHubPullRequestParticipant";
 import { GitHubFileModel, GitHubPullRequestActivityModel, GitHubPullRequestModel } from "../api/GitHubAPI";
@@ -61,6 +61,7 @@ export class GitHubPullRequest extends PullRequest {
 
         this.participants = Array.from(allParticipants).map((participantName) =>
             new GitHubPullRequestParticipant(
+                model.teamName,
                 participantName,
                 model.pullRequest,
                 GitHubPullRequest.getActivitiesOf(model.pullRequestActivities, participantName),

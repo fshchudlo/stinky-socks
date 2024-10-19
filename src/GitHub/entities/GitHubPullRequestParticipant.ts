@@ -1,17 +1,18 @@
-import { PullRequestParticipant } from "../../metrics-db/PullRequestParticipant";
+import { PullRequestParticipant } from "../../MetricsDB/PullRequestParticipant";
 import getHumanComments from "./getHumanComments";
 import { GitHubPullRequestActivityModel, GitHubPullRequestModel } from "../api/GitHubAPI";
 
 export class GitHubPullRequestParticipant extends PullRequestParticipant {
-    constructor(participantName: string, pullRequestData: GitHubPullRequestModel, participantActivities: GitHubPullRequestActivityModel[], botUserNames: string[], formerEmployeeNames: string[]) {
+    constructor(teamName: string, participantName: string, pullRequestData: GitHubPullRequestModel, participantActivities: GitHubPullRequestActivityModel[], botUserNames: string[], formerEmployeeNames: string[]) {
         super();
-        this.initializeBaseProperties(participantName, pullRequestData)
+        this.initializeBaseProperties(teamName, participantName, pullRequestData)
             .setUserStatus(botUserNames, formerEmployeeNames)
             .setCommentStats(participantActivities, botUserNames)
             .setApprovalStats(participantActivities, botUserNames);
     }
 
-    private initializeBaseProperties(participantName: string, pullRequestData: GitHubPullRequestModel): GitHubPullRequestParticipant {
+    private initializeBaseProperties(teamName: string, participantName: string, pullRequestData: GitHubPullRequestModel): GitHubPullRequestParticipant {
+        this.teamName = teamName;
         this.projectKey = pullRequestData.base.repo.owner.login;
         this.repositoryName = pullRequestData.base.repo.name;
         this.pullRequestNumber = pullRequestData.number;

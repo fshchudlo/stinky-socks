@@ -1,17 +1,18 @@
-import { PullRequestParticipant } from "../../metrics-db/PullRequestParticipant";
+import { PullRequestParticipant } from "../../MetricsDB/PullRequestParticipant";
 import getHumanActivities from "./getHumanActivities";
 import { BitbucketPullRequestActivityModel, BitbucketPullRequestModel } from "../api/BitbucketAPI";
 
 export class BitbucketPullRequestParticipant extends PullRequestParticipant {
-    constructor(participantName: string, pullRequestData: BitbucketPullRequestModel, participantActivities: BitbucketPullRequestActivityModel[], botUserSlugs: string[], formerEmployeeSlugs: string[]) {
+    constructor(teamName: string, participantName: string, pullRequestData: BitbucketPullRequestModel, participantActivities: BitbucketPullRequestActivityModel[], botUserSlugs: string[], formerEmployeeSlugs: string[]) {
         super();
-        this.initializeBaseProperties(participantName, pullRequestData)
+        this.initializeBaseProperties(teamName, participantName, pullRequestData)
             .setUserStatus(botUserSlugs, formerEmployeeSlugs)
             .setCommentStats(participantActivities, botUserSlugs)
             .setApprovalStats(participantActivities, botUserSlugs);
     }
 
-    private initializeBaseProperties(participantName: string, pullRequestData: BitbucketPullRequestModel): BitbucketPullRequestParticipant {
+    private initializeBaseProperties(teamName: string, participantName: string, pullRequestData: BitbucketPullRequestModel): BitbucketPullRequestParticipant {
+        this.teamName = teamName;
         this.projectKey = pullRequestData.toRef.repository.project.key;
         this.repositoryName = pullRequestData.toRef.repository.slug;
         this.pullRequestNumber = pullRequestData.id;

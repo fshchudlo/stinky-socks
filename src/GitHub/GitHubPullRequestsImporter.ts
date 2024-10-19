@@ -1,7 +1,7 @@
 import { GitHubAPI, GitHubPullRequestModel } from "./api/GitHubAPI";
 import { Repository } from "typeorm";
-import { PullRequest } from "../metrics-db/PullRequest";
-import { MetricsDB } from "../metrics-db/MetricsDB";
+import { PullRequest } from "../MetricsDB/PullRequest";
+import { MetricsDB } from "../MetricsDB/MetricsDB";
 import { GitHubPullRequest } from "./entities/GitHubPullRequest";
 
 export type GitHubProjectSettings = {

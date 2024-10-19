@@ -1,8 +1,8 @@
 import { BitbucketAPI, BitbucketPullRequestModel } from "./api/BitbucketAPI";
 import { BitbucketPullRequest } from "./entities/BitbucketPullRequest";
-import { MetricsDB } from "../metrics-db/MetricsDB";
+import { MetricsDB } from "../MetricsDB/MetricsDB";
 import { Repository } from "typeorm";
-import { PullRequest } from "../metrics-db/PullRequest";
+import { PullRequest } from "../MetricsDB/PullRequest";
 
 export type BitbucketProjectSettings = {
     projectKey: string;

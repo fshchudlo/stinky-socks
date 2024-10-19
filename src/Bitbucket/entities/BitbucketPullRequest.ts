@@ -1,5 +1,5 @@
 import getHumanActivities from "./getHumanActivities";
-import { PullRequest } from "../../metrics-db/PullRequest";
+import { PullRequest } from "../../MetricsDB/PullRequest";
 import { BitbucketPullRequestParticipant } from "./BitbucketPullRequestParticipant";
 import {
     BitbucketCommitModel,
@@ -32,8 +32,10 @@ export class BitbucketPullRequest extends PullRequest {
         this.projectKey = model.pullRequest.toRef.repository.project.key;
         this.repositoryName = model.pullRequest.toRef.repository.slug;
         this.pullRequestNumber = model.pullRequest.id;
-        this.author = model.pullRequest.author.user.slug;
         this.viewURL = model.pullRequest.links.self[0].href;
+
+        this.author = model.pullRequest.author.user.slug;
+
         this.authorIsBotUser = model.botUserSlugs.includes(this.author);
         this.authorIsFormerEmployee = model.formerEmployeeSlugs.includes(this.author);
         this.targetBranch = model.pullRequest.toRef.displayId;
@@ -67,6 +69,7 @@ export class BitbucketPullRequest extends PullRequest {
 
         this.participants = Array.from(allParticipants).map((participantName) =>
             new BitbucketPullRequestParticipant(
+                model.teamName,
                 participantName,
                 model.pullRequest,
                 BitbucketPullRequest.getActivitiesOf(model.pullRequestActivities, participantName),

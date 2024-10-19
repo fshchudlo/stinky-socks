@@ -1,6 +1,6 @@
 import "reflect-metadata";
 
-import { MetricsDB } from "./metrics-db/MetricsDB";
+import { MetricsDB } from "./MetricsDB/MetricsDB";
 import { BitbucketAPI } from "./Bitbucket/api/BitbucketAPI";
 import { BitbucketPullRequestsImporter } from "./Bitbucket/BitbucketPullRequestsImporter";
 import { appImportConfig, TeamImportSettings } from "./app.importConfig";
