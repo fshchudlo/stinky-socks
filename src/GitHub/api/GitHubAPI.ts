@@ -89,6 +89,7 @@ export type GitHubPullRequestModel = {
 };
 
 export type GitHubPullRequestActivityModel = {
+    comments: { user: GitHubUserModel }[];
     event: string;
     created_at: string;
     committer?: GitHubUserModel & {
