@@ -23,7 +23,7 @@
   },
   "editable": true,
   "fiscalYearStartMonth": 0,
-  "graphTooltip": 0,
+  "graphTooltip": 1,
   "id": 1,
   "links": [],
   "liveNow": false,
@@ -2679,7 +2679,7 @@
               "options": {
                 "mode": "exclude",
                 "names": [
-                  "Time to first reaction"
+                  "Average lead time"
                 ],
                 "prefix": "All except:",
                 "readOnly": true
