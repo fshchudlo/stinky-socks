@@ -1,4 +1,4 @@
-import { BitbucketAPI } from "./api/BitbucketAPI";
+import { BitbucketAPI, BitbucketPullRequestModel } from "./api/BitbucketAPI";
 import { BitbucketPullRequest } from "./entities/BitbucketPullRequest";
 import { MetricsDB } from "../metrics-db/MetricsDB";
 import { Repository } from "typeorm";
@@ -9,7 +9,7 @@ export type BitbucketProjectSettings = {
     botUserSlugs: string[];
     formerEmployeeSlugs: string[];
     repositoriesSelector: (api: BitbucketAPI) => Promise<string[]>;
-    pullRequestsFilterFn: (pr: any) => boolean,
+    pullRequestsFilterFn: (pr: BitbucketPullRequestModel) => boolean,
     auth: {
         apiUrl: string;
         apiToken: string;
@@ -79,7 +79,7 @@ export class BitbucketPullRequestsImporter {
         console.groupEnd();
     }
 
-    private async savePullRequest(project: BitbucketProjectSettings, repositoryName: string, pullRequest: any) {
+    private async savePullRequest(project: BitbucketProjectSettings, repositoryName: string, pullRequest: BitbucketPullRequestModel) {
         const [activities, commits, diff] = await Promise.all([
             this.bitbucketAPI.getPullRequestActivities(project.projectKey, repositoryName, pullRequest.id),
             this.bitbucketAPI.getPullRequestCommits(project.projectKey, repositoryName, pullRequest.id),

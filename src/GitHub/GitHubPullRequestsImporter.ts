@@ -1,15 +1,15 @@
-import { GitHubAPI } from "./api/GitHubAPI";
+import { GitHubAPI, GitHubPullRequestModel } from "./api/GitHubAPI";
 import { Repository } from "typeorm";
 import { PullRequest } from "../metrics-db/PullRequest";
 import { MetricsDB } from "../metrics-db/MetricsDB";
-import { GithubPullRequest } from "./entities/GithubPullRequest";
+import { GitHubPullRequest } from "./entities/GitHubPullRequest";
 
-export type GithubProjectSettings = {
+export type GitHubProjectSettings = {
     owner: string;
     botUserNames: string[];
     formerEmployeeNames: string[];
     repositoriesSelector: (api: GitHubAPI) => Promise<string[]>;
-    pullRequestsFilterFn: (pr: any) => boolean,
+    pullRequestsFilterFn: (pr: GitHubPullRequestModel) => boolean,
     auth: {
         apiToken: string;
     }
@@ -19,9 +19,9 @@ export class GitHubPullRequestsImporter {
     private readonly gitHubAPI: GitHubAPI;
     private readonly teamName: string;
     private readonly repository: Repository<PullRequest>;
-    private readonly project: GithubProjectSettings;
+    private readonly project: GitHubProjectSettings;
 
-    constructor(gitHubAPI: GitHubAPI, teamName: string, project: GithubProjectSettings) {
+    constructor(gitHubAPI: GitHubAPI, teamName: string, project: GitHubProjectSettings) {
         this.gitHubAPI = gitHubAPI;
         this.teamName = teamName;
         this.project = project;
@@ -75,12 +75,12 @@ export class GitHubPullRequestsImporter {
         console.groupEnd();
     }
 
-    private async savePullRequest(project: GithubProjectSettings, repositoryName: string, pullRequest: any) {
+    private async savePullRequest(project: GitHubProjectSettings, repositoryName: string, pullRequest: GitHubPullRequestModel) {
         const [activities, files] = await Promise.all([
             this.gitHubAPI.getPullRequestActivities(project.owner, repositoryName, pullRequest.number),
             this.gitHubAPI.getPullRequestFiles(project.owner, repositoryName, pullRequest.number)
         ]);
-        const pullRequestEntity = new GithubPullRequest({
+        const pullRequestEntity = new GitHubPullRequest({
                 teamName: this.teamName,
                 botUserNames: project.botUserNames,
                 formerEmployeeNames: project.formerEmployeeNames,

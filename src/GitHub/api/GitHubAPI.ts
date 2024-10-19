@@ -46,10 +46,10 @@ export class GitHubAPI {
 
     async fetchAllRepositories(owner: string): Promise<any[]> {
         const repositories = await this.getFullList(`${this.baseUrl}/orgs/${owner}/repos`);
-        return repositories.filter((repo: any) => !repo.archived && !repo.disabled);
+        return repositories.filter(repo => !repo.archived && !repo.disabled);
     }
 
-    async getClosedPullRequests(owner: string, repo: string, page: number, per_page: number): Promise<any[]> {
+    async getClosedPullRequests(owner: string, repo: string, page: number, per_page: number): Promise<GitHubPullRequestModel[]> {
         const url = `${this.baseUrl}/repos/${owner}/${repo}/pulls`;
         return await this.get(url, {
             state: "closed",
@@ -59,13 +59,55 @@ export class GitHubAPI {
             per_page
         });
     }
-    async getPullRequestActivities(owner: string, repo: string, pullRequestId: number): Promise<any[]> {
-        const url = `${this.baseUrl}/repos/${owner}/${repo}/issues/${pullRequestId}/timeline`
+
+    async getPullRequestActivities(owner: string, repo: string, pullRequestId: number): Promise<GitHubPullRequestActivityModel[]> {
+        const url = `${this.baseUrl}/repos/${owner}/${repo}/issues/${pullRequestId}/timeline`;
         return await this.getFullList(url);
     }
 
-    async getPullRequestFiles(owner: string, repo: string, pullRequestId: number) {
-        const url = `${this.baseUrl}/repos/${owner}/${repo}/pulls/${pullRequestId}/files`
+    async getPullRequestFiles(owner: string, repo: string, pullRequestId: number): Promise<GitHubFileModel[]> {
+        const url = `${this.baseUrl}/repos/${owner}/${repo}/pulls/${pullRequestId}/files`;
         return await this.getFullList(url);
     }
 }
+
+export type GitHubPullRequestModel = {
+    base: {
+        repo: {
+            owner: GitHubUserModel;
+            name: string;
+        };
+        ref: string;
+    };
+    number: number;
+    user: GitHubUserModel;
+    html_url: string;
+    requested_reviewers: GitHubUserModel[];
+    assignees: GitHubUserModel[];
+    created_at: string;
+    merged_at: string;
+};
+
+export type GitHubPullRequestActivityModel = {
+    event: string;
+    created_at: string;
+    committer?: GitHubUserModel & {
+        date: string;
+    };
+    user: GitHubUserModel;
+    actor?: GitHubUserModel;
+    author?: GitHubUserModel & {
+        date: string;
+    };
+    requested_reviewer?: GitHubUserModel;
+    state?: string;
+    submitted_at?: string;
+};
+
+export type GitHubFileModel = {
+    filename: string;
+    changes: number;
+};
+export type GitHubUserModel = {
+    login: string;
+};

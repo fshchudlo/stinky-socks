@@ -93,16 +93,16 @@ export class BitbucketPullRequest extends PullRequest {
         }
         return new Date(model.pullRequest.createdDate);
     }
-    private static getActivitiesOf(activities: BitbucketPullRequestActivityModel[], userName: string): any[] {
+    private static getActivitiesOf(activities: BitbucketPullRequestActivityModel[], userName: string): BitbucketPullRequestActivityModel[] {
         return activities.filter(a => a.user.slug === userName);
     }
 
     private static getDiffSize(diffData: BitbucketDiffModel): number {
         let linesChanged = 0;
-        diffData.diffs.forEach((d: any) => {
+        diffData.diffs.forEach(d => {
             if (!d.hunks) return;
-            d.hunks.forEach((hunk: any) => {
-                hunk.segments.forEach((segment: any) => {
+            d.hunks.forEach(hunk => {
+                hunk.segments.forEach(segment => {
                     if (segment.type === "ADDED" || segment.type === "DELETED") {
                         linesChanged += segment.lines.length;
                     }
@@ -112,7 +112,7 @@ export class BitbucketPullRequest extends PullRequest {
         return linesChanged;
     }
 
-    private static testsWereTouched(prDiff: any): boolean {
-        return prDiff.diffs.some((diff: any) => diff.destination?.toString.includes("test"));
+    private static testsWereTouched(prDiff: BitbucketDiffModel): boolean {
+        return prDiff.diffs.some(diff => diff.destination?.toString.includes("test"));
     }
 }

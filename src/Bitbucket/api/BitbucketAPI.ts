@@ -130,6 +130,7 @@ export type BitbucketCommitModel = {
 
 export type BitbucketDiffModel = {
     diffs: {
+        destination: { toString: string; };
         hunks: {
             segments: {
                 type: string;

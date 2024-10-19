@@ -1,11 +1,11 @@
 import "reflect-metadata";
 
 import { MetricsDB } from "./metrics-db/MetricsDB";
-import { BitbucketAPI } from "./bitbucket/api/BitbucketAPI";
-import { BitbucketPullRequestsImporter } from "./bitbucket/BitbucketPullRequestsImporter";
+import { BitbucketAPI } from "./Bitbucket/api/BitbucketAPI";
+import { BitbucketPullRequestsImporter } from "./Bitbucket/BitbucketPullRequestsImporter";
 import { appImportConfig, TeamImportSettings } from "./app.importConfig";
-import { GitHubPullRequestsImporter } from "./github/GitHubPullRequestsImporter";
-import { GitHubAPI } from "./github/api/GitHubAPI";
+import { GitHubPullRequestsImporter } from "./GitHub/GitHubPullRequestsImporter";
+import { GitHubAPI } from "./GitHub/api/GitHubAPI";
 
 async function runDataImports() {
     await MetricsDB.initialize();

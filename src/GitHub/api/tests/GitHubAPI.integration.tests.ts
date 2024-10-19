@@ -1,7 +1,7 @@
 import "dotenv/config";
 import { GitHubAPI } from "../GitHubAPI";
 
-describe("GithubAPI 𝑰𝒏𝒕𝒆𝒈𝒓𝒂𝒕𝒊𝒐𝒏 Test", () => {
+describe("GitHubAPI 𝑰𝒏𝒕𝒆𝒈𝒓𝒂𝒕𝒊𝒐𝒏 Test", () => {
     it.skip("should fetch pull requests history", async () => {
         const owner = "grafana";
         const repoName = "grafana";
