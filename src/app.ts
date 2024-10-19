@@ -41,12 +41,12 @@ async function importBitbucketProjects(team: TeamImportSettings) {
 async function importGitHubPullRequests(team: TeamImportSettings) {
     for (const gitHubProject of team.gitHubProjects) {
         console.group();
-        console.log(`🔁 Importing pull requests for '${gitHubProject.projectKey}' project`);
+        console.log(`🔁 Importing pull requests for '${gitHubProject.owner}' project`);
 
         const gitHubAPI = new GitHubAPI(gitHubProject.auth.apiToken);
         await new GitHubPullRequestsImporter(gitHubAPI, team.teamName, gitHubProject).importPullRequests();
 
-        console.log(`🔁 Import of pull requests for '${gitHubProject.projectKey}' project completed`);
+        console.log(`🔁 Import of pull requests for '${gitHubProject.owner}' project completed`);
         console.groupEnd();
     }
 }

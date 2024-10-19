@@ -19,11 +19,11 @@ export const appImportConfig = {
             auth: {
                 apiToken: process.env.GITHUB_API_TOKEN
             },
-            projectKey: 'TEST',
+            owner: 'TEST',
             botUserNames: ['bot.user'],
             formerEmployeeNames: ['former.employee'],
             repositoriesSelector: async (api: GitHubAPI) => (await api.fetchAllRepositories('TEST')).filter(r => !r.name.startsWith('test')).map((r: any) => r.slug),
-            pullRequestsFilterFn: (pr: any) => pr.openedDate < new Date('2015-01-01')
+            pullRequestsFilterFn: (pr: any) => new Date(pr.openedDate) < new Date('2015-01-01')
         }],
         bitbucketProjects: [{
             auth: {
@@ -38,3 +38,4 @@ export const appImportConfig = {
         }]
     } as TeamImportSettings]
 };
+

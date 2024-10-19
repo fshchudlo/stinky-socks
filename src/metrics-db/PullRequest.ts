@@ -49,9 +49,6 @@ export abstract class PullRequest {
     protected commentsCount: number;
 
     @Column()
-    protected rebasesCount: number;
-
-    @Column()
     protected diffSize: number;
 
     @Column()

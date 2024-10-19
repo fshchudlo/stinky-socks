@@ -54,7 +54,6 @@ export class BitbucketPullRequest extends PullRequest {
 
     private calculateCommitStats(model: ImportModel): BitbucketPullRequest {
         this.commentsCount = Utils.getHumanActivities(model.pullRequestActivities, model.botUserSlugs, "COMMENTED").length;
-        this.rebasesCount = BitbucketPullRequest.getRebases(model.pullRequestActivities).length;
         this.diffSize = BitbucketPullRequest.getDiffSize(model.diff);
         this.testsWereTouched = BitbucketPullRequest.testsWereTouched(model.diff);
         return this;
@@ -96,10 +95,6 @@ export class BitbucketPullRequest extends PullRequest {
     }
     private static getActivitiesOf(activities: BitbucketPullRequestActivityModel[], userName: string): any[] {
         return activities.filter(a => a.user.slug === userName);
-    }
-
-    private static getRebases(activities: BitbucketPullRequestActivityModel[]): any[] {
-        return activities.filter(a => a.action === "RESCOPED" && a.fromHash !== a.previousFromHash);
     }
 
     private static getDiffSize(diffData: BitbucketDiffModel): number {

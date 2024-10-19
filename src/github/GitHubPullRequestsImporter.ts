@@ -5,7 +5,7 @@ import { MetricsDB } from "../metrics-db/MetricsDB";
 import { GithubPullRequest } from "./entities/GithubPullRequest";
 
 export type GithubProjectSettings = {
-    projectKey: string;
+    owner: string;
     botUserNames: string[];
     formerEmployeeNames: string[];
     repositoriesSelector: (api: GitHubAPI) => Promise<string[]>;
@@ -46,9 +46,9 @@ export class GitHubPullRequestsImporter {
         console.group();
         const pageSize = 100;
         let pageNumber = 1;
-        const lastMergeDateOfStoredPRs: Date | null = await MetricsDB.getPRsCountAndLastMergeDate(this.teamName, this.project.projectKey, repositoryName);
+        const lastMergeDateOfStoredPRs: Date | null = await MetricsDB.getPRsCountAndLastMergeDate(this.teamName, this.project.owner, repositoryName);
         while (true) {
-            const pullRequestsChunk = await this.gitHubAPI.getClosedPullRequests(this.project.projectKey, repositoryName, pageNumber, pageSize);
+            const pullRequestsChunk = await this.gitHubAPI.getClosedPullRequests(this.project.owner, repositoryName, pageNumber, pageSize);
 
             for (const pullRequest of pullRequestsChunk) {
                 console.count(`📥 ${repositoryName}: pull requests processed`);
@@ -77,8 +77,8 @@ export class GitHubPullRequestsImporter {
 
     private async savePullRequest(project: GithubProjectSettings, repositoryName: string, pullRequest: any) {
         const [activities, files] = await Promise.all([
-            this.gitHubAPI.getPullRequestActivities(project.projectKey, repositoryName, pullRequest.number),
-            this.gitHubAPI.getPullRequestFiles(project.projectKey, repositoryName, pullRequest.number)
+            this.gitHubAPI.getPullRequestActivities(project.owner, repositoryName, pullRequest.number),
+            this.gitHubAPI.getPullRequestFiles(project.owner, repositoryName, pullRequest.number)
         ]);
         const pullRequestEntity = new GithubPullRequest({
                 teamName: this.teamName,

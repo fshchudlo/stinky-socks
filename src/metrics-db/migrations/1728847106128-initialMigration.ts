@@ -36,7 +36,6 @@ export class InitialMigration1728847106128 implements MigrationInterface {
                     { name: namingStrategy.columnName("mergedDate", undefined, []), type: "timestamp" },
                     { name: namingStrategy.columnName("reviewersCount", undefined, []), type: "int" },
                     { name: namingStrategy.columnName("commentsCount", undefined, []), type: "int" },
-                    { name: namingStrategy.columnName("rebasesCount", undefined, []), type: "int" },
                     { name: namingStrategy.columnName("diffSize", undefined, []), type: "bigint" },
                     { name: namingStrategy.columnName("testsWereTouched", undefined, []), type: "boolean" }
                 ]

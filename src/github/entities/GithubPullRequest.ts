@@ -49,7 +49,6 @@ export class GithubPullRequest extends PullRequest {
         this.commentsCount = Utils.getHumanComments(model.pullRequestActivities, model.botUserNames).length;
         this.diffSize = model.files.reduce((acc: any, file: any) => acc + file.changes, 0);
         this.testsWereTouched = model.files.some((f: any) => f.filename.toLowerCase().includes("test"));
-        this.rebasesCount = GithubPullRequest.getRebases(model.pullRequestActivities).length;
         return this;
     }
 
@@ -91,10 +90,5 @@ export class GithubPullRequest extends PullRequest {
 
     private static getActivitiesOf(activities: any[], userName: string): any[] {
         return activities.filter(a => a.user.login === userName);
-    }
-
-    private static getRebases(activities: any[]): any[] {
-        throw new Error(`Method not implemented`);
-        return activities.filter(a => a.action === "RESCOPED" && a.fromHash !== a.previousFromHash);
     }
 }
