@@ -77,7 +77,7 @@ export class GitHubPullRequestsImporter {
             this.gitHubAPI.getPullRequestActivities(project.owner, repositoryName, pullRequest.number),
             this.gitHubAPI.getPullRequestFiles(project.owner, repositoryName, pullRequest.number)
         ]);
-        const pullRequestEntity = new GitHubPullRequest({
+        const pullRequestEntity = await new GitHubPullRequest().init({
                 teamName: this.teamName,
                 botUserNames: project.botUserNames,
                 formerEmployeeNames: project.formerEmployeeNames,

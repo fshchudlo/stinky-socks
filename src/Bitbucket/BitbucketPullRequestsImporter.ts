@@ -83,7 +83,7 @@ export class BitbucketPullRequestsImporter {
             this.bitbucketAPI.getPullRequestDiff(project.projectKey, repositoryName, pullRequest.id)
         ]);
 
-        const pullRequestEntity = new BitbucketPullRequest({
+        const pullRequestEntity = await new BitbucketPullRequest().init({
                 teamName: this.teamName,
                 botUserSlugs: project.botUserSlugs,
                 formerEmployeeSlugs: project.formerEmployeeSlugs,

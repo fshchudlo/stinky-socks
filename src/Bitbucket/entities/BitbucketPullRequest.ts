@@ -7,6 +7,7 @@ import {
     BitbucketPullRequestActivityModel,
     BitbucketPullRequestModel
 } from "../api/BitbucketAPI";
+import { ContributorFactory } from "../../MetricsDB/ContributorFactory";
 
 export type ImportModel = {
     teamName: string;
@@ -19,27 +20,29 @@ export type ImportModel = {
 }
 
 export class BitbucketPullRequest extends PullRequest {
-    constructor(model: ImportModel) {
-        super();
-        this.initializeBaseProperties(model)
+    public async init(model: ImportModel): Promise<BitbucketPullRequest> {
+        return (await this.initializeBaseProperties(model))
             .initializeDates(model)
             .calculateCommitStats(model)
             .initializeParticipants(model);
     }
 
-    private initializeBaseProperties(model: ImportModel): BitbucketPullRequest {
+    private async initializeBaseProperties(model: ImportModel): Promise<BitbucketPullRequest> {
         this.teamName = model.teamName;
         this.projectKey = model.pullRequest.toRef.repository.project.key;
         this.repositoryName = model.pullRequest.toRef.repository.slug;
         this.pullRequestNumber = model.pullRequest.id;
         this.viewURL = model.pullRequest.links.self[0].href;
-
-        this.author = model.pullRequest.author.user.slug;
-
-        this.authorIsBotUser = model.botUserSlugs.includes(this.author);
-        this.authorIsFormerEmployee = model.formerEmployeeSlugs.includes(this.author);
         this.targetBranch = model.pullRequest.toRef.displayId;
         this.reviewersCount = model.pullRequest.reviewers.length;
+
+        const authorLogin = model.pullRequest.author.user.slug;
+        this.author = await ContributorFactory.fetchContributor({
+            teamName: model.teamName,
+            login: authorLogin,
+            isBotUser: model.botUserSlugs.includes(authorLogin),
+            isFormerEmployee: model.formerEmployeeSlugs.includes(authorLogin)
+        });
         return this;
     }
 
@@ -84,7 +87,7 @@ export class BitbucketPullRequest extends PullRequest {
         const reviewerAdditions = model.pullRequestActivities.filter(a => "addedReviewers" in a);
 
         if (reviewerAdditions.length > 0) {
-            const initialReviewersSlugs = new Set<string>(model.pullRequest.reviewers.map(r=> r.user.slug).filter(s => !model.botUserSlugs.includes(s)));
+            const initialReviewersSlugs = new Set<string>(model.pullRequest.reviewers.map(r => r.user.slug).filter(s => !model.botUserSlugs.includes(s)));
             const addedReviewersSlugs = new Set<string>(reviewerAdditions.flatMap(a => a.addedReviewers?.map(r => r.slug) || []));
 
             // If all initial reviewers were added after PR was opened
@@ -96,6 +99,7 @@ export class BitbucketPullRequest extends PullRequest {
         }
         return new Date(model.pullRequest.createdDate);
     }
+
     private static getActivitiesOf(activities: BitbucketPullRequestActivityModel[], userName: string): BitbucketPullRequestActivityModel[] {
         return activities.filter(a => a.user.slug === userName);
     }

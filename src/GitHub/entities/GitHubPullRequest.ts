@@ -2,6 +2,7 @@ import { PullRequest } from "../../MetricsDB/PullRequest";
 import getHumanComments from "./getHumanComments";
 import { GitHubPullRequestParticipant } from "./GitHubPullRequestParticipant";
 import { GitHubFileModel, GitHubPullRequestActivityModel, GitHubPullRequestModel } from "../api/GitHubAPI";
+import { ContributorFactory } from "../../MetricsDB/ContributorFactory";
 
 export type ImportModel = {
     teamName: string;
@@ -13,25 +14,30 @@ export type ImportModel = {
 }
 
 export class GitHubPullRequest extends PullRequest {
-    constructor(model: ImportModel) {
-        super();
-        this.initializeBaseProperties(model)
+    public async init(model: ImportModel) {
+        return (await this.initializeBaseProperties(model))
             .initializeDates(model)
             .calculateCommitStats(model)
             .initializeParticipants(model);
     }
 
-    private initializeBaseProperties(model: ImportModel): GitHubPullRequest {
+    private async initializeBaseProperties(model: ImportModel): Promise<GitHubPullRequest> {
         this.teamName = model.teamName;
         this.projectKey = model.pullRequest.base.repo.owner.login;
         this.repositoryName = model.pullRequest.base.repo.name;
         this.pullRequestNumber = model.pullRequest.number;
-        this.author = model.pullRequest.user.login;
         this.viewURL = model.pullRequest.html_url;
-        this.authorIsBotUser = model.botUserNames.includes(this.author);
-        this.authorIsFormerEmployee = model.formerEmployeeNames.includes(this.author);
         this.targetBranch = model.pullRequest.base.ref;
         this.reviewersCount = model.pullRequest.requested_reviewers.length;
+
+        const authorLogin = model.pullRequest.user.login;
+        this.author = await ContributorFactory.fetchContributor({
+            teamName: model.teamName,
+            login: authorLogin,
+            isBotUser: model.botUserNames.includes(authorLogin),
+            isFormerEmployee: model.formerEmployeeNames.includes(authorLogin)
+        });
+
         return this;
     }
 

@@ -25,7 +25,7 @@ export class Contributor {
     @Column()
     nickname: string;
 
-    @OneToMany(() => PullRequest, (pullRequest) => pullRequest.authorUser)
+    @OneToMany(() => PullRequest, (pullRequest) => pullRequest.author)
     pullRequests: PullRequest[];
 
     @OneToMany(() => PullRequestParticipant, (participant) => participant.participant)

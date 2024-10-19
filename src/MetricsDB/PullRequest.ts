@@ -17,16 +17,7 @@ export abstract class PullRequest {
     protected teamName: string;
 
     @Column()
-    protected author: string;
-
-    @Column()
     protected viewURL: string;
-
-    @Column()
-    protected authorIsBotUser: boolean;
-
-    @Column()
-    protected authorIsFormerEmployee: boolean;
 
     @Column()
     protected targetBranch: string;
@@ -49,7 +40,7 @@ export abstract class PullRequest {
     @Column()
     protected commentsCount: number;
 
-    @Column()
+    @Column({ type: "numeric" })
     protected diffSize: number;
 
     @Column()
@@ -61,6 +52,6 @@ export abstract class PullRequest {
     participants: PullRequestParticipant[];
 
     @ManyToOne(() => Contributor, (author) => author.pullRequests, { onDelete: "CASCADE" })
-    @JoinColumn({ name: "author_id" })
-    authorUser: Contributor;
+    @JoinColumn()
+    author: Contributor;
 }
