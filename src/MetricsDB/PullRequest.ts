@@ -47,7 +47,7 @@ export abstract class PullRequest {
     protected testsWereTouched: boolean;
 
     @Column({ type: "varchar" })
-    protected authorRole: "COLLABORATOR" | "CONTRIBUTOR" | "NONE";
+    protected authorRole: "COLLABORATOR" | "CONTRIBUTOR" | "FIRST_TIMER" | "FIRST_TIME_CONTRIBUTOR" | "MEMBER" | "OWNER" | "MANNEQUIN" | "NONE";
 
     @OneToMany(() => PullRequestParticipant, (participant) => participant.pullRequest, {
         cascade: true
