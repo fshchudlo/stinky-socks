@@ -57,13 +57,13 @@ export class ContributorFactory {
         });
     }
 
-    private static async generateUniqueNickname(team: string): Promise<string> {
+    private static async generateUniqueNickname(teamName: string): Promise<string> {
         let nickname: string;
         let isUnique = false;
 
         do {
             nickname = ContributorFactory.generateNickname();
-            const existingContributor = await contributorRepo.findOne({ where: { teamName: team, nickname } });
+            const existingContributor = await contributorRepo.findOne({ where: { teamName, nickname } });
             if (!existingContributor) {
                 isUnique = true;
             }

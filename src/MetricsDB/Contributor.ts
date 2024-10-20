@@ -4,7 +4,7 @@ import { PullRequest } from "./PullRequest";
 
 
 @Entity()
-@Unique(["nickname"])
+@Unique(["teamName", "nickname"])
 @Unique(["teamName", "login"])
 export class Contributor {
     @PrimaryGeneratedColumn()
