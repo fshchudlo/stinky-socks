@@ -13,5 +13,12 @@ describe("GitHubAPI 𝑰𝒏𝒕𝒆𝒈𝒓𝒂𝒕𝒊𝒐𝒏 Test", () => {
         const pullRequestsHistory = await sut.getClosedPullRequests(owner, repoName, 1, 10);
         expect(pullRequestsHistory.values).not.toHaveLength(0);
 
+
+        const pullRequestsFiles = await sut.getPullRequestFiles(owner, repoName, pullRequestsHistory[0].number);
+        expect(pullRequestsFiles.values).not.toHaveLength(0);
+
+        const pullRequestsActivities = await sut.getPullRequestActivities(owner, repoName, pullRequestsHistory[0].number);
+        expect(pullRequestsActivities.values).not.toHaveLength(0);
+
     });
 });

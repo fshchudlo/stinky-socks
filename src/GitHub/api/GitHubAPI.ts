@@ -17,6 +17,15 @@ export class GitHubAPI {
             params: params
         };
         const response = await axios.get(url, config);
+        if (response.headers['x-ratelimit-remaining'] === '1') {
+            const resetTime = parseInt(response.headers['x-ratelimit-reset'], 10) * 1000;
+            const currentTime = Date.now();
+            const waitTime = resetTime - currentTime;
+
+            console.warn(`GitHub API rate limit exceeded. Waiting for ${waitTime / 1000} seconds...`);
+            await new Promise(resolve => setTimeout(resolve, waitTime));
+        }
+
         if (response.status === 200) {
             return response.data;
         }
@@ -89,7 +98,10 @@ export type GitHubPullRequestModel = {
 };
 
 export type GitHubPullRequestActivityModel = {
-    comments: { user: GitHubUserModel }[];
+    comments: {
+        created_at: string;
+        user: GitHubUserModel
+    }[];
     event: string;
     created_at: string;
     committer?: GitHubUserModel & {
