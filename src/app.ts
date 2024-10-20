@@ -30,7 +30,7 @@ async function importBitbucketProjects(team: TeamImportSettings) {
     const timelogLabel = `🎉 Bitbucket pull requests import completed!`;
     console.time(timelogLabel);
 
-    for (const bitbucketProject of team.bitbucketProjects) {
+    for (const bitbucketProject of team.bitbucketProjects || []) {
         console.group(`🔁 Importing pull requests for '${bitbucketProject.projectKey}' project`);
 
         const bitbucketAPI = new BitbucketAPI(bitbucketProject.auth.apiUrl, bitbucketProject.auth.apiToken);
@@ -46,7 +46,7 @@ async function importGitHubPullRequests(team: TeamImportSettings) {
     const timelogLabel = `🎉 GitHub pull requests import completed!`;
     console.time(timelogLabel);
 
-    for (const gitHubProject of team.gitHubProjects) {
+    for (const gitHubProject of team.gitHubProjects || []) {
         console.group(`🔁 Importing pull requests for '${gitHubProject.owner}' project`);
 
         const gitHubAPI = new GitHubAPI(gitHubProject.auth.apiToken);

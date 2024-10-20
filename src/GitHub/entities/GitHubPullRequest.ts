@@ -1,7 +1,12 @@
 import { PullRequest } from "../../MetricsDB/PullRequest";
 import getHumanComments from "./getHumanComments";
 import { GitHubPullRequestParticipant } from "./GitHubPullRequestParticipant";
-import { GitHubFileModel, GitHubPullRequestActivityModel, GitHubPullRequestModel } from "../api/GitHubAPI";
+import {
+    ActivityTraits,
+    GitHubFileModel,
+    GitHubPullRequestActivityModel,
+    GitHubPullRequestModel
+} from "../api/contracts";
 import { ContributorFactory } from "../../MetricsDB/ContributorFactory";
 import getHumanLineComments from "./getHumanLineComments";
 
@@ -47,7 +52,7 @@ export class GitHubPullRequest extends PullRequest {
         this.openedDate = this.calculatePrOpenDate(model);
         this.mergedDate = new Date(model.pullRequest.merged_at);
 
-        const commitTimestamps = model.pullRequestActivities.filter(a => a.event == "committed").map((c) => new Date(c.author!.date).getTime());
+        const commitTimestamps = model.pullRequestActivities.filter(ActivityTraits.isCommitedEvent).map((c) => new Date(c.author!.date).getTime());
         this.initialCommitDate = new Date(Math.min(...commitTimestamps));
         this.lastCommitDate = new Date(Math.max(...commitTimestamps));
 
@@ -79,15 +84,18 @@ export class GitHubPullRequest extends PullRequest {
     }
 
     private calculatePrOpenDate(model: ImportModel): Date {
-        const readyForReviewEvent = model.pullRequestActivities.filter(a => a.event == "ready_for_review");
+        const readyForReviewEvent = model.pullRequestActivities.filter(ActivityTraits.isReadyForReviewEvent);
         if (readyForReviewEvent.length > 0) {
             const earliestDate = Math.min(...readyForReviewEvent.map(a => new Date(a.created_at).getTime()));
             return new Date(earliestDate);
         }
 
-        const reviewerAdditions = model.pullRequestActivities.filter(a => a.event == "review_requested");
+        const reviewerAdditions = model.pullRequestActivities.filter(ActivityTraits.isReviewRequestedEvent);
         if (reviewerAdditions.length > 0) {
-            const initialReviewers = reviewerAdditions.filter(a => new Date(a.created_at).getTime() == new Date(model.pullRequest.created_at).getTime()).map(r => r.requested_reviewer!.login).filter(s => !model.botUserNames.includes(s));
+            const initialReviewers = reviewerAdditions
+                .filter(a => new Date(a.created_at).getTime() == new Date(model.pullRequest.created_at).getTime())
+                .map(r => r.requested_reviewer?.login || r.requested_team?.name)
+                .filter(s => !model.botUserNames.includes(s));
             // If all reviewers were added after PR was opened
             if (initialReviewers.length == 0) {
                 const earliestAddingDate = Math.min(...reviewerAdditions.map(activity => new Date(activity.created_at).getTime()));
@@ -102,10 +110,12 @@ export class GitHubPullRequest extends PullRequest {
             if (["mentioned", "subscribed"].includes(a.event)) {
                 return false;
             }
-            if (a.event === "line-commented") {
+            if (ActivityTraits.isLineCommentedEvent(a)) {
                 return a.comments.map(c => c.user.login).includes(userName);
             }
-            return (a.actor || a.author || a.user).login === userName;
+
+            const typedA = a as any;
+            return (typedA.actor?.login || typedA.author?.login || typedA.user?.login) === userName;
         });
     }
 }

@@ -1,6 +1,6 @@
 import { PullRequestParticipant } from "../../MetricsDB/PullRequestParticipant";
 import getHumanComments from "./getHumanComments";
-import { GitHubPullRequestActivityModel, GitHubPullRequestModel } from "../api/GitHubAPI";
+import { ActivityTraits, GitHubPullRequestActivityModel, GitHubPullRequestModel } from "../api/contracts";
 import { ContributorFactory } from "../../MetricsDB/ContributorFactory";
 import getHumanLineComments from "./getHumanLineComments";
 
@@ -38,7 +38,8 @@ export class GitHubPullRequestParticipant extends PullRequestParticipant {
 
     private setApprovalStats(participantActivities: GitHubPullRequestActivityModel[], botUserNames: string[]) {
         const approvals = participantActivities
-            .filter(a => a.event === "reviewed" && a.state === "approved")
+            .filter(ActivityTraits.isReviewedEvent)
+            .filter(a => a.state === "approved")
             .filter(a => !botUserNames.includes(a.user.login));
 
         const approvalTimestamps = approvals.map(a => new Date(a.submitted_at!).getTime());

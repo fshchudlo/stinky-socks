@@ -1,4 +1,5 @@
 import axios, { AxiosRequestConfig } from "axios";
+import { GitHubFileModel, GitHubPullRequestActivityModel, GitHubPullRequestModel } from "./contracts";
 
 export class GitHubAPI {
     private readonly token: string;
@@ -17,8 +18,8 @@ export class GitHubAPI {
             params: params
         };
         const response = await axios.get(url, config);
-        if (response.headers['x-ratelimit-remaining'] === '1') {
-            const resetTime = parseInt(response.headers['x-ratelimit-reset'], 10) * 1000;
+        if (response.headers["x-ratelimit-remaining"] === "1") {
+            const resetTime = parseInt(response.headers["x-ratelimit-reset"], 10) * 1000;
             const currentTime = Date.now();
             const waitTime = resetTime - currentTime;
 
@@ -71,7 +72,13 @@ export class GitHubAPI {
 
     async getPullRequestActivities(owner: string, repo: string, pullRequestId: number): Promise<GitHubPullRequestActivityModel[]> {
         const url = `${this.baseUrl}/repos/${owner}/${repo}/issues/${pullRequestId}/timeline`;
-        return await this.getFullList(url);
+        const result = await this.getFullList(url);
+        return result.map(a => {
+            if (!["auto_rebase_enabled", "base_ref_force_pushed", "connected", "auto_merge_disabled", "auto_squash_enabled", "convert_to_draft", "unsubscribed", "locked", "removed_from_project", "moved_columns_in_project", "added_to_project", "review_dismissed", "comment_deleted", "base_ref_changed", "review_request_removed", "unassigned", "reopened", "demilestoned", "line-commented", "head_ref_restored", "automatic_base_change_succeeded", "ready_for_review", "reviewed", "review_requested", "cross-referenced", "referenced", "commented", "committed", "merged", "closed", "unlabeled", "milestoned", "renamed", "labeled", "head_ref_deleted", "head_ref_force_pushed", "mentioned", "subscribed", "assigned"].includes(a.event)) {
+                throw new Error(`Unknown event type: ${a.event}`);
+            }
+            return a;
+        });
     }
 
     async getPullRequestFiles(owner: string, repo: string, pullRequestId: number): Promise<GitHubFileModel[]> {
@@ -79,49 +86,3 @@ export class GitHubAPI {
         return await this.getFullList(url);
     }
 }
-
-export type GitHubPullRequestModel = {
-    author_association: "COLLABORATOR" | "CONTRIBUTOR" | "FIRST_TIMER" | "FIRST_TIME_CONTRIBUTOR" | "MEMBER" | "OWNER" | "MANNEQUIN" | "NONE";
-    base: {
-        repo: {
-            owner: GitHubUserModel;
-            name: string;
-        };
-        ref: string;
-    };
-    number: number;
-    user: GitHubUserModel;
-    html_url: string;
-    requested_reviewers: GitHubUserModel[];
-    assignees: GitHubUserModel[];
-    created_at: string;
-    merged_at: string;
-};
-
-export type GitHubPullRequestActivityModel = {
-    comments: {
-        created_at: string;
-        user: GitHubUserModel
-    }[];
-    event: string;
-    created_at: string;
-    committer?: GitHubUserModel & {
-        date: string;
-    };
-    user: GitHubUserModel;
-    actor?: GitHubUserModel;
-    author?: GitHubUserModel & {
-        date: string;
-    };
-    requested_reviewer?: GitHubUserModel;
-    state?: string;
-    submitted_at?: string;
-};
-
-export type GitHubFileModel = {
-    filename: string;
-    changes: number;
-};
-export type GitHubUserModel = {
-    login: string;
-};

@@ -1,8 +1,9 @@
-import { GitHubAPI, GitHubPullRequestModel } from "./api/GitHubAPI";
+import { GitHubAPI } from "./api/GitHubAPI";
 import { Repository } from "typeorm";
 import { PullRequest } from "../MetricsDB/PullRequest";
 import { MetricsDB } from "../MetricsDB/MetricsDB";
 import { GitHubPullRequest } from "./entities/GitHubPullRequest";
+import { GitHubPullRequestModel } from "./api/contracts";
 
 export type GitHubProjectSettings = {
     owner: string;
