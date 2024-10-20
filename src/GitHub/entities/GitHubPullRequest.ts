@@ -3,6 +3,7 @@ import getHumanComments from "./getHumanComments";
 import { GitHubPullRequestParticipant } from "./GitHubPullRequestParticipant";
 import { GitHubFileModel, GitHubPullRequestActivityModel, GitHubPullRequestModel } from "../api/GitHubAPI";
 import { ContributorFactory } from "../../MetricsDB/ContributorFactory";
+import getHumanLineComments from "./getHumanLineComments";
 
 export type ImportModel = {
     teamName: string;
@@ -29,6 +30,7 @@ export class GitHubPullRequest extends PullRequest {
         this.viewURL = model.pullRequest.html_url;
         this.targetBranch = model.pullRequest.base.ref;
         this.reviewersCount = model.pullRequest.requested_reviewers.length;
+        this.authorRole = model.pullRequest.author_association;
 
         const authorLogin = model.pullRequest.user.login;
         this.author = await ContributorFactory.fetchContributor({
@@ -53,7 +55,7 @@ export class GitHubPullRequest extends PullRequest {
     }
 
     private calculateCommitStats(model: ImportModel) {
-        this.commentsCount = getHumanComments(model.pullRequestActivities, model.botUserNames).length;
+        this.commentsCount = getHumanComments(model.pullRequestActivities, model.botUserNames).length + getHumanLineComments(model.pullRequestActivities, model.botUserNames).length;
         this.diffSize = model.files.reduce((acc, file) => acc + file.changes, 0);
         this.testsWereTouched = model.files.some(file => file.filename.toLowerCase().includes("test"));
         return this;
@@ -98,6 +100,14 @@ export class GitHubPullRequest extends PullRequest {
     }
 
     private static getActivitiesOf(activities: GitHubPullRequestActivityModel[], userName: string) {
-        return activities.filter(a => (a.actor || a.author || a.user).login === userName);
+        return activities.filter(a => {
+            if (["mentioned", "subscribed"].includes(a.event)) {
+                return false;
+            }
+            if (a.event === "line-commented") {
+                return a.comments.map(c => c.user.login).includes(userName);
+            }
+            return (a.actor || a.author || a.user).login === userName;
+        });
     }
 }

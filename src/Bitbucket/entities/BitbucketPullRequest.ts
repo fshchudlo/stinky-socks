@@ -35,6 +35,7 @@ export class BitbucketPullRequest extends PullRequest {
         this.viewURL = model.pullRequest.links.self[0].href;
         this.targetBranch = model.pullRequest.toRef.displayId;
         this.reviewersCount = model.pullRequest.reviewers.length;
+        this.authorRole = "CONTRIBUTOR"
 
         const authorLogin = model.pullRequest.author.user.slug;
         this.author = await ContributorFactory.fetchContributor({

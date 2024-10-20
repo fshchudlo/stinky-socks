@@ -81,6 +81,7 @@ export class GitHubAPI {
 }
 
 export type GitHubPullRequestModel = {
+    author_association: "COLLABORATOR" | "CONTRIBUTOR" | "NONE";
     base: {
         repo: {
             owner: GitHubUserModel;

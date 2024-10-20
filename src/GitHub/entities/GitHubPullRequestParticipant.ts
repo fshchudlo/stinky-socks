@@ -2,6 +2,7 @@ import { PullRequestParticipant } from "../../MetricsDB/PullRequestParticipant";
 import getHumanComments from "./getHumanComments";
 import { GitHubPullRequestActivityModel, GitHubPullRequestModel } from "../api/GitHubAPI";
 import { ContributorFactory } from "../../MetricsDB/ContributorFactory";
+import getHumanLineComments from "./getHumanLineComments";
 
 export class GitHubPullRequestParticipant extends PullRequestParticipant {
     async init(teamName: string, participantName: string, pullRequestData: GitHubPullRequestModel, participantActivities: GitHubPullRequestActivityModel[], botUserNames: string[], formerEmployeeNames: string[]) {
@@ -26,8 +27,9 @@ export class GitHubPullRequestParticipant extends PullRequestParticipant {
 
     private setCommentStats(participantActivities: GitHubPullRequestActivityModel[], botUserNames: string[]) {
         const comments = getHumanComments(participantActivities, botUserNames);
+        const lineComments = getHumanLineComments(participantActivities, botUserNames);
 
-        const commentTimestamps = comments.map(c => new Date(c.submitted_at!).getTime());
+        const commentTimestamps = comments.map(c => new Date(c.created_at!).getTime()).concat(lineComments.map(c => new Date(c.created_at!).getTime()));
         this.firstCommentDate = commentTimestamps.length ? new Date(Math.min(...commentTimestamps)) : null as any;
         this.lastCommentDate = commentTimestamps.length ? new Date(Math.max(...commentTimestamps)) : null as any;
         this.commentsCount = comments.length;
