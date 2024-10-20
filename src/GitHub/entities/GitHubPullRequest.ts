@@ -66,17 +66,15 @@ export class GitHubPullRequest extends PullRequest {
             ...model.pullRequest.requested_reviewers.map(r => r.login),
             ...model.pullRequest.assignees.map(p => p.login)
         ]);
-        this.participants = [];
-        for (const participantName of Array.from(allParticipants)) {
-            this.participants.push(await new GitHubPullRequestParticipant().init(
+        this.participants = await Promise.all(Array.from(allParticipants).map(participantName =>
+            new GitHubPullRequestParticipant().init(
                 model.teamName,
                 participantName,
                 model.pullRequest,
                 GitHubPullRequest.getActivitiesOf(model.pullRequestActivities, participantName),
                 model.botUserNames,
                 model.formerEmployeeNames
-            ));
-        }
+            )));
         return this;
     }
 
@@ -89,7 +87,7 @@ export class GitHubPullRequest extends PullRequest {
 
         const reviewerAdditions = model.pullRequestActivities.filter(a => a.event == "review_requested");
         if (reviewerAdditions.length > 0) {
-            const initialReviewers = reviewerAdditions.filter(a => a.created_at == model.pullRequest.created_at).map(r => r.requested_reviewer!.login).filter(s => !model.botUserNames.includes(s));
+            const initialReviewers = reviewerAdditions.filter(a => new Date(a.created_at).getTime() == new Date(model.pullRequest.created_at).getTime()).map(r => r.requested_reviewer!.login).filter(s => !model.botUserNames.includes(s));
             // If all reviewers were added after PR was opened
             if (initialReviewers.length == 0) {
                 const earliestAddingDate = Math.min(...reviewerAdditions.map(activity => new Date(activity.created_at).getTime()));

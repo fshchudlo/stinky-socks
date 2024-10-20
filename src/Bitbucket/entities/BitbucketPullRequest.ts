@@ -35,7 +35,7 @@ export class BitbucketPullRequest extends PullRequest {
         this.viewURL = model.pullRequest.links.self[0].href;
         this.targetBranch = model.pullRequest.toRef.displayId;
         this.reviewersCount = model.pullRequest.reviewers.length;
-        this.authorRole = "CONTRIBUTOR"
+        this.authorRole = "MEMBER";
 
         const authorLogin = model.pullRequest.author.user.slug;
         this.author = await ContributorFactory.fetchContributor({
@@ -71,17 +71,14 @@ export class BitbucketPullRequest extends PullRequest {
             ...model.pullRequest.participants.map(p => p.user.slug)
         ]);
 
-        this.participants = [];
-        for (const participantName of Array.from(allParticipants)) {
-            this.participants.push(await new BitbucketPullRequestParticipant().init(
-                model.teamName,
-                participantName,
-                model.pullRequest,
-                BitbucketPullRequest.getActivitiesOf(model.pullRequestActivities, participantName),
-                model.botUserSlugs,
-                model.formerEmployeeSlugs
-            ));
-        }
+        this.participants = await Promise.all(Array.from(allParticipants).map(participantName => new BitbucketPullRequestParticipant().init(
+            model.teamName,
+            participantName,
+            model.pullRequest,
+            BitbucketPullRequest.getActivitiesOf(model.pullRequestActivities, participantName),
+            model.botUserSlugs,
+            model.formerEmployeeSlugs
+        )));
         return this;
     }
 
