@@ -13,6 +13,7 @@ export type GitHubPullRequestModel = {
     requested_reviewers: GitHubUserModel[];
     assignees: GitHubUserModel[];
     created_at: string;
+    updated_at: string;
     merged_at: string;
 };
 

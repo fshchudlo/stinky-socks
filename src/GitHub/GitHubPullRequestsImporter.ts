@@ -45,16 +45,17 @@ export class GitHubPullRequestsImporter {
     private async importRepositoryPullRequests(repositoryName: string) {
         const pageSize = 100;
         let pageNumber = 1;
-        const lastMergeDateOfStoredPRs: Date | null = await MetricsDB.getPRsCountAndLastMergeDate(this.teamName, this.project.owner, repositoryName);
+        const lastUpdateDateOfStoredPRs: Date | null = await MetricsDB.getPRsMaxDate("updatedDate", this.teamName, this.project.owner, repositoryName);
         while (true) {
             const pullRequestsChunk = await this.gitHubAPI.getClosedPullRequests(this.project.owner, repositoryName, pageNumber, pageSize);
 
             for (const pullRequest of pullRequestsChunk) {
                 console.count(`📥 ${repositoryName}: pull requests processed`);
-                if (!pullRequest.merged_at) {
+                if (lastUpdateDateOfStoredPRs != null && new Date(pullRequest.updated_at) <= lastUpdateDateOfStoredPRs) {
                     continue;
                 }
-                if (lastMergeDateOfStoredPRs != null && new Date(pullRequest.merged_at) <= lastMergeDateOfStoredPRs) {
+
+                if (!pullRequest.merged_at) {
                     continue;
                 }
 

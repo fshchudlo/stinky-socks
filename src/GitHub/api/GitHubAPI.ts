@@ -63,7 +63,7 @@ export class GitHubAPI {
         const url = `${this.baseUrl}/repos/${owner}/${repo}/pulls`;
         return await this.get(url, {
             state: "closed",
-            sort: "created",
+            sort: "updated",
             direction: "asc",
             page,
             per_page

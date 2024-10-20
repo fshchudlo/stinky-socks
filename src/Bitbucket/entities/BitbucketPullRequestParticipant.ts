@@ -1,6 +1,6 @@
 import { PullRequestParticipant } from "../../MetricsDB/PullRequestParticipant";
 import getHumanActivities from "./getHumanActivities";
-import { BitbucketPullRequestActivityModel, BitbucketPullRequestModel } from "../api/BitbucketAPI";
+import { BitbucketPullRequestActivityModel, BitbucketPullRequestModel } from "../api/contracts";
 import { ContributorFactory } from "../../MetricsDB/ContributorFactory";
 
 export class BitbucketPullRequestParticipant extends PullRequestParticipant {
@@ -21,6 +21,7 @@ export class BitbucketPullRequestParticipant extends PullRequestParticipant {
             isBotUser: botUserSlugs.includes(participantName),
             isFormerEmployee: formerEmployeeSlugs.includes(participantName)
         });
+        this.participantIdForPrimaryKeyHack = this.participant.id;
         return this;
     }
 

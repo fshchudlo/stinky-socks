@@ -6,7 +6,7 @@ import {
     BitbucketDiffModel,
     BitbucketPullRequestActivityModel,
     BitbucketPullRequestModel
-} from "../api/BitbucketAPI";
+} from "../api/contracts";
 import { ContributorFactory } from "../../MetricsDB/ContributorFactory";
 
 export type ImportModel = {
@@ -36,6 +36,8 @@ export class BitbucketPullRequest extends PullRequest {
         this.targetBranch = model.pullRequest.toRef.displayId;
         this.reviewersCount = model.pullRequest.reviewers.length;
         this.authorRole = "MEMBER";
+        this.createdDate = new Date(model.pullRequest.createdDate);
+        this.updatedDate = new Date(model.pullRequest.updatedDate);
 
         const authorLogin = model.pullRequest.author.user.slug;
         this.author = await ContributorFactory.fetchContributor({

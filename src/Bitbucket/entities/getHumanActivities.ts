@@ -1,4 +1,4 @@
-import { BitbucketPullRequestActivityModel } from "../api/BitbucketAPI";
+import { BitbucketPullRequestActivityModel } from "../api/contracts";
 
 export default function getHumanActivities(activities: BitbucketPullRequestActivityModel[], botUsers: string[], actionType: "COMMENTED" | "APPROVED") {
     return activities

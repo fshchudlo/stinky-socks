@@ -1,23 +1,24 @@
-import { Entity, Column, ManyToOne, JoinColumn, PrimaryGeneratedColumn } from "typeorm";
+import { Entity, Column, ManyToOne, JoinColumn, PrimaryColumn } from "typeorm";
 import { PullRequest } from "./PullRequest";
 import { Contributor } from "./Contributor";
 
 @Entity()
 export abstract class PullRequestParticipant {
-    @PrimaryGeneratedColumn()
-    protected id: number;
-
-    @Column()
+    @PrimaryColumn()
     protected teamName: string;
 
-    @Column()
+    @PrimaryColumn()
     protected projectKey: string;
 
-    @Column()
+    @PrimaryColumn()
     protected repositoryName: string;
 
-    @Column()
+    @PrimaryColumn()
     protected pullRequestNumber: number;
+
+    @PrimaryColumn()
+    //Without this typeorm makes really strange things when doing upsert logic
+    protected participantIdForPrimaryKeyHack: number;
 
     @Column({ nullable: true })
     protected firstCommentDate?: Date;

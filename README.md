@@ -16,9 +16,9 @@
 ### Recommendations regarding import
 
 - Occasionally, there may be irregularities in the data. For instance, both the GitHub and Bitbucket APIs sometimes fail
-  to return data about commits (see [this as example](https://github.com/grafana/grafana/pull/637)). I recommend thoroughly filtering such data using the
-  pullRequestsFilterFn function in ./src/app.importConfig.ts to prevent these cases from introducing noise into the
-  dataset.
+  to return data about commits (see [this as example](https://github.com/grafana/grafana/pull/637)). I recommend
+  thoroughly filtering such data using the `pullRequestsFilterFn` function in ./src/app.importConfig.ts to prevent these
+  cases from introducing noise into the dataset.
 
 ### Running unit tests
 

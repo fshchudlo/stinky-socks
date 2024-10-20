@@ -1,8 +1,9 @@
-import { BitbucketAPI, BitbucketPullRequestModel } from "./api/BitbucketAPI";
+import { BitbucketAPI } from "./api/BitbucketAPI";
 import { BitbucketPullRequest } from "./entities/BitbucketPullRequest";
 import { MetricsDB } from "../MetricsDB/MetricsDB";
 import { Repository } from "typeorm";
 import { PullRequest } from "../MetricsDB/PullRequest";
+import { BitbucketPullRequestModel } from "./api/contracts";
 
 export type BitbucketProjectSettings = {
     projectKey: string;
@@ -44,7 +45,7 @@ export class BitbucketPullRequestsImporter {
 
 
     /**
-     * Unfortunately, the Bitbucket API does not allow filtering or sorting pull requests by merge date.
+     * Unfortunately, the Bitbucket API 1.0 (used in on-prem versions) does not allow filtering or sorting pull requests by merge date.
      * This can result in data gaps when a pull request remains open for an extended period before being merged.
      * To avoid missing data, we retrieve all pull requests from the API each time.
      * This is typically isn't an issue since this is tens of thousands of pull requests at worst and the Bitbucket API performs well
@@ -52,7 +53,7 @@ export class BitbucketPullRequestsImporter {
      */
     private async importRepositoryPullRequests(repositoryName: string) {
         const limit = 1000;
-        const lastMergeDateOfStoredPRs: Date | null = await MetricsDB.getPRsCountAndLastMergeDate(this.teamName, this.project.projectKey, repositoryName);
+        const lastMergeDateOfStoredPRs: Date | null = await MetricsDB.getPRsMaxDate("mergedDate", this.teamName, this.project.projectKey, repositoryName);
         for (let start = 0; ; start += limit) {
             const pullRequestsChunk = await this.bitbucketAPI.getMergedPullRequests(this.project.projectKey, repositoryName, start, limit);
 

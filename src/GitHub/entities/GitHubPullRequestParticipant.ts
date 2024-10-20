@@ -22,6 +22,7 @@ export class GitHubPullRequestParticipant extends PullRequestParticipant {
             isBotUser: botUserNames.includes(participantName),
             isFormerEmployee: formerEmployeeNames.includes(participantName)
         });
+        this.participantIdForPrimaryKeyHack = this.participant.id;
         return this;
     }
 

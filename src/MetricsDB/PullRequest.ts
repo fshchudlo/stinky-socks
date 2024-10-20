@@ -23,6 +23,12 @@ export abstract class PullRequest {
     protected targetBranch: string;
 
     @Column()
+    protected createdDate: Date;
+
+    @Column()
+    protected updatedDate: Date;
+
+    @Column()
     protected openedDate: Date;
 
     @Column({ nullable: true })
