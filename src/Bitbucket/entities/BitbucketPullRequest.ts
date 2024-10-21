@@ -57,9 +57,7 @@ export class BitbucketPullRequest extends PullRequest {
     private async initializeParticipants(model: ImportParams) {
         const allParticipants = new Set<string>([
             ...model.pullRequest.reviewers.map(r => r.user.slug),
-            ...model.pullRequest.participants.map(p => p.user.slug),
-            ...model.pullRequestActivities.filter(a => a.action == "COMMENTED").map(p => p.user.slug),
-            ...model.pullRequestActivities.filter(a => a.action == "APPROVED").map(p => p.user.slug)
+            ...model.pullRequest.participants.map(p => p.user.slug)
         ]);
 
         this.participants = await Promise.all(
