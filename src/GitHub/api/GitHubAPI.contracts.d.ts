@@ -68,7 +68,7 @@ export type GitHubPullRequestActivityReadyForReviewModel = {
 };
 
 
-export type GitHubFileModel = {
+export type GitHubFileDiffModel = {
     filename: string;
     changes: number;
 };

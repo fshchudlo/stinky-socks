@@ -1,5 +1,5 @@
 import axios, { AxiosRequestConfig } from "axios";
-import { GitHubFileModel, GitHubPullRequestActivityModel, GitHubPullRequestModel } from "./GitHubAPI.contracts";
+import { GitHubFileDiffModel, GitHubPullRequestActivityModel, GitHubPullRequestModel } from "./GitHubAPI.contracts";
 
 export class GitHubAPI {
     private readonly token: string;
@@ -81,7 +81,7 @@ export class GitHubAPI {
         });
     }
 
-    async getPullRequestFiles(owner: string, repo: string, pullRequestId: number): Promise<GitHubFileModel[]> {
+    async getPullRequestFiles(owner: string, repo: string, pullRequestId: number): Promise<GitHubFileDiffModel[]> {
         const url = `${this.baseUrl}/repos/${owner}/${repo}/pulls/${pullRequestId}/files`;
         return await this.getFullList(url);
     }

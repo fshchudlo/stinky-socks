@@ -1,33 +1,19 @@
 import getHumanActivities from "./helpers/getHumanActivities";
 import { PullRequest } from "../../MetricsDB/PullRequest";
 import { BitbucketPullRequestParticipant } from "./BitbucketPullRequestParticipant";
-import {
-    BitbucketCommitModel,
-    BitbucketDiffModel,
-    BitbucketPullRequestActivityModel,
-    BitbucketPullRequestModel
-} from "../api/BitbucketAPI.contracts";
+import { BitbucketDiffModel, BitbucketPullRequestActivityModel } from "../api/BitbucketAPI.contracts";
 import { ContributorFactory } from "../../MetricsDB/ContributorFactory";
-
-export type ImportModel = {
-    teamName: string;
-    botUserSlugs: string[],
-    formerEmployeeSlugs: string[],
-    pullRequest: BitbucketPullRequestModel,
-    pullRequestActivities: BitbucketPullRequestActivityModel[],
-    commits: BitbucketCommitModel[],
-    diff: BitbucketDiffModel
-}
+import { ImportParams } from "./ImportParams";
 
 export class BitbucketPullRequest extends PullRequest {
-    public async init(model: ImportModel): Promise<BitbucketPullRequest> {
+    public async init(model: ImportParams): Promise<BitbucketPullRequest> {
         return await (await this.initializeBaseProperties(model))
             .initializeDates(model)
             .calculateCommitStats(model)
             .initializeParticipants(model);
     }
 
-    private async initializeBaseProperties(model: ImportModel) {
+    private async initializeBaseProperties(model: ImportParams) {
         this.teamName = model.teamName;
         this.projectName = model.pullRequest.toRef.repository.project.key;
         this.repositoryName = model.pullRequest.toRef.repository.slug;
@@ -49,7 +35,7 @@ export class BitbucketPullRequest extends PullRequest {
         return this;
     }
 
-    private initializeDates(model: ImportModel) {
+    private initializeDates(model: ImportParams) {
         this.sharedForReviewDate = this.calculatePrOpenDate(model);
         this.mergedDate = new Date(model.pullRequest.closedDate);
 
@@ -60,14 +46,14 @@ export class BitbucketPullRequest extends PullRequest {
         return this;
     }
 
-    private calculateCommitStats(model: ImportModel) {
+    private calculateCommitStats(model: ImportParams) {
         this.commentsCount = getHumanActivities(model.pullRequestActivities, model.botUserSlugs, "COMMENTED").length;
         this.diffSize = BitbucketPullRequest.getDiffSize(model.diff);
         this.testsWereTouched = BitbucketPullRequest.testsWereTouched(model.diff);
         return this;
     }
 
-    private async initializeParticipants(model: ImportModel) {
+    private async initializeParticipants(model: ImportParams) {
         const allParticipants = new Set<string>([
             ...model.pullRequest.reviewers.map(r => r.user.slug),
             ...model.pullRequest.participants.map(p => p.user.slug)
@@ -84,7 +70,7 @@ export class BitbucketPullRequest extends PullRequest {
         return this;
     }
 
-    private calculatePrOpenDate(model: ImportModel): Date {
+    private calculatePrOpenDate(model: ImportParams): Date {
         const reviewerAdditions = model.pullRequestActivities.filter(a => "addedReviewers" in a);
 
         if (reviewerAdditions.length > 0) {

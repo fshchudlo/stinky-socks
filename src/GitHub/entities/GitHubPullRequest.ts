@@ -1,33 +1,21 @@
 import { PullRequest } from "../../MetricsDB/PullRequest";
 import getHumanComments from "./helpers/getHumanComments";
 import { GitHubPullRequestParticipant } from "./GitHubPullRequestParticipant";
-import {
-    GitHubFileModel,
-    GitHubPullRequestActivityModel,
-    GitHubPullRequestModel
-} from "../api/GitHubAPI.contracts";
+import { GitHubPullRequestActivityModel } from "../api/GitHubAPI.contracts";
 import { ContributorFactory } from "../../MetricsDB/ContributorFactory";
 import getHumanLineComments from "./helpers/getHumanLineComments";
 import { ActivityTraits } from "./helpers/ActivityTraits";
-
-export type ImportModel = {
-    teamName: string;
-    botUserNames: string[],
-    formerEmployeeNames: string[],
-    pullRequest: GitHubPullRequestModel,
-    pullRequestActivities: GitHubPullRequestActivityModel[],
-    files: GitHubFileModel[]
-}
+import { ImportParams } from "./ImportParams";
 
 export class GitHubPullRequest extends PullRequest {
-    public async init(model: ImportModel) {
+    public async init(model: ImportParams) {
         return await (await this.initializeBaseProperties(model))
             .initializeDates(model)
             .calculateCommitStats(model)
             .initializeParticipants(model);
     }
 
-    private async initializeBaseProperties(model: ImportModel) {
+    private async initializeBaseProperties(model: ImportParams) {
         this.teamName = model.teamName;
         this.projectName = model.pullRequest.base.repo.owner.login;
         this.repositoryName = model.pullRequest.base.repo.name;
@@ -51,7 +39,7 @@ export class GitHubPullRequest extends PullRequest {
         return this;
     }
 
-    private initializeDates(model: ImportModel) {
+    private initializeDates(model: ImportParams) {
         this.sharedForReviewDate = this.calculatePrSharedForReviewDate(model);
         this.mergedDate = new Date(model.pullRequest.merged_at);
 
@@ -62,14 +50,14 @@ export class GitHubPullRequest extends PullRequest {
         return this;
     }
 
-    private calculateCommitStats(model: ImportModel) {
+    private calculateCommitStats(model: ImportParams) {
         this.commentsCount = getHumanComments(model.pullRequestActivities, model.botUserNames).length + getHumanLineComments(model.pullRequestActivities, model.botUserNames).length;
         this.diffSize = model.files.reduce((acc, file) => acc + file.changes, 0);
         this.testsWereTouched = model.files.some(file => file.filename.toLowerCase().includes("test"));
         return this;
     }
 
-    private async initializeParticipants(model: ImportModel) {
+    private async initializeParticipants(model: ImportParams) {
         const allParticipants = new Set<string>([
             ...model.pullRequest.requested_reviewers.map(r => r.login),
             ...model.pullRequest.assignees.map(p => p.login)
@@ -86,7 +74,7 @@ export class GitHubPullRequest extends PullRequest {
         return this;
     }
 
-    private calculatePrSharedForReviewDate(model: ImportModel): Date {
+    private calculatePrSharedForReviewDate(model: ImportParams): Date {
         const readyForReviewEvent = model.pullRequestActivities.filter(ActivityTraits.isReadyForReviewEvent);
         if (readyForReviewEvent.length > 0) {
             const earliestDate = Math.min(...readyForReviewEvent.map(a => new Date(a.created_at).getTime()));
