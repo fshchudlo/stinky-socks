@@ -4,17 +4,17 @@ import { Contributor } from "./Contributor";
 
 @Entity()
 export abstract class PullRequest {
+    @Column()
+    protected teamName: string;
+
     @PrimaryColumn()
-    protected projectKey: string;
+    protected projectName: string;
 
     @PrimaryColumn()
     protected repositoryName: string;
 
     @PrimaryColumn()
     protected pullRequestNumber: number;
-
-    @Column()
-    protected teamName: string;
 
     @Column()
     protected viewURL: string;
@@ -29,7 +29,7 @@ export abstract class PullRequest {
     protected updatedDate: Date;
 
     @Column()
-    protected openedDate: Date;
+    protected sharedForReviewDate: Date;
 
     @Column({ nullable: true })
     protected initialCommitDate?: Date;

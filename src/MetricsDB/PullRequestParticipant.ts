@@ -8,7 +8,7 @@ export abstract class PullRequestParticipant {
     protected teamName: string;
 
     @PrimaryColumn()
-    protected projectKey: string;
+    protected projectName: string;
 
     @PrimaryColumn()
     protected repositoryName: string;
@@ -38,7 +38,7 @@ export abstract class PullRequestParticipant {
     @ManyToOne(() => PullRequest, (pr) => pr.participants, { onDelete: "CASCADE" })
     // ⚠️ remove snake naming after this bugfix merge: https://github.com/typeorm/typeorm/pull/11062
     @JoinColumn([
-        { name: "project_key", referencedColumnName: "projectKey" },
+        { name: "project_name", referencedColumnName: "projectName" },
         { name: "repository_name", referencedColumnName: "repositoryName" },
         { name: "pull_request_number", referencedColumnName: "pullRequestNumber" }
     ])

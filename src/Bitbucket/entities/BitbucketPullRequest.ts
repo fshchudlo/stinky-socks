@@ -29,7 +29,7 @@ export class BitbucketPullRequest extends PullRequest {
 
     private async initializeBaseProperties(model: ImportModel) {
         this.teamName = model.teamName;
-        this.projectKey = model.pullRequest.toRef.repository.project.key;
+        this.projectName = model.pullRequest.toRef.repository.project.key;
         this.repositoryName = model.pullRequest.toRef.repository.slug;
         this.pullRequestNumber = model.pullRequest.id;
         this.viewURL = model.pullRequest.links.self[0].href;
@@ -50,7 +50,7 @@ export class BitbucketPullRequest extends PullRequest {
     }
 
     private initializeDates(model: ImportModel) {
-        this.openedDate = this.calculatePrOpenDate(model);
+        this.sharedForReviewDate = this.calculatePrOpenDate(model);
         this.mergedDate = new Date(model.pullRequest.closedDate);
 
         const commitTimestamps = model.commits.map((c) => c.authorTimestamp as number);

@@ -12,7 +12,7 @@ export class BitbucketPullRequestParticipant extends PullRequestParticipant {
 
     private async initializeBaseProperties(teamName: string, participantName: string, pullRequestData: BitbucketPullRequestModel, botUserSlugs: string[], formerEmployeeSlugs: string[]) {
         this.teamName = teamName;
-        this.projectKey = pullRequestData.toRef.repository.project.key;
+        this.projectName = pullRequestData.toRef.repository.project.key;
         this.repositoryName = pullRequestData.toRef.repository.slug;
         this.pullRequestNumber = pullRequestData.id;
         this.participant = await ContributorFactory.fetchContributor({

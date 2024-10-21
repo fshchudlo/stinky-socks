@@ -13,7 +13,7 @@ export class GitHubPullRequestParticipant extends PullRequestParticipant {
 
     private async initializeBaseProperties(teamName: string, participantName: string, pullRequestData: GitHubPullRequestModel, botUserNames: string[], formerEmployeeNames: string[]) {
         this.teamName = teamName;
-        this.projectKey = pullRequestData.base.repo.owner.login;
+        this.projectName = pullRequestData.base.repo.owner.login;
         this.repositoryName = pullRequestData.base.repo.name;
         this.pullRequestNumber = pullRequestData.number;
         this.participant = await ContributorFactory.fetchContributor({

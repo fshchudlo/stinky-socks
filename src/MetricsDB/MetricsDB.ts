@@ -23,13 +23,13 @@ class MetricsDataSource extends DataSource {
         });
     }
 
-    async getPRsMaxDate(dateFieldName: "mergedDate" | "updatedDate", teamName: string, projectKey: string, repositorySlug: string) {
+    async getPRsMaxDate(dateFieldName: "mergedDate" | "updatedDate", teamName: string, projectName: string, repositoryName: string) {
         return (await this.getRepository(PullRequest)
             .createQueryBuilder("pr")
             .select(`MAX(pr.${dateFieldName})`, "maxDate")
-            .where("pr.teamName = :teamName", { teamName: teamName })
-            .andWhere("pr.projectKey = :projectKey", { projectKey: projectKey })
-            .andWhere("pr.repositoryName = :repositoryName", { repositoryName: repositorySlug })
+            .where("pr.teamName = :teamName", { teamName })
+            .andWhere("pr.projectName = :projectName", { projectName })
+            .andWhere("pr.repositoryName = :repositoryName", { repositoryName })
             .getRawOne())?.maxDate || null;
     }
 }
