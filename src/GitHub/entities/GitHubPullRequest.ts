@@ -1,11 +1,11 @@
 import { PullRequest } from "../../MetricsDB/PullRequest";
-import getHumanComments from "./helpers/getHumanComments";
 import { GitHubPullRequestParticipant } from "./GitHubPullRequestParticipant";
-import { GitHubPullRequestActivityModel } from "../api/GitHubAPI.contracts";
 import { ContributorFactory } from "../../MetricsDB/ContributorFactory";
-import getHumanLineComments from "./helpers/getHumanLineComments";
 import { ActivityTraits } from "./helpers/ActivityTraits";
 import { ImportParams } from "./ImportParams";
+import getCommentsTimestamps from "./helpers/getCommentsTimestamps";
+import getActivitiesOf from "./helpers/getActivitiesOf";
+import calculatePrSharedForReviewDate from "./helpers/calculatePrSharedForReviewDate";
 
 export class GitHubPullRequest extends PullRequest {
     public async init(model: ImportParams) {
@@ -40,10 +40,10 @@ export class GitHubPullRequest extends PullRequest {
     }
 
     private initializeDates(model: ImportParams) {
-        this.sharedForReviewDate = this.calculatePrSharedForReviewDate(model);
+        this.sharedForReviewDate = calculatePrSharedForReviewDate(model);
         this.mergedDate = new Date(model.pullRequest.merged_at);
 
-        const commitTimestamps = model.pullRequestActivities.filter(ActivityTraits.isCommitedEvent).map((c) => new Date(c.author!.date).getTime());
+        const commitTimestamps = model.pullRequestActivities.filter(ActivityTraits.isCommitedEvent).map((c) => new Date(c.author.date).getTime());
         this.initialCommitDate = new Date(Math.min(...commitTimestamps));
         this.lastCommitDate = new Date(Math.max(...commitTimestamps));
 
@@ -51,7 +51,7 @@ export class GitHubPullRequest extends PullRequest {
     }
 
     private calculateCommitStats(model: ImportParams) {
-        this.commentsCount = getHumanComments(model.pullRequestActivities, model.botUserNames).length + getHumanLineComments(model.pullRequestActivities, model.botUserNames).length;
+        this.commentsCount = getCommentsTimestamps(model.pullRequestActivities, model.botUserNames).length;
         this.diffSize = model.files.reduce((acc, file) => acc + file.changes, 0);
         this.testsWereTouched = model.files.some(file => file.filename.toLowerCase().includes("test"));
         return this;
@@ -60,52 +60,31 @@ export class GitHubPullRequest extends PullRequest {
     private async initializeParticipants(model: ImportParams) {
         const allParticipants = new Set<string>([
             ...model.pullRequest.requested_reviewers.map(r => r.login),
-            ...model.pullRequest.assignees.map(p => p.login)
+            ...model.pullRequest.assignees.map(p => p.login),
+            ...model.pullRequestActivities.filter(ActivityTraits.isCommentedEvent).map(c => c.actor.login),
+            ...model.pullRequestActivities.filter(ActivityTraits.isLineCommentedEvent).flatMap(c => c.comments).map(c => c.user.login),
+            ...model.pullRequestActivities.filter(ActivityTraits.isReviewedEvent).map(c => c.user.login)
         ]);
-        this.participants = await Promise.all(Array.from(allParticipants).map(participantName =>
-            new GitHubPullRequestParticipant().init(
-                model.teamName,
-                participantName,
-                model.pullRequest,
-                GitHubPullRequest.getActivitiesOf(model.pullRequestActivities, participantName),
-                model.botUserNames,
-                model.formerEmployeeNames
-            )));
+
+        this.participants = await Promise.all(
+            Array.from(allParticipants)
+                .filter(p => p !== model.pullRequest.user.login)
+                .map(async participantName => {
+
+                    const participantUser = await ContributorFactory.fetchContributor({
+                        teamName: model.teamName,
+                        login: participantName,
+                        isBotUser: model.botUserNames.includes(participantName),
+                        isFormerEmployee: model.formerEmployeeNames.includes(participantName)
+                    });
+
+                    return new GitHubPullRequestParticipant(
+                        model.teamName,
+                        model.pullRequest,
+                        getActivitiesOf(model.pullRequestActivities, participantName),
+                        participantUser
+                    );
+                }));
         return this;
-    }
-
-    private calculatePrSharedForReviewDate(model: ImportParams): Date {
-        const readyForReviewEvent = model.pullRequestActivities.filter(ActivityTraits.isReadyForReviewEvent);
-        if (readyForReviewEvent.length > 0) {
-            const earliestDate = Math.min(...readyForReviewEvent.map(a => new Date(a.created_at).getTime()));
-            return new Date(earliestDate);
-        }
-
-        const nonBotReviewerAdditions = model.pullRequestActivities
-            .filter(ActivityTraits.isReviewRequestedEvent)
-            .filter(a => !model.botUserNames.includes(a.requested_reviewer?.login || a.requested_team?.name));
-
-        if (nonBotReviewerAdditions.length > 0) {
-            const reviewersAddedAtPRCreation = nonBotReviewerAdditions
-                .filter(a => new Date(a.created_at).getTime() == new Date(model.pullRequest.created_at).getTime());
-
-            if (reviewersAddedAtPRCreation.length == 0) {
-                // All reviewers were added after PR was opened
-                const earliestAdditionDate = Math.min(...nonBotReviewerAdditions.map(activity => new Date(activity.created_at).getTime()));
-                return new Date(earliestAdditionDate);
-            }
-        }
-        return new Date(model.pullRequest.created_at);
-    }
-
-    private static getActivitiesOf(activities: GitHubPullRequestActivityModel[], userName: string) {
-        return activities.filter(a => {
-            if (ActivityTraits.isLineCommentedEvent(a)) {
-                return a.comments.map(c => c.user.login).includes(userName);
-            }
-
-            const typedA = a as any;
-            return (typedA.actor?.login || typedA.author?.login || typedA.user?.login) === userName;
-        });
     }
 }

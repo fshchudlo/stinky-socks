@@ -1,48 +1,39 @@
 import { PullRequestParticipant } from "../../MetricsDB/PullRequestParticipant";
-import getHumanComments from "./helpers/getHumanComments";
 import { GitHubPullRequestActivityModel, GitHubPullRequestModel } from "../api/GitHubAPI.contracts";
-import { ContributorFactory } from "../../MetricsDB/ContributorFactory";
-import getHumanLineComments from "./helpers/getHumanLineComments";
 import { ActivityTraits } from "./helpers/ActivityTraits";
+import getCommentsTimestamps from "./helpers/getCommentsTimestamps";
+import { Contributor } from "../../MetricsDB/Contributor";
 
 export class GitHubPullRequestParticipant extends PullRequestParticipant {
-    async init(teamName: string, participantName: string, pullRequestData: GitHubPullRequestModel, participantActivities: GitHubPullRequestActivityModel[], botUserNames: string[], formerEmployeeNames: string[]) {
-        return (await this.initializeBaseProperties(teamName, participantName, pullRequestData, botUserNames, formerEmployeeNames))
-            .setCommentStats(participantActivities, botUserNames)
-            .setApprovalStats(participantActivities, botUserNames);
+    constructor(teamName: string, pullRequestData: GitHubPullRequestModel, participantActivities: GitHubPullRequestActivityModel[], participantUser: Contributor) {
+        super();
+        this.initializeBaseProperties(teamName, pullRequestData, participantUser)
+            .setCommentStats(participantActivities)
+            .setApprovalStats(participantActivities);
     }
 
-    private async initializeBaseProperties(teamName: string, participantName: string, pullRequestData: GitHubPullRequestModel, botUserNames: string[], formerEmployeeNames: string[]) {
+    private initializeBaseProperties(teamName: string, pullRequestData: GitHubPullRequestModel, participantUser: Contributor) {
         this.teamName = teamName;
         this.projectName = pullRequestData.base.repo.owner.login;
         this.repositoryName = pullRequestData.base.repo.name;
         this.pullRequestNumber = pullRequestData.number;
-        this.participant = await ContributorFactory.fetchContributor({
-            teamName: teamName,
-            login: participantName,
-            isBotUser: botUserNames.includes(participantName),
-            isFormerEmployee: formerEmployeeNames.includes(participantName)
-        });
+        this.participant = participantUser;
         this.participantIdForPrimaryKeyHack = this.participant.id;
         return this;
     }
 
-    private setCommentStats(participantActivities: GitHubPullRequestActivityModel[], botUserNames: string[]) {
-        const comments = getHumanComments(participantActivities, botUserNames);
-        const lineComments = getHumanLineComments(participantActivities, botUserNames);
-
-        const commentTimestamps = comments.map(c => new Date(c.created_at!).getTime()).concat(lineComments.map(c => new Date(c.created_at!).getTime()));
+    private setCommentStats(participantActivities: GitHubPullRequestActivityModel[]) {
+        const commentTimestamps = getCommentsTimestamps(participantActivities);
         this.firstCommentDate = commentTimestamps.length ? new Date(Math.min(...commentTimestamps)) : null as any;
         this.lastCommentDate = commentTimestamps.length ? new Date(Math.max(...commentTimestamps)) : null as any;
-        this.commentsCount = comments.length;
+        this.commentsCount = commentTimestamps.length;
         return this;
     }
 
-    private setApprovalStats(participantActivities: GitHubPullRequestActivityModel[], botUserNames: string[]) {
+    private setApprovalStats(participantActivities: GitHubPullRequestActivityModel[]) {
         const approvals = participantActivities
             .filter(ActivityTraits.isReviewedEvent)
-            .filter(a => a.state === "approved")
-            .filter(a => !botUserNames.includes(a.user.login));
+            .filter(a => a.state === "approved");
 
         const approvalTimestamps = approvals.map(a => new Date(a.submitted_at!).getTime());
         this.firstApprovalDate = approvalTimestamps.length ? new Date(Math.min(...approvalTimestamps)) : null as any;

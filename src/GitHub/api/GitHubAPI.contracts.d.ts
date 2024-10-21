@@ -35,10 +35,10 @@ export type GitHubPullRequestActivityLineCommentedModel = {
 
 export type GitHubPullRequestActivityCommitedModel = {
     event: "committed";
-    committer: GitHubUserModel & {
+    committer: {
         date: string;
     };
-    author: GitHubUserModel & {
+    author: {
         date: string;
     };
 };

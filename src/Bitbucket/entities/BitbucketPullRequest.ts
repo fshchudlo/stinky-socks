@@ -1,4 +1,3 @@
-import getHumanActivities from "./helpers/getHumanActivities";
 import { PullRequest } from "../../MetricsDB/PullRequest";
 import { BitbucketPullRequestParticipant } from "./BitbucketPullRequestParticipant";
 import { BitbucketDiffModel, BitbucketPullRequestActivityModel } from "../api/BitbucketAPI.contracts";
@@ -36,7 +35,7 @@ export class BitbucketPullRequest extends PullRequest {
     }
 
     private initializeDates(model: ImportParams) {
-        this.sharedForReviewDate = this.calculatePrOpenDate(model);
+        this.sharedForReviewDate = this.calculatePrSharedForReviewDate(model);
         this.mergedDate = new Date(model.pullRequest.closedDate);
 
         const commitTimestamps = model.commits.map((c) => c.authorTimestamp as number);
@@ -47,7 +46,9 @@ export class BitbucketPullRequest extends PullRequest {
     }
 
     private calculateCommitStats(model: ImportParams) {
-        this.commentsCount = getHumanActivities(model.pullRequestActivities, model.botUserSlugs, "COMMENTED").length;
+        this.commentsCount = model.pullRequestActivities
+            .filter(a => a.action === "COMMENTED")
+            .filter(a => !model.botUserSlugs.includes(a.user.slug)).length;
         this.diffSize = BitbucketPullRequest.getDiffSize(model.diff);
         this.testsWereTouched = BitbucketPullRequest.testsWereTouched(model.diff);
         return this;
@@ -59,18 +60,24 @@ export class BitbucketPullRequest extends PullRequest {
             ...model.pullRequest.participants.map(p => p.user.slug)
         ]);
 
-        this.participants = await Promise.all(Array.from(allParticipants).map(participantName => new BitbucketPullRequestParticipant().init(
-            model.teamName,
-            participantName,
-            model.pullRequest,
-            BitbucketPullRequest.getActivitiesOf(model.pullRequestActivities, participantName),
-            model.botUserSlugs,
-            model.formerEmployeeSlugs
-        )));
+        this.participants = await Promise.all(Array.from(allParticipants).map(async participantName => {
+            const participantUser = await ContributorFactory.fetchContributor({
+                teamName: model.teamName,
+                login: participantName,
+                isBotUser: model.botUserSlugs.includes(participantName),
+                isFormerEmployee: model.formerEmployeeSlugs.includes(participantName)
+            });
+            return new BitbucketPullRequestParticipant(
+                model.teamName,
+                model.pullRequest,
+                BitbucketPullRequest.getActivitiesOf(model.pullRequestActivities, participantName),
+                participantUser
+            );
+        }));
         return this;
     }
 
-    private calculatePrOpenDate(model: ImportParams): Date {
+    private calculatePrSharedForReviewDate(model: ImportParams): Date {
         const reviewerAdditions = model.pullRequestActivities.filter(a => "addedReviewers" in a);
 
         if (reviewerAdditions.length > 0) {
