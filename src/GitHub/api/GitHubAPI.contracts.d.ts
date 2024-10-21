@@ -56,6 +56,7 @@ export type GitHubPullRequestActivityReviewRequestedModel = {
     created_at: string;
 };
 export type GitHubPullRequestActivityReviewedModel = {
+    body: string;
     event: "reviewed";
     state: "approved" | "changes_requested" | "commented" | "dismissed" | "pending";
     submitted_at: string;

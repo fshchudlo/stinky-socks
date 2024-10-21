@@ -37,7 +37,7 @@ export class ContributorFactory {
         login = AppConfig.userNameNormalizerFn(login);
 
         return await contributorsCache.wrap(cacheKey, async () => {
-            let contributor = await contributorRepo.findOne({ where: { teamName: teamName, login } });
+            let contributor = await contributorRepo.findOne({ where: { teamName, login } });
 
             if (contributor) {
                 return contributor;
