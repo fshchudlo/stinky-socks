@@ -89,11 +89,9 @@ export class BitbucketPullRequest extends PullRequest {
             const initialReviewersSlugs = new Set<string>(model.pullRequest.reviewers.map(r => r.user.slug).filter(s => !model.botUserSlugs.includes(s)));
             const addedReviewersSlugs = new Set<string>(reviewerAdditions.flatMap(a => a.addedReviewers?.map(r => r.slug) || []));
 
-            // If all initial reviewers were added after PR was opened
+            // If all reviewers were added after PR was opened
             if ([...initialReviewersSlugs].every(s => addedReviewersSlugs.has(s))) {
-                // Return the date of the earliest activity where reviewers were added
-                const earliestAddingDate = Math.min(...reviewerAdditions.map(activity => activity.createdDate));
-                return new Date(earliestAddingDate);
+                return new Date(Math.min(...reviewerAdditions.map(activity => activity.createdDate)));
             }
         }
         return new Date(model.pullRequest.createdDate);
