@@ -57,23 +57,28 @@ export class BitbucketPullRequest extends PullRequest {
     private async initializeParticipants(model: ImportParams) {
         const allParticipants = new Set<string>([
             ...model.pullRequest.reviewers.map(r => r.user.slug),
-            ...model.pullRequest.participants.map(p => p.user.slug)
+            ...model.pullRequest.participants.map(p => p.user.slug),
+            ...model.pullRequestActivities.filter(a => a.action == "COMMENTED").map(p => p.user.slug),
+            ...model.pullRequestActivities.filter(a => a.action == "APPROVED").map(p => p.user.slug)
         ]);
 
-        this.participants = await Promise.all(Array.from(allParticipants).map(async participantName => {
-            const participantUser = await ContributorFactory.fetchContributor({
-                teamName: model.teamName,
-                login: participantName,
-                isBotUser: model.botUserSlugs.includes(participantName),
-                isFormerEmployee: model.formerEmployeeSlugs.includes(participantName)
-            });
-            return new BitbucketPullRequestParticipant(
-                model.teamName,
-                model.pullRequest,
-                BitbucketPullRequest.getActivitiesOf(model.pullRequestActivities, participantName),
-                participantUser
-            );
-        }));
+        this.participants = await Promise.all(
+            Array.from(allParticipants)
+                .filter(p => p !== model.pullRequest.author.user.slug)
+                .map(async participantName => {
+                    const participantUser = await ContributorFactory.fetchContributor({
+                        teamName: model.teamName,
+                        login: participantName,
+                        isBotUser: model.botUserSlugs.includes(participantName),
+                        isFormerEmployee: model.formerEmployeeSlugs.includes(participantName)
+                    });
+                    return new BitbucketPullRequestParticipant(
+                        model.teamName,
+                        model.pullRequest,
+                        BitbucketPullRequest.getActivitiesOf(model.pullRequestActivities, participantName),
+                        participantUser
+                    );
+                }));
         return this;
     }
 
