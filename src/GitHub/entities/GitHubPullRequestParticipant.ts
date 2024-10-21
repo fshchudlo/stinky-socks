@@ -1,8 +1,9 @@
 import { PullRequestParticipant } from "../../MetricsDB/PullRequestParticipant";
-import getHumanComments from "./getHumanComments";
-import { ActivityTraits, GitHubPullRequestActivityModel, GitHubPullRequestModel } from "../api/contracts";
+import getHumanComments from "./helpers/getHumanComments";
+import { GitHubPullRequestActivityModel, GitHubPullRequestModel } from "../api/GitHubAPI.contracts";
 import { ContributorFactory } from "../../MetricsDB/ContributorFactory";
-import getHumanLineComments from "./getHumanLineComments";
+import getHumanLineComments from "./helpers/getHumanLineComments";
+import { ActivityTraits } from "./helpers/ActivityTraits";
 
 export class GitHubPullRequestParticipant extends PullRequestParticipant {
     async init(teamName: string, participantName: string, pullRequestData: GitHubPullRequestModel, participantActivities: GitHubPullRequestActivityModel[], botUserNames: string[], formerEmployeeNames: string[]) {

@@ -4,7 +4,7 @@ import {
     BitbucketDiffModel,
     BitbucketPullRequestActivityModel,
     BitbucketPullRequestModel
-} from "./contracts";
+} from "./BitbucketAPI.contracts";
 
 export type BitbucketPagedResponse<T> = {
     "size": number;

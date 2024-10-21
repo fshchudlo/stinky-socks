@@ -1,14 +1,14 @@
 import { PullRequest } from "../../MetricsDB/PullRequest";
-import getHumanComments from "./getHumanComments";
+import getHumanComments from "./helpers/getHumanComments";
 import { GitHubPullRequestParticipant } from "./GitHubPullRequestParticipant";
 import {
-    ActivityTraits,
     GitHubFileModel,
     GitHubPullRequestActivityModel,
     GitHubPullRequestModel
-} from "../api/contracts";
+} from "../api/GitHubAPI.contracts";
 import { ContributorFactory } from "../../MetricsDB/ContributorFactory";
-import getHumanLineComments from "./getHumanLineComments";
+import getHumanLineComments from "./helpers/getHumanLineComments";
+import { ActivityTraits } from "./helpers/ActivityTraits";
 
 export type ImportModel = {
     teamName: string;

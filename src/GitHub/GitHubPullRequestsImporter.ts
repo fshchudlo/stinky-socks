@@ -3,7 +3,7 @@ import { Repository } from "typeorm";
 import { PullRequest } from "../MetricsDB/PullRequest";
 import { MetricsDB } from "../MetricsDB/MetricsDB";
 import { GitHubPullRequest } from "./entities/GitHubPullRequest";
-import { GitHubPullRequestModel } from "./api/contracts";
+import { GitHubPullRequestModel } from "./api/GitHubAPI.contracts";
 
 export type GitHubProjectSettings = {
     owner: string;

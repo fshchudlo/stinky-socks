@@ -1,8 +1,8 @@
 import "dotenv/config";
 import { BitbucketProjectSettings } from "./Bitbucket/BitbucketPullRequestsImporter";
 import { GitHubProjectSettings } from "./GitHub/GitHubPullRequestsImporter";
-import { GitHubPullRequestModel } from "./GitHub/api/GitHubAPI";
-import { BitbucketPullRequestModel } from "./Bitbucket/api/BitbucketAPI";
+import { GitHubPullRequestModel } from "./GitHub/api/GitHubAPI.contracts";
+import { BitbucketPullRequestModel } from "./Bitbucket/api/BitbucketAPI.contracts";
 
 export type TeamImportSettings = {
     teamName: string;

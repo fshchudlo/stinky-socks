@@ -1,4 +1,4 @@
-import getHumanActivities from "./getHumanActivities";
+import getHumanActivities from "./helpers/getHumanActivities";
 import { PullRequest } from "../../MetricsDB/PullRequest";
 import { BitbucketPullRequestParticipant } from "./BitbucketPullRequestParticipant";
 import {
@@ -6,7 +6,7 @@ import {
     BitbucketDiffModel,
     BitbucketPullRequestActivityModel,
     BitbucketPullRequestModel
-} from "../api/contracts";
+} from "../api/BitbucketAPI.contracts";
 import { ContributorFactory } from "../../MetricsDB/ContributorFactory";
 
 export type ImportModel = {

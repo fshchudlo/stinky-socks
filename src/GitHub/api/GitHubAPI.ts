@@ -1,5 +1,5 @@
 import axios, { AxiosRequestConfig } from "axios";
-import { GitHubFileModel, GitHubPullRequestActivityModel, GitHubPullRequestModel } from "./contracts";
+import { GitHubFileModel, GitHubPullRequestActivityModel, GitHubPullRequestModel } from "./GitHubAPI.contracts";
 
 export class GitHubAPI {
     private readonly token: string;

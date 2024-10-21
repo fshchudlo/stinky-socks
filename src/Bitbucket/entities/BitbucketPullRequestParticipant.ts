@@ -1,6 +1,6 @@
 import { PullRequestParticipant } from "../../MetricsDB/PullRequestParticipant";
-import getHumanActivities from "./getHumanActivities";
-import { BitbucketPullRequestActivityModel, BitbucketPullRequestModel } from "../api/contracts";
+import getHumanActivities from "./helpers/getHumanActivities";
+import { BitbucketPullRequestActivityModel, BitbucketPullRequestModel } from "../api/BitbucketAPI.contracts";
 import { ContributorFactory } from "../../MetricsDB/ContributorFactory";
 
 export class BitbucketPullRequestParticipant extends PullRequestParticipant {

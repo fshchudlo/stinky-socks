@@ -1,4 +1,5 @@
-import { ActivityTraits, GitHubPullRequestActivityModel } from "../api/contracts";
+import { GitHubPullRequestActivityModel } from "../../api/GitHubAPI.contracts";
+import { ActivityTraits } from "./ActivityTraits";
 
 export default function getHumanLineComments(activities: GitHubPullRequestActivityModel[], botUsers: string[]) {
     return activities
