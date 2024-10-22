@@ -3,21 +3,24 @@ import getCommentsTimestamps from "./getCommentsTimestamps";
 import { ActivityTraits } from "./ActivityTraits";
 
 export default function calculatePrSharedForReviewDate(model: ImportParams): Date {
+    const firstCommentDate = getEarliestCommentTimestamp(model);
+
     const readyForReviewEvents = model.pullRequestActivities.filter(ActivityTraits.isReadyForReviewEvent);
     if (readyForReviewEvents.length > 0) {
-        return new Date(getEarliestDate(readyForReviewEvents.map(a => a.created_at)));
+        const earliestReadyForReviewEvent = getEarliestTimestamp(readyForReviewEvents.map(a => a.created_at));
+        if (!firstCommentDate || firstCommentDate > earliestReadyForReviewEvent) {
+            return new Date(earliestReadyForReviewEvent);
+        }
     }
 
     const nonBotReviewerAdditions = getNonBotReviewerAdditions(model);
-
     if (nonBotReviewerAdditions.length > 0) {
         const reviewersAddedAfterPRCreation = getReviewersAddedAfterPRCreation(nonBotReviewerAdditions, model.pullRequest.created_at);
 
         // All reviewers were added after PR creation time
         if (reviewersAddedAfterPRCreation.length === nonBotReviewerAdditions.length) {
-            const earliestReviewerAdditionDate = getEarliestDate(nonBotReviewerAdditions.map(a => a.created_at));
+            const earliestReviewerAdditionDate = getEarliestTimestamp(nonBotReviewerAdditions.map(a => a.created_at));
 
-            const firstCommentDate = getEarliestCommentDate(model);
 
             if (!firstCommentDate || firstCommentDate > earliestReviewerAdditionDate) {
                 return new Date(earliestReviewerAdditionDate);
@@ -28,7 +31,7 @@ export default function calculatePrSharedForReviewDate(model: ImportParams): Dat
     return new Date(model.pullRequest.created_at);
 }
 
-function getEarliestDate(dates: string[]): number {
+function getEarliestTimestamp(dates: string[]): number {
     return Math.min(...dates.map(date => new Date(date).getTime()));
 }
 
@@ -42,7 +45,7 @@ function getReviewersAddedAfterPRCreation(activities: any[], prCreationDate: str
     return activities.filter(addition => new Date(addition.created_at).getTime() > new Date(prCreationDate).getTime());
 }
 
-function getEarliestCommentDate(model: ImportParams): number | null {
+function getEarliestCommentTimestamp(model: ImportParams): number | null {
     const commentTimeStamps = getCommentsTimestamps(model.pullRequestActivities, model.botUserNames);
     return commentTimeStamps.length ? Math.min(...commentTimeStamps) : null;
 }
