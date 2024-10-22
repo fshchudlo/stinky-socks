@@ -8,8 +8,22 @@ import { GitHubPullRequestsImporter } from "./GitHub/GitHubPullRequestsImporter"
 import { GitHubAPI } from "./GitHub/api/GitHubAPI";
 import { ContributorFactory } from "./MetricsDB/ContributorFactory";
 
+let isImportRunning = false;
+
 async function runDataImports() {
-    await MetricsDB.initialize();
+    if (isImportRunning) {
+        console.warn("⚠️ Previous import is still running. Skipping this execution.");
+        return;
+    }
+    try {
+        isImportRunning = true;
+        await importTeamProjects();
+    } finally {
+        isImportRunning = false;
+    }
+}
+
+async function importTeamProjects() {
     const timelogLabel = `🎉 Teams data import completed!`;
     console.time(timelogLabel);
     console.group("🚀 Starting Pull Requests import...");
@@ -49,7 +63,7 @@ async function importGitHubPullRequests(team: TeamImportSettings) {
     for (const gitHubProject of team.gitHubProjects || []) {
         console.group(`🔁 Importing pull requests for '${gitHubProject.owner}' project`);
 
-        const gitHubAPI = new GitHubAPI(gitHubProject.auth.apiToken);
+        const gitHubAPI = new GitHubAPI(gitHubProject.auth.apiToken, false);
         await new GitHubPullRequestsImporter(gitHubAPI, team.teamName, gitHubProject).importPullRequests();
 
         console.log(`🔁 Import of pull requests for '${gitHubProject.owner}' project completed`);
@@ -58,4 +72,10 @@ async function importGitHubPullRequests(team: TeamImportSettings) {
     console.timeEnd(timelogLabel);
 }
 
-runDataImports().catch(error => console.log(error));
+MetricsDB.initialize().then(() => {
+    runDataImports().catch(error => console.log(error));
+
+    setInterval(() => {
+        runDataImports().catch(error => console.log(error));
+    }, 60 * 60 * 1000); //each hour
+});

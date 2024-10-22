@@ -1,12 +1,14 @@
-import axios, { AxiosRequestConfig } from "axios";
+import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
 import { GitHubFileDiffModel, GitHubPullRequestActivityModel, GitHubPullRequestModel } from "./GitHubAPI.contracts";
 
 export class GitHubAPI {
     private readonly token: string;
     private readonly baseUrl = "https://api.github.com";
+    private addressRateLimits: boolean;
 
-    constructor(token: string) {
+    constructor(token: string, addressRateLimits: boolean = true) {
         this.token = token;
+        this.addressRateLimits = addressRateLimits;
     }
 
     private async get(url: string, params: any = undefined): Promise<any> {
@@ -18,7 +20,17 @@ export class GitHubAPI {
             params: params
         };
         const response = await axios.get(url, config);
-        if (response.headers["x-ratelimit-remaining"] === "1") {
+
+        await this.checkRateLimits(response);
+
+        if (response.status === 200) {
+            return response.data;
+        }
+        throw new Error(`Error executing request for ${url} message: ${response.statusText}`);
+    }
+
+    private async checkRateLimits(response: AxiosResponse<any>) {
+        if (this.addressRateLimits && response.headers["x-ratelimit-remaining"] === "1") {
             const resetTime = parseInt(response.headers["x-ratelimit-reset"], 10) * 1000;
             const currentTime = Date.now();
             const waitTime = resetTime - currentTime;
@@ -26,11 +38,6 @@ export class GitHubAPI {
             console.warn(`GitHub API rate limit exceeded. Waiting for ${waitTime / 1000} seconds...`);
             await new Promise(resolve => setTimeout(resolve, waitTime));
         }
-
-        if (response.status === 200) {
-            return response.data;
-        }
-        throw new Error(`Error executing request for ${url} message: ${response.statusText}`);
     }
 
     private async getFullList(url: string, params: any = undefined): Promise<any[]> {
