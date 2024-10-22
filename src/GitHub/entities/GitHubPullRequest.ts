@@ -51,7 +51,7 @@ export class GitHubPullRequest extends PullRequest {
     }
 
     private calculateCommitStats(model: ImportParams) {
-        this.commentsCount = getCommentsTimestamps(model.pullRequestActivities, model.botUserNames).length;
+        this.totalCommentsCount = getCommentsTimestamps(model.pullRequestActivities, model.botUserNames).length;
         this.diffSize = model.files.reduce((acc, file) => acc + file.changes, 0);
         this.testsWereTouched = model.files.some(file => file.filename.toLowerCase().includes("test"));
         return this;

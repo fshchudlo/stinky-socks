@@ -46,7 +46,7 @@ export class BitbucketPullRequest extends PullRequest {
     }
 
     private calculateCommitStats(model: ImportParams) {
-        this.commentsCount = model.pullRequestActivities
+        this.totalCommentsCount = model.pullRequestActivities
             .filter(a => a.action === "COMMENTED")
             .filter(a => !model.botUserSlugs.includes(a.user.slug)).length;
         this.diffSize = BitbucketPullRequest.getDiffSize(model.diff);

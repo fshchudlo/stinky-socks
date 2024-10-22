@@ -44,7 +44,7 @@ export abstract class PullRequest {
     protected reviewersCount: number;
 
     @Column()
-    protected commentsCount: number;
+    protected totalCommentsCount: number;
 
     @Column({ type: "numeric" })
     protected diffSize: number;
