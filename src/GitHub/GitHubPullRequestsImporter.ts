@@ -51,6 +51,7 @@ export class GitHubPullRequestsImporter {
 
             for (const pullRequest of pullRequestsChunk) {
                 console.count(`📥 ${repositoryName}: pull requests processed`);
+
                 if (lastUpdateDateOfStoredPRs != null && new Date(pullRequest.updated_at) <= lastUpdateDateOfStoredPRs) {
                     continue;
                 }
