@@ -73,9 +73,9 @@ async function importGitHubPullRequests(team: TeamImportSettings) {
 }
 
 MetricsDB.initialize().then(() => {
-    runDataImports().catch(error => console.log(error));
+    runDataImports().catch(error => console.error(error));
 
     setInterval(() => {
-        runDataImports().catch(error => console.log(error));
+        runDataImports().catch(error => console.error(error));
     }, 60 * 60 * 1000); //each hour
 });
