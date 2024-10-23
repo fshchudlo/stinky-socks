@@ -557,7 +557,32 @@
           },
           "unit": "s"
         },
-        "overrides": []
+        "overrides": [
+          {
+            "__systemRef": "hideSeriesFrom",
+            "matcher": {
+              "id": "byNames",
+              "options": {
+                "mode": "exclude",
+                "names": [
+                  "Average lead time"
+                ],
+                "prefix": "All except:",
+                "readOnly": true
+              }
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom",
+                "value": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": true
+                }
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
         "h": 8,
@@ -3304,8 +3329,8 @@
       {
         "current": {
           "selected": true,
-          "text": "Quarters",
-          "value": "3M"
+          "text": "Weeks",
+          "value": "1w"
         },
         "hide": 0,
         "includeAll": false,
@@ -3319,7 +3344,7 @@
             "value": "1d"
           },
           {
-            "selected": false,
+            "selected": true,
             "text": "Weeks",
             "value": "1w"
           },
@@ -3329,7 +3354,7 @@
             "value": "1M"
           },
           {
-            "selected": true,
+            "selected": false,
             "text": "Quarters",
             "value": "3M"
           },
@@ -3354,6 +3379,6 @@
   "timezone": "",
   "title": "PR metrics",
   "uid": "dadf1ef8-d081-4d14-a1f3-82c235fc7fc1",
-  "version": 38,
+  "version": 1,
   "weekStart": ""
 }
