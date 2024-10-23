@@ -135,7 +135,7 @@
           }
         }
       ],
-      "title": "Time from the first commit to pull request merge",
+      "title": "Lead Time (from the first commit to pull request merge), excluding outliers ($percent_of_outliers_to_exclude)",
       "type": "stat"
     },
     {
@@ -225,7 +225,7 @@
           }
         }
       ],
-      "title": "Development time (excluding outliers)",
+      "title": "Development time, excluding outliers ($percent_of_outliers_to_exclude)",
       "type": "stat"
     },
     {
@@ -314,7 +314,7 @@
           }
         }
       ],
-      "title": "First reaction to pull request in (excluding outliers)",
+      "title": "Time to first reaction, excluding outliers ($percent_of_outliers_to_exclude)",
       "type": "stat"
     },
     {
@@ -404,7 +404,7 @@
           }
         }
       ],
-      "title": "Pull request rework time (excluding outliers)",
+      "title": "Rework time, excluding outliers ($percent_of_outliers_to_exclude)",
       "type": "stat"
     },
     {
@@ -494,7 +494,7 @@
           }
         }
       ],
-      "title": "Idle between pull request approval and merge (excluding outliers)",
+      "title": "Idle between pull request approval and merge, excluding outliers ($percent_of_outliers_to_exclude)",
       "type": "stat"
     },
     {
@@ -3260,8 +3260,8 @@
       {
         "current": {
           "selected": true,
-          "text": "0%",
-          "value": "0"
+          "text": "+/-1%",
+          "value": "0.01"
         },
         "description": "How many percent of the lowest/highest values be excluded from the stats",
         "hide": 0,
@@ -3271,12 +3271,12 @@
         "name": "percent_of_outliers_to_exclude",
         "options": [
           {
-            "selected": true,
+            "selected": false,
             "text": "0%",
             "value": "0"
           },
           {
-            "selected": false,
+            "selected": true,
             "text": "+/-1%",
             "value": "0.01"
           },
@@ -3303,7 +3303,7 @@
       },
       {
         "current": {
-          "selected": false,
+          "selected": true,
           "text": "Quarters",
           "value": "3M"
         },
@@ -3347,13 +3347,13 @@
     ]
   },
   "time": {
-    "from": "now-10y",
+    "from": "now-90d",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "",
   "title": "PR metrics",
   "uid": "dadf1ef8-d081-4d14-a1f3-82c235fc7fc1",
-  "version": 34,
+  "version": 38,
   "weekStart": ""
 }
