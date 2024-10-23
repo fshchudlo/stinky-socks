@@ -4,7 +4,7 @@ import { GitHubFileDiffModel, GitHubPullRequestActivityModel, GitHubPullRequestM
 export class GitHubAPI {
     private readonly token: string;
     private readonly baseUrl = "https://api.github.com";
-    private addressRateLimits: boolean;
+    private readonly addressRateLimits: boolean;
 
     constructor(token: string, addressRateLimits: boolean = true) {
         this.token = token;
@@ -66,14 +66,14 @@ export class GitHubAPI {
         return repositories.filter(repo => !repo.archived && !repo.disabled);
     }
 
-    async getClosedPullRequests(owner: string, repo: string, page: number, per_page: number): Promise<GitHubPullRequestModel[]> {
+    async getClosedPullRequests(owner: string, repo: string, pageNumber: number, pageSize: number): Promise<GitHubPullRequestModel[]> {
         const url = `${this.baseUrl}/repos/${owner}/${repo}/pulls`;
         return await this.get(url, {
             state: "closed",
             sort: "updated",
             direction: "asc",
-            page,
-            per_page
+            page: pageNumber,
+            per_page: pageSize
         });
     }
 

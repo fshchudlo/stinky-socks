@@ -4,10 +4,16 @@ import { Repository } from "typeorm";
 import { createCache } from "cache-manager";
 import { AppConfig } from "../app.config";
 
-const adjectives = [
+const firstAdjectives = [
     "Brave", "Clever", "Witty", "Kind", "Fierce", "Happy", "Jolly", "Sneaky", "Bouncy", "Dizzy",
     "Goofy", "Zippy", "Lucky", "Fluffy", "Cheerful", "Grumpy", "Wacky", "Puzzled", "Eccentric", "Spunky",
     "Quirky", "Funky", "Chirpy", "Nifty", "Snappy", "Peppy", "Perky", "Whizzy", "Zany", "Breezy"
+];
+
+const secondAdjectives: string[] = [
+    "Silly", "Bubbly", "Jazzy", "Snazzy", "Zesty", "Wobbly", "Dandy", "Doodle", "Loopy", "Perky",
+    "Wiggly", "Sassy", "Peppy", "Swirly", "Fizzy", "Chipper", "Zippy", "Poppy", "Snappy", "Plucky",
+    "Sprightly", "Mellow", "Jumpy", "Giddy", "Cheeky", "Spiffy", "Frothy", "Breezy", "Chirpy", "Nifty"
 ];
 
 const animals = [
@@ -66,6 +72,8 @@ export class ContributorFactory {
             const existingContributor = await contributorRepo.findOne({ where: { teamName, nickname } });
             if (!existingContributor) {
                 isUnique = true;
+            } else {
+                console.log(`Nickname "${nickname}" is already taken. Checking for another one...`);
             }
         } while (!isUnique);
 
@@ -73,9 +81,16 @@ export class ContributorFactory {
     }
 
     private static generateNickname(): string {
-        const adjective = adjectives[Math.floor(Math.random() * adjectives.length)];
+        const adjectives = [
+            firstAdjectives[Math.floor(Math.random() * firstAdjectives.length)],
+            secondAdjectives[Math.floor(Math.random() * firstAdjectives.length)]
+        ];
+
         const animal = animals[Math.floor(Math.random() * animals.length)];
-        return `${adjective} ${animal}`;
+
+        const adjectivesString = (Math.floor(Math.random()) > 0 ? adjectives.reverse() : adjectives).join(" ");
+
+        return `${adjectivesString} ${animal}`;
     }
 
 }

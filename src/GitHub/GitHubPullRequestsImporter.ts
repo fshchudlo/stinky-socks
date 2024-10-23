@@ -47,7 +47,7 @@ export class GitHubPullRequestsImporter {
         let pageNumber = 1;
         const lastUpdateDateOfStoredPRs: Date | null = await MetricsDB.getPRsMaxDate("updatedDate", this.teamName, this.project.owner, repositoryName);
         while (true) {
-            const timelogLabel = `📥 ${repositoryName}: processing pull requests #${pageSize * (pageNumber - 1)}-${pageSize * pageNumber}...`;
+            const timelogLabel = `💾 ${this.teamName}/${repositoryName}: successfully processed pull requests #${pageSize * (pageNumber - 1)}-${pageSize * pageNumber}.`;
             console.time(timelogLabel);
 
             const pullRequestsChunk = await this.gitHubAPI.getClosedPullRequests(this.project.owner, repositoryName, pageNumber, pageSize);
@@ -71,6 +71,7 @@ export class GitHubPullRequestsImporter {
             console.timeEnd(timelogLabel);
 
             if (pullRequestsChunk.length < pageSize) {
+                console.log(`The page #${pageNumber} was the last one, exiting.`);
                 break;
             }
             pageNumber++;

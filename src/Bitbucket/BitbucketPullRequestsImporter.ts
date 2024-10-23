@@ -55,10 +55,12 @@ export class BitbucketPullRequestsImporter {
         const limit = 1000;
         const lastMergeDateOfStoredPRs: Date | null = await MetricsDB.getPRsMaxDate("mergedDate", this.teamName, this.project.projectKey, repositoryName);
         for (let start = 0; ; start += limit) {
+            const timelogLabel = `💾 ${this.teamName}/${repositoryName}: successfully processed pull requests #${start}-${start + limit}.`;
+            console.time(timelogLabel);
+
             const pullRequestsChunk = await this.bitbucketAPI.getMergedPullRequests(this.project.projectKey, repositoryName, start, limit);
 
             for (const pullRequest of pullRequestsChunk.values) {
-                console.count(`📥 ${repositoryName}: pull requests processed`);
                 if (lastMergeDateOfStoredPRs != null && new Date(pullRequest.closedDate) <= lastMergeDateOfStoredPRs) {
                     continue;
                 }
@@ -70,8 +72,10 @@ export class BitbucketPullRequestsImporter {
                 }
             }
 
+            console.timeEnd(timelogLabel);
+
             if (pullRequestsChunk.isLastPage) {
-                console.countReset(`📥 ${repositoryName}: pull requests processed`);
+                console.log(`That was the last chunk, exiting.`);
                 break;
             }
         }
