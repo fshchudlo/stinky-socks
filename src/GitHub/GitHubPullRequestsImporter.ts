@@ -51,7 +51,6 @@ export class GitHubPullRequestsImporter {
             console.time(timelogLabel);
 
             const pullRequestsChunk = await this.gitHubAPI.getClosedPullRequests(this.project.owner, repositoryName, pageNumber, pageSize);
-
             for (const pullRequest of pullRequestsChunk) {
 
                 if (lastUpdateDateOfStoredPRs != null && new Date(pullRequest.updated_at) <= lastUpdateDateOfStoredPRs) {
