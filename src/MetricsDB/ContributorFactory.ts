@@ -88,7 +88,7 @@ export class ContributorFactory {
 
         const animal = animals[Math.floor(Math.random() * animals.length)];
 
-        const adjectivesString = (Math.floor(Math.random()) > 0 ? adjectives.reverse() : adjectives).join(" ");
+        const adjectivesString = (Math.floor(Math.random() * 2) > 0 ? adjectives.reverse() : adjectives).join(" ");
 
         return `${adjectivesString} ${animal}`;
     }
