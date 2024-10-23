@@ -114,7 +114,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT AVG(pr_lead_time) AS \"Average lead time\"\nFROM \n   (SELECT \n      EXTRACT(EPOCH FROM (merged_date-initial_commit_date)) AS pr_lead_time,\n      PERCENT_RANK() OVER (ORDER BY EXTRACT(EPOCH FROM (merged_date-initial_commit_date))) AS value_rank\n   FROM pull_request AS pr\n      INNER JOIN contributor as author ON author.id = pr.author_id\n   WHERE  $__timeFilter(shared_for_review_date)\n      AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))    \n      AND (COALESCE($repository_name) IS NULL OR repository_name IN ($repository_name))   \n      AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n      AND ('$include_bots_activities'='Yes' OR NOT author.is_bot_user)\n      ) AS lead_times\nWHERE value_rank BETWEEN (0+$percent_of_discarded_extremums) AND (1-$percent_of_discarded_extremums)\n",
+          "rawSql": "SELECT AVG(pr_lead_time) AS \"Average lead time\"\nFROM \n   (SELECT \n      EXTRACT(EPOCH FROM (merged_date-initial_commit_date)) AS pr_lead_time,\n      PERCENT_RANK() OVER (ORDER BY EXTRACT(EPOCH FROM (merged_date-initial_commit_date))) AS value_rank\n   FROM pull_request AS pr\n      INNER JOIN contributor as author ON author.id = pr.author_id\n   WHERE  $__timeFilter(shared_for_review_date)\n      AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))    \n      AND (COALESCE($repository_name) IS NULL OR repository_name IN ($repository_name))   \n      AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n      AND ('$include_bots_activities'='Yes' OR NOT author.is_bot_user)\n      ) AS lead_times\nWHERE value_rank BETWEEN (0+$percent_of_outliers_to_exclude) AND (1-$percent_of_outliers_to_exclude)\n",
           "refId": "A",
           "sql": {
             "columns": [
@@ -140,7 +140,7 @@
     },
     {
       "datasource": {
-        "type": "postgres",
+        "type": "grafana-postgresql-datasource",
         "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
       },
       "description": "From the first commit to PR raised",
@@ -204,7 +204,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT AVG(from_commit_to_raise) AS \"Average lead time\"\nFROM \n   (SELECT \n      GREATEST(EXTRACT(EPOCH FROM (shared_for_review_date-initial_commit_date)),0) AS from_commit_to_raise,\n      PERCENT_RANK() OVER (ORDER BY GREATEST(EXTRACT(EPOCH FROM (shared_for_review_date-initial_commit_date)),0)) AS value_rank\n   FROM pull_request AS pr\n      INNER JOIN contributor as author ON author.id = pr.author_id\n   WHERE $__timeFilter(shared_for_review_date)\n      AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n      AND (COALESCE($repository_name) IS NULL OR repository_name IN ($repository_name))   \n      AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n      AND ('$include_bots_activities'='Yes' OR NOT author.is_bot_user)\n      ) AS timings\nWHERE value_rank BETWEEN (0+$percent_of_discarded_extremums) AND (1-$percent_of_discarded_extremums)\n",
+          "rawSql": "SELECT AVG(from_commit_to_raise) AS \"Average lead time\"\nFROM \n   (SELECT \n      GREATEST(EXTRACT(EPOCH FROM (shared_for_review_date-initial_commit_date)),0) AS from_commit_to_raise,\n      PERCENT_RANK() OVER (ORDER BY GREATEST(EXTRACT(EPOCH FROM (shared_for_review_date-initial_commit_date)),0)) AS value_rank\n   FROM pull_request AS pr\n      INNER JOIN contributor as author ON author.id = pr.author_id\n   WHERE $__timeFilter(shared_for_review_date)\n      AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n      AND (COALESCE($repository_name) IS NULL OR repository_name IN ($repository_name))   \n      AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n      AND ('$include_bots_activities'='Yes' OR NOT author.is_bot_user)\n      ) AS timings\nWHERE value_rank BETWEEN (0+$percent_of_outliers_to_exclude) AND (1-$percent_of_outliers_to_exclude)\n",
           "refId": "A",
           "sql": {
             "columns": [
@@ -225,7 +225,7 @@
           }
         }
       ],
-      "title": "Development time",
+      "title": "Development time (excluding outliers)",
       "type": "stat"
     },
     {
@@ -293,7 +293,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT AVG(time_to_first_response) \nFROM (\n    SELECT\n        GREATEST(EXTRACT(EPOCH FROM (first_response_date-shared_for_review_date)), 0) AS time_to_first_response,\n        PERCENT_RANK() OVER (ORDER BY GREATEST(EXTRACT(EPOCH FROM (first_response_date-shared_for_review_date)), 0)) AS value_rank\n    FROM (\n            SELECT\n                shared_for_review_date,\n                MIN(LEAST(COALESCE(prtcpnt.first_approval_date, prtcpnt.first_comment_date),\n                    COALESCE(prtcpnt.first_comment_date, prtcpnt.first_approval_date))) AS first_response_date\n            FROM pull_request AS pr\n                    INNER JOIN pull_request_participant AS prtcpnt ON pr.project_name = prtcpnt.project_name AND pr.repository_name = prtcpnt.repository_name AND pr.pull_request_number = prtcpnt.pull_request_number\n                    INNER JOIN contributor as author ON author.id = pr.author_id\n                    INNER JOIN contributor as participant ON participant.id = prtcpnt.participant_id\n            WHERE $__timeFilter(shared_for_review_date)\n                    AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n                    AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))   \n                    AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n                    AND ('$include_bots_activities'='Yes' OR NOT author.is_bot_user)\n                    AND ('$include_bots_activities'='Yes' OR NOT participant.is_bot_user)\n            GROUP BY pr.project_name, pr.repository_name, pr.pull_request_number, pr.shared_for_review_date\n            HAVING MIN(LEAST(COALESCE(prtcpnt.first_approval_date, prtcpnt.first_comment_date),\n                    COALESCE(prtcpnt.first_comment_date, prtcpnt.first_approval_date))) IS NOT NULL\n        ) AS \"First responses\") AS timings\nWHERE value_rank BETWEEN (0+$percent_of_discarded_extremums) AND (1-$percent_of_discarded_extremums)",
+          "rawSql": "SELECT AVG(time_to_first_response) \nFROM (\n    SELECT\n        GREATEST(EXTRACT(EPOCH FROM (first_response_date-shared_for_review_date)), 0) AS time_to_first_response,\n        PERCENT_RANK() OVER (ORDER BY GREATEST(EXTRACT(EPOCH FROM (first_response_date-shared_for_review_date)), 0)) AS value_rank\n    FROM (\n            SELECT\n                shared_for_review_date,\n                MIN(LEAST(COALESCE(prtcpnt.first_approval_date, prtcpnt.first_comment_date),\n                    COALESCE(prtcpnt.first_comment_date, prtcpnt.first_approval_date))) AS first_response_date\n            FROM pull_request AS pr\n                    INNER JOIN pull_request_participant AS prtcpnt ON pr.project_name = prtcpnt.project_name AND pr.repository_name = prtcpnt.repository_name AND pr.pull_request_number = prtcpnt.pull_request_number\n                    INNER JOIN contributor as author ON author.id = pr.author_id\n                    INNER JOIN contributor as participant ON participant.id = prtcpnt.participant_id\n            WHERE $__timeFilter(shared_for_review_date)\n                    AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n                    AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))   \n                    AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n                    AND ('$include_bots_activities'='Yes' OR NOT author.is_bot_user)\n                    AND ('$include_bots_activities'='Yes' OR NOT participant.is_bot_user)\n            GROUP BY pr.project_name, pr.repository_name, pr.pull_request_number, pr.shared_for_review_date\n            HAVING MIN(LEAST(COALESCE(prtcpnt.first_approval_date, prtcpnt.first_comment_date),\n                    COALESCE(prtcpnt.first_comment_date, prtcpnt.first_approval_date))) IS NOT NULL\n        ) AS \"First responses\") AS timings\nWHERE value_rank BETWEEN (0+$percent_of_outliers_to_exclude) AND (1-$percent_of_outliers_to_exclude)",
           "refId": "A",
           "sql": {
             "columns": [
@@ -314,7 +314,7 @@
           }
         }
       ],
-      "title": "First reaction to pull request in",
+      "title": "First reaction to pull request in (excluding outliers)",
       "type": "stat"
     },
     {
@@ -383,7 +383,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT AVG(rework_time)\nFROM (\n    SELECT\n        EXTRACT(EPOCH FROM (merged_date-first_response_date)) AS rework_time,\n        PERCENT_RANK() OVER (ORDER BY EXTRACT(EPOCH FROM (merged_date-first_response_date))) AS value_rank\n    FROM (\n            SELECT\n                merged_date,\n                MIN(LEAST(prtcpnt.first_approval_date, prtcpnt.first_comment_date)) as first_response_date\n            FROM pull_request AS pr\n                INNER JOIN pull_request_participant AS prtcpnt ON pr.project_name = prtcpnt.project_name AND pr.repository_name = prtcpnt.repository_name AND pr.pull_request_number = prtcpnt.pull_request_number\n                INNER JOIN contributor as author ON author.id = pr.author_id\n                INNER JOIN contributor as participant ON participant.id = prtcpnt.participant_id\n            WHERE $__timeFilter(shared_for_review_date)\n                AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n                AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n                AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n                AND ('$include_bots_activities'='Yes' OR NOT author.is_bot_user)\n                AND ('$include_bots_activities'='Yes' OR NOT participant.is_bot_user)\n            GROUP BY pr.project_name, pr.repository_name, pr.pull_request_number, pr.merged_date\n            HAVING MIN(LEAST(prtcpnt.first_approval_date, prtcpnt.first_comment_date)) IS NOT NULL\n        ) AS response_timings\n) AS timings\nWHERE value_rank BETWEEN (0+$percent_of_discarded_extremums) AND (1-$percent_of_discarded_extremums)",
+          "rawSql": "SELECT AVG(rework_time)\nFROM (\n    SELECT\n        EXTRACT(EPOCH FROM (merged_date-first_response_date)) AS rework_time,\n        PERCENT_RANK() OVER (ORDER BY EXTRACT(EPOCH FROM (merged_date-first_response_date))) AS value_rank\n    FROM (\n            SELECT\n                merged_date,\n                MIN(LEAST(prtcpnt.first_approval_date, prtcpnt.first_comment_date)) as first_response_date\n            FROM pull_request AS pr\n                INNER JOIN pull_request_participant AS prtcpnt ON pr.project_name = prtcpnt.project_name AND pr.repository_name = prtcpnt.repository_name AND pr.pull_request_number = prtcpnt.pull_request_number\n                INNER JOIN contributor as author ON author.id = pr.author_id\n                INNER JOIN contributor as participant ON participant.id = prtcpnt.participant_id\n            WHERE $__timeFilter(shared_for_review_date)\n                AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n                AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n                AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n                AND ('$include_bots_activities'='Yes' OR NOT author.is_bot_user)\n                AND ('$include_bots_activities'='Yes' OR NOT participant.is_bot_user)\n            GROUP BY pr.project_name, pr.repository_name, pr.pull_request_number, pr.merged_date\n            HAVING MIN(LEAST(prtcpnt.first_approval_date, prtcpnt.first_comment_date)) IS NOT NULL\n        ) AS response_timings\n) AS timings\nWHERE value_rank BETWEEN (0+$percent_of_outliers_to_exclude) AND (1-$percent_of_outliers_to_exclude)",
           "refId": "A",
           "sql": {
             "columns": [
@@ -404,7 +404,7 @@
           }
         }
       ],
-      "title": "Pull request rework time",
+      "title": "Pull request rework time (excluding outliers)",
       "type": "stat"
     },
     {
@@ -473,7 +473,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT AVG(from_last_approve_to_merge)\nFROM (\n    SELECT\n        EXTRACT(EPOCH FROM (merged_date-last_approval_date)) AS from_last_approve_to_merge,\n        PERCENT_RANK() OVER (ORDER BY EXTRACT(EPOCH FROM (merged_date-last_approval_date))) AS value_rank\n    FROM (\n            SELECT\n                merged_date,\n                MAX(prtcpnt.last_approval_date) as last_approval_date\n            FROM pull_request AS pr\n                INNER JOIN pull_request_participant AS prtcpnt ON pr.project_name = prtcpnt.project_name AND pr.repository_name = prtcpnt.repository_name AND pr.pull_request_number = prtcpnt.pull_request_number\n                INNER JOIN contributor as author ON author.id = pr.author_id\n                INNER JOIN contributor as participant ON participant.id = prtcpnt.participant_id\n            WHERE $__timeFilter(shared_for_review_date)\n                AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n                AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n                AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n                AND ('$include_bots_activities'='Yes' OR NOT author.is_bot_user)\n                AND ('$include_bots_activities'='Yes' OR NOT participant.is_bot_user)\n            GROUP BY pr.project_name, pr.repository_name, pr.pull_request_number, pr.merged_date\n            HAVING MAX(prtcpnt.last_approval_date) IS NOT NULL\n        ) AS approvals\n) AS timings\nWHERE value_rank BETWEEN (0+$percent_of_discarded_extremums) AND (1-$percent_of_discarded_extremums)",
+          "rawSql": "SELECT AVG(from_last_approve_to_merge)\nFROM (\n    SELECT\n        EXTRACT(EPOCH FROM (merged_date-last_approval_date)) AS from_last_approve_to_merge,\n        PERCENT_RANK() OVER (ORDER BY EXTRACT(EPOCH FROM (merged_date-last_approval_date))) AS value_rank\n    FROM (\n            SELECT\n                merged_date,\n                MAX(prtcpnt.last_approval_date) as last_approval_date\n            FROM pull_request AS pr\n                INNER JOIN pull_request_participant AS prtcpnt ON pr.project_name = prtcpnt.project_name AND pr.repository_name = prtcpnt.repository_name AND pr.pull_request_number = prtcpnt.pull_request_number\n                INNER JOIN contributor as author ON author.id = pr.author_id\n                INNER JOIN contributor as participant ON participant.id = prtcpnt.participant_id\n            WHERE $__timeFilter(shared_for_review_date)\n                AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n                AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n                AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n                AND ('$include_bots_activities'='Yes' OR NOT author.is_bot_user)\n                AND ('$include_bots_activities'='Yes' OR NOT participant.is_bot_user)\n            GROUP BY pr.project_name, pr.repository_name, pr.pull_request_number, pr.merged_date\n            HAVING MAX(prtcpnt.last_approval_date) IS NOT NULL\n        ) AS approvals\n) AS timings\nWHERE value_rank BETWEEN (0+$percent_of_outliers_to_exclude) AND (1-$percent_of_outliers_to_exclude)",
           "refId": "A",
           "sql": {
             "columns": [
@@ -494,7 +494,7 @@
           }
         }
       ],
-      "title": "Idle between pull request approval and merge",
+      "title": "Idle between pull request approval and merge (excluding outliers)",
       "type": "stat"
     },
     {
@@ -590,7 +590,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT \n$__timeGroupAlias(shared_for_review_date, $group_by_period), \nAVG(pr_lead_time) AS \"Average lead time\"\nFROM \n   (SELECT \n      shared_for_review_date,\n      EXTRACT(EPOCH FROM (merged_date-initial_commit_date)) AS pr_lead_time,\n      PERCENT_RANK() OVER (ORDER BY EXTRACT(EPOCH FROM (merged_date-initial_commit_date))) AS value_rank\n   FROM pull_request AS pr\n      INNER JOIN contributor as author ON author.id = pr.author_id\n   WHERE (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))    \n      AND (COALESCE($repository_name) IS NULL OR repository_name IN ($repository_name))   \n      AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n      AND ('$include_bots_activities'='Yes' OR NOT author.is_bot_user)\n      ) AS lead_times\nWHERE value_rank BETWEEN (0+$percent_of_discarded_extremums) AND (1-$percent_of_discarded_extremums)\nGROUP BY 1\nORDER BY $__timeGroup(shared_for_review_date, $group_by_period, 0)",
+          "rawSql": "SELECT \n$__timeGroupAlias(shared_for_review_date, $group_by_period), \nAVG(pr_lead_time) AS \"Average lead time\"\nFROM \n   (SELECT \n      shared_for_review_date,\n      EXTRACT(EPOCH FROM (merged_date-initial_commit_date)) AS pr_lead_time,\n      PERCENT_RANK() OVER (ORDER BY EXTRACT(EPOCH FROM (merged_date-initial_commit_date))) AS value_rank\n   FROM pull_request AS pr\n      INNER JOIN contributor as author ON author.id = pr.author_id\n   WHERE (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))    \n      AND (COALESCE($repository_name) IS NULL OR repository_name IN ($repository_name))   \n      AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n      AND ('$include_bots_activities'='Yes' OR NOT author.is_bot_user)\n      ) AS lead_times\nWHERE value_rank BETWEEN (0+$percent_of_outliers_to_exclude) AND (1-$percent_of_outliers_to_exclude)\nGROUP BY 1\nORDER BY $__timeGroup(shared_for_review_date, $group_by_period, 0)",
           "refId": "Lead time",
           "sql": {
             "columns": [
@@ -619,7 +619,7 @@
           "format": "table",
           "hide": false,
           "rawQuery": true,
-          "rawSql": "SELECT \n$__timeGroupAlias(shared_for_review_date, $group_by_period), \nAVG(from_commit_to_raise) AS \"Development time\"\nFROM \n   (SELECT \n      shared_for_review_date,\n      GREATEST(EXTRACT(EPOCH FROM (shared_for_review_date-initial_commit_date)),0) AS from_commit_to_raise,\n      PERCENT_RANK() OVER (ORDER BY EXTRACT(EPOCH FROM (shared_for_review_date-initial_commit_date))) AS value_rank\n   FROM pull_request AS pr\n      INNER JOIN contributor as author ON author.id = pr.author_id\n   WHERE (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))    \n      AND (COALESCE($repository_name) IS NULL OR repository_name IN ($repository_name))   \n      AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n      AND ('$include_bots_activities'='Yes' OR NOT author.is_bot_user)\n      ) AS lead_times\nWHERE value_rank BETWEEN (0+$percent_of_discarded_extremums) AND (1-$percent_of_discarded_extremums)\nGROUP BY 1\nORDER BY $__timeGroup(shared_for_review_date, $group_by_period, 0)",
+          "rawSql": "SELECT \n$__timeGroupAlias(shared_for_review_date, $group_by_period), \nAVG(from_commit_to_raise) AS \"Development time\"\nFROM \n   (SELECT \n      shared_for_review_date,\n      GREATEST(EXTRACT(EPOCH FROM (shared_for_review_date-initial_commit_date)),0) AS from_commit_to_raise,\n      PERCENT_RANK() OVER (ORDER BY EXTRACT(EPOCH FROM (shared_for_review_date-initial_commit_date))) AS value_rank\n   FROM pull_request AS pr\n      INNER JOIN contributor as author ON author.id = pr.author_id\n   WHERE (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))    \n      AND (COALESCE($repository_name) IS NULL OR repository_name IN ($repository_name))   \n      AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n      AND ('$include_bots_activities'='Yes' OR NOT author.is_bot_user)\n      ) AS lead_times\nWHERE value_rank BETWEEN (0+$percent_of_outliers_to_exclude) AND (1-$percent_of_outliers_to_exclude)\nGROUP BY 1\nORDER BY $__timeGroup(shared_for_review_date, $group_by_period, 0)",
           "refId": "Development time",
           "sql": {
             "columns": [
@@ -648,7 +648,7 @@
           "format": "table",
           "hide": false,
           "rawQuery": true,
-          "rawSql": "SELECT \n$__timeGroupAlias(shared_for_review_date, $group_by_period), \nAVG(time_to_first_response) AS \"Time to first reaction\" \nFROM (\n    SELECT\n        shared_for_review_date,\n        GREATEST(EXTRACT(EPOCH FROM (first_response_date-shared_for_review_date)), 0) AS time_to_first_response,\n        PERCENT_RANK() OVER (ORDER BY GREATEST(EXTRACT(EPOCH FROM (first_response_date-shared_for_review_date)), 0)) AS value_rank\n    FROM (\n            SELECT\n                shared_for_review_date,\n                MIN(LEAST(COALESCE(prtcpnt.first_approval_date, prtcpnt.first_comment_date),\n                    COALESCE(prtcpnt.first_comment_date, prtcpnt.first_approval_date))) AS first_response_date\n            FROM pull_request AS pr\n                INNER JOIN pull_request_participant AS prtcpnt ON pr.project_name = prtcpnt.project_name AND pr.repository_name = prtcpnt.repository_name AND pr.pull_request_number = prtcpnt.pull_request_number\n                INNER JOIN contributor as author ON author.id = pr.author_id\n                INNER JOIN contributor as participant ON participant.id = prtcpnt.participant_id\n            WHERE (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n                AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))   \n                AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n                AND ('$include_bots_activities'='Yes' OR NOT author.is_bot_user)\n                AND ('$include_bots_activities'='Yes' OR NOT participant.is_bot_user)\n            GROUP BY pr.project_name, pr.repository_name, pr.pull_request_number, pr.shared_for_review_date\n            HAVING MIN(LEAST(COALESCE(prtcpnt.first_approval_date, prtcpnt.first_comment_date),\n                    COALESCE(prtcpnt.first_comment_date, prtcpnt.first_approval_date))) IS NOT NULL\n        ) AS \"First responses\") AS timings\nWHERE value_rank BETWEEN (0+$percent_of_discarded_extremums) AND (1-$percent_of_discarded_extremums)\nGROUP BY 1\nORDER BY $__timeGroup(shared_for_review_date, $group_by_period, 0)",
+          "rawSql": "SELECT \n$__timeGroupAlias(shared_for_review_date, $group_by_period), \nAVG(time_to_first_response) AS \"Time to first reaction\" \nFROM (\n    SELECT\n        shared_for_review_date,\n        GREATEST(EXTRACT(EPOCH FROM (first_response_date-shared_for_review_date)), 0) AS time_to_first_response,\n        PERCENT_RANK() OVER (ORDER BY GREATEST(EXTRACT(EPOCH FROM (first_response_date-shared_for_review_date)), 0)) AS value_rank\n    FROM (\n            SELECT\n                shared_for_review_date,\n                MIN(LEAST(COALESCE(prtcpnt.first_approval_date, prtcpnt.first_comment_date),\n                    COALESCE(prtcpnt.first_comment_date, prtcpnt.first_approval_date))) AS first_response_date\n            FROM pull_request AS pr\n                INNER JOIN pull_request_participant AS prtcpnt ON pr.project_name = prtcpnt.project_name AND pr.repository_name = prtcpnt.repository_name AND pr.pull_request_number = prtcpnt.pull_request_number\n                INNER JOIN contributor as author ON author.id = pr.author_id\n                INNER JOIN contributor as participant ON participant.id = prtcpnt.participant_id\n            WHERE (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n                AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))   \n                AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n                AND ('$include_bots_activities'='Yes' OR NOT author.is_bot_user)\n                AND ('$include_bots_activities'='Yes' OR NOT participant.is_bot_user)\n            GROUP BY pr.project_name, pr.repository_name, pr.pull_request_number, pr.shared_for_review_date\n            HAVING MIN(LEAST(COALESCE(prtcpnt.first_approval_date, prtcpnt.first_comment_date),\n                    COALESCE(prtcpnt.first_comment_date, prtcpnt.first_approval_date))) IS NOT NULL\n        ) AS \"First responses\") AS timings\nWHERE value_rank BETWEEN (0+$percent_of_outliers_to_exclude) AND (1-$percent_of_outliers_to_exclude)\nGROUP BY 1\nORDER BY $__timeGroup(shared_for_review_date, $group_by_period, 0)",
           "refId": "Time to first reaction",
           "sql": {
             "columns": [
@@ -677,7 +677,7 @@
           "format": "table",
           "hide": false,
           "rawQuery": true,
-          "rawSql": "SELECT \n$__timeGroupAlias(shared_for_review_date, $group_by_period), \nAVG(rework_time) AS \"Rework time\"\nFROM (\n    SELECT\n        shared_for_review_date,\n        EXTRACT(EPOCH FROM (merged_date-first_response_date)) AS rework_time,\n        PERCENT_RANK() OVER (ORDER BY EXTRACT(EPOCH FROM (merged_date-first_response_date))) AS value_rank\n    FROM (\n            SELECT\n                shared_for_review_date,\n                merged_date,\n                MIN(GREATEST(COALESCE(prtcpnt.first_approval_date, pr.shared_for_review_date), COALESCE(prtcpnt.first_comment_date, pr.shared_for_review_date))) as first_response_date\n            FROM pull_request AS pr\n                INNER JOIN pull_request_participant AS prtcpnt ON pr.project_name = prtcpnt.project_name AND pr.repository_name = prtcpnt.repository_name AND pr.pull_request_number = prtcpnt.pull_request_number\n                INNER JOIN contributor as author ON author.id = pr.author_id\n                INNER JOIN contributor as participant ON participant.id = prtcpnt.participant_id\n            WHERE (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n                AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n                AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n                AND ('$include_bots_activities'='Yes' OR NOT author.is_bot_user)\n                AND ('$include_bots_activities'='Yes' OR NOT participant.is_bot_user)\n            GROUP BY pr.project_name, pr.repository_name, pr.pull_request_number, pr.merged_date, pr.shared_for_review_date\n            HAVING MIN(GREATEST(COALESCE(prtcpnt.first_approval_date, pr.shared_for_review_date), COALESCE(prtcpnt.first_comment_date, pr.shared_for_review_date))) IS NOT NULL\n        ) AS response_timings\n) AS timings\nWHERE value_rank BETWEEN (0+$percent_of_discarded_extremums) AND (1-$percent_of_discarded_extremums)\nGROUP BY 1\nORDER BY $__timeGroup(shared_for_review_date, $group_by_period, 0)",
+          "rawSql": "SELECT \n$__timeGroupAlias(shared_for_review_date, $group_by_period), \nAVG(rework_time) AS \"Rework time\"\nFROM (\n    SELECT\n        shared_for_review_date,\n        EXTRACT(EPOCH FROM (merged_date-first_response_date)) AS rework_time,\n        PERCENT_RANK() OVER (ORDER BY EXTRACT(EPOCH FROM (merged_date-first_response_date))) AS value_rank\n    FROM (\n            SELECT\n                shared_for_review_date,\n                merged_date,\n                MIN(GREATEST(COALESCE(prtcpnt.first_approval_date, pr.shared_for_review_date), COALESCE(prtcpnt.first_comment_date, pr.shared_for_review_date))) as first_response_date\n            FROM pull_request AS pr\n                INNER JOIN pull_request_participant AS prtcpnt ON pr.project_name = prtcpnt.project_name AND pr.repository_name = prtcpnt.repository_name AND pr.pull_request_number = prtcpnt.pull_request_number\n                INNER JOIN contributor as author ON author.id = pr.author_id\n                INNER JOIN contributor as participant ON participant.id = prtcpnt.participant_id\n            WHERE (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n                AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n                AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n                AND ('$include_bots_activities'='Yes' OR NOT author.is_bot_user)\n                AND ('$include_bots_activities'='Yes' OR NOT participant.is_bot_user)\n            GROUP BY pr.project_name, pr.repository_name, pr.pull_request_number, pr.merged_date, pr.shared_for_review_date\n            HAVING MIN(GREATEST(COALESCE(prtcpnt.first_approval_date, pr.shared_for_review_date), COALESCE(prtcpnt.first_comment_date, pr.shared_for_review_date))) IS NOT NULL\n        ) AS response_timings\n) AS timings\nWHERE value_rank BETWEEN (0+$percent_of_outliers_to_exclude) AND (1-$percent_of_outliers_to_exclude)\nGROUP BY 1\nORDER BY $__timeGroup(shared_for_review_date, $group_by_period, 0)",
           "refId": "Rework time",
           "sql": {
             "columns": [
@@ -706,7 +706,7 @@
           "format": "table",
           "hide": false,
           "rawQuery": true,
-          "rawSql": "SELECT \n    $__timeGroupAlias(shared_for_review_date, $group_by_period), \n    AVG(from_last_approve_to_merge) AS \"Idle after approve\"\nFROM (\n    SELECT\n        shared_for_review_date,\n        EXTRACT(EPOCH FROM (merged_date-last_approval_date)) AS from_last_approve_to_merge,\n        PERCENT_RANK() OVER (ORDER BY EXTRACT(EPOCH FROM (merged_date-last_approval_date))) AS value_rank\n    FROM (\n            SELECT\n                shared_for_review_date,\n                merged_date,\n                MAX(prtcpnt.last_approval_date) as last_approval_date\n            FROM pull_request AS pr\n                INNER JOIN pull_request_participant AS prtcpnt ON pr.project_name = prtcpnt.project_name AND pr.repository_name = prtcpnt.repository_name AND pr.pull_request_number = prtcpnt.pull_request_number\n                INNER JOIN contributor as author ON author.id = pr.author_id\n                INNER JOIN contributor as participant ON participant.id = prtcpnt.participant_id\n            WHERE (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n                AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n                AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n                AND ('$include_bots_activities'='Yes' OR NOT author.is_bot_user)\n                AND ('$include_bots_activities'='Yes' OR NOT participant.is_bot_user)\n            GROUP BY pr.project_name, pr.repository_name, pr.pull_request_number, pr.merged_date, pr.shared_for_review_date\n            HAVING MAX(prtcpnt.last_approval_date) IS NOT NULL\n        ) AS approvals\n) AS timings\nWHERE value_rank BETWEEN (0+$percent_of_discarded_extremums) AND (1-$percent_of_discarded_extremums)\nGROUP BY 1\nORDER BY $__timeGroup(shared_for_review_date, $group_by_period, 0)",
+          "rawSql": "SELECT \n    $__timeGroupAlias(shared_for_review_date, $group_by_period), \n    AVG(from_last_approve_to_merge) AS \"Idle after approve\"\nFROM (\n    SELECT\n        shared_for_review_date,\n        EXTRACT(EPOCH FROM (merged_date-last_approval_date)) AS from_last_approve_to_merge,\n        PERCENT_RANK() OVER (ORDER BY EXTRACT(EPOCH FROM (merged_date-last_approval_date))) AS value_rank\n    FROM (\n            SELECT\n                shared_for_review_date,\n                merged_date,\n                MAX(prtcpnt.last_approval_date) as last_approval_date\n            FROM pull_request AS pr\n                INNER JOIN pull_request_participant AS prtcpnt ON pr.project_name = prtcpnt.project_name AND pr.repository_name = prtcpnt.repository_name AND pr.pull_request_number = prtcpnt.pull_request_number\n                INNER JOIN contributor as author ON author.id = pr.author_id\n                INNER JOIN contributor as participant ON participant.id = prtcpnt.participant_id\n            WHERE (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n                AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n                AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n                AND ('$include_bots_activities'='Yes' OR NOT author.is_bot_user)\n                AND ('$include_bots_activities'='Yes' OR NOT participant.is_bot_user)\n            GROUP BY pr.project_name, pr.repository_name, pr.pull_request_number, pr.merged_date, pr.shared_for_review_date\n            HAVING MAX(prtcpnt.last_approval_date) IS NOT NULL\n        ) AS approvals\n) AS timings\nWHERE value_rank BETWEEN (0+$percent_of_outliers_to_exclude) AND (1-$percent_of_outliers_to_exclude)\nGROUP BY 1\nORDER BY $__timeGroup(shared_for_review_date, $group_by_period, 0)",
           "refId": "Idle after approve",
           "sql": {
             "columns": [
@@ -2456,7 +2456,7 @@
           }
         }
       ],
-      "title": "Typical PR timings",
+      "title": "Typical PR timings (including outliers)",
       "type": "barchart"
     },
     {
@@ -3005,8 +3005,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   }
                 ]
               }
@@ -3118,7 +3117,7 @@
       {
         "allValue": "NULL",
         "current": {
-          "selected": true,
+          "selected": false,
           "text": [
             "All"
           ],
@@ -3260,19 +3259,19 @@
       },
       {
         "current": {
-          "selected": false,
-          "text": "+/-3%",
-          "value": "0.03"
+          "selected": true,
+          "text": "0%",
+          "value": "0"
         },
-        "description": "How many percents of lowest/highest values to exclude from stats",
+        "description": "How many percent of the lowest/highest values be excluded from the stats",
         "hide": 0,
         "includeAll": false,
-        "label": "Percent of discarded extremums",
+        "label": "Percentage of outliers to exclude",
         "multi": false,
-        "name": "percent_of_discarded_extremums",
+        "name": "percent_of_outliers_to_exclude",
         "options": [
           {
-            "selected": false,
+            "selected": true,
             "text": "0%",
             "value": "0"
           },
@@ -3282,7 +3281,7 @@
             "value": "0.01"
           },
           {
-            "selected": true,
+            "selected": false,
             "text": "+/-3%",
             "value": "0.03"
           },
@@ -3304,7 +3303,7 @@
       },
       {
         "current": {
-          "selected": true,
+          "selected": false,
           "text": "Quarters",
           "value": "3M"
         },
@@ -3348,13 +3347,13 @@
     ]
   },
   "time": {
-    "from": "now-90d",
+    "from": "now-10y",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "",
   "title": "PR metrics",
   "uid": "dadf1ef8-d081-4d14-a1f3-82c235fc7fc1",
-  "version": 1,
+  "version": 34,
   "weekStart": ""
 }
