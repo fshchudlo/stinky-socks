@@ -47,10 +47,12 @@ export class GitHubPullRequestsImporter {
         let pageNumber = 1;
         const lastUpdateDateOfStoredPRs: Date | null = await MetricsDB.getPRsMaxDate("updatedDate", this.teamName, this.project.owner, repositoryName);
         while (true) {
+            const timelogLabel = `📥 ${repositoryName}: processing pull requests #${pageSize * (pageNumber - 1)}-${pageSize * pageNumber}...`;
+            console.time(timelogLabel);
+
             const pullRequestsChunk = await this.gitHubAPI.getClosedPullRequests(this.project.owner, repositoryName, pageNumber, pageSize);
 
             for (const pullRequest of pullRequestsChunk) {
-                console.count(`📥 ${repositoryName}: pull requests processed`);
 
                 if (lastUpdateDateOfStoredPRs != null && new Date(pullRequest.updated_at) <= lastUpdateDateOfStoredPRs) {
                     continue;
@@ -66,9 +68,9 @@ export class GitHubPullRequestsImporter {
                     console.warn(`⚠️ Pull request ${pullRequest.number} was filtered out by specified pullRequestsFilterFn function`);
                 }
             }
+            console.timeEnd(timelogLabel);
 
             if (pullRequestsChunk.length < pageSize) {
-                console.countReset(`📥 ${repositoryName}: pull requests processed`);
                 break;
             }
             pageNumber++;
