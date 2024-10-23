@@ -60,7 +60,7 @@ export type GitHubPullRequestActivityReviewedModel = {
     event: "reviewed";
     state: "approved" | "changes_requested" | "commented" | "dismissed" | "pending";
     submitted_at: string;
-    user: GitHubUserModel;
+    user?: GitHubUserModel;
 };
 export type GitHubPullRequestActivityReadyForReviewModel = {
     event: "ready_for_review";

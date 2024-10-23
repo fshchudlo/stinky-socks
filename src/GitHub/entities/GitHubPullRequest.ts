@@ -58,30 +58,31 @@ export class GitHubPullRequest extends PullRequest {
     }
 
     private async initializeParticipants(model: ImportParams) {
-        const allParticipants = new Set<string>([
+        const allParticipants = new Set<string | null>([
             ...model.pullRequest.requested_reviewers.map(r => r.login),
             ...model.pullRequest.assignees.map(p => p.login),
             ...model.pullRequestActivities.filter(ActivityTraits.isCommentedEvent).map(c => c.actor.login),
             ...model.pullRequestActivities.filter(ActivityTraits.isLineCommentedEvent).flatMap(c => c.comments).map(c => c.user.login),
-            ...model.pullRequestActivities.filter(ActivityTraits.isReviewedEvent).map(c => c.user.login)
+            ...model.pullRequestActivities.filter(ActivityTraits.isReviewedEvent).map(c => c.user?.login || null)
         ]);
 
         this.participants = await Promise.all(
             Array.from(allParticipants)
-                .filter(p => p !== model.pullRequest.user.login)
-                .map(async participantName => {
+                .filter((participantLogin): participantLogin is string => !!participantLogin)
+                .filter(participantLogin => participantLogin !== model.pullRequest.user.login)
+                .map(async participantLogin => {
 
                     const participantUser = await ContributorFactory.fetchContributor({
                         teamName: model.teamName,
-                        login: participantName,
-                        isBotUser: model.botUserNames.includes(participantName),
-                        isFormerEmployee: model.formerEmployeeNames.includes(participantName)
+                        login: participantLogin,
+                        isBotUser: model.botUserNames.includes(participantLogin),
+                        isFormerEmployee: model.formerEmployeeNames.includes(participantLogin)
                     });
 
                     return new GitHubPullRequestParticipant(
                         model.teamName,
                         model.pullRequest,
-                        getActivitiesOf(model.pullRequestActivities, participantName),
+                        getActivitiesOf(model.pullRequestActivities, participantLogin),
                         participantUser
                     );
                 }));
