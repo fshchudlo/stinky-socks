@@ -1889,12 +1889,132 @@
       "type": "barchart"
     },
     {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 1,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "s"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byType",
+              "options": "number"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "hidden"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 13,
+        "w": 24,
+        "x": 0,
+        "y": 56
+      },
+      "id": 12,
+      "options": {
+        "barRadius": 0,
+        "barWidth": 0.8,
+        "fullHighlight": false,
+        "groupWidth": 0.8,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "orientation": "horizontal",
+        "showValue": "never",
+        "stacking": "normal",
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        },
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 0
+      },
+      "pluginVersion": "11.3.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT grouping_field AS \"$group_by_field\",\n  AVG((GREATEST(EXTRACT(EPOCH FROM (shared_for_review_date-initial_commit_date)), 0))) AS \"Development time\",\n  AVG(EXTRACT(EPOCH FROM (first_response_date-shared_for_review_date))) AS \"First reaction got in\",\n  AVG(EXTRACT(EPOCH FROM (merged_date-first_response_date))) AS \"Rework time\",\n  AVG(EXTRACT(EPOCH FROM (merged_date-last_approval_date))) AS \"Idle after approve\"\nFROM (SELECT\n        $group_by_field as grouping_field,\n        pr.merged_date,\n        pr.shared_for_review_date,\n        pr.initial_commit_date,\n        MIN(LEAST(COALESCE(first_approval_date, first_comment_date),COALESCE(first_comment_date, first_approval_date))) AS first_response_date,\n        MAX(last_approval_date) as last_approval_date\n    FROM pull_request AS pr\n        INNER JOIN pull_request_participant AS prtcpnt ON pr.project_name = prtcpnt.project_name AND pr.repository_name = prtcpnt.repository_name AND pr.pull_request_number = prtcpnt.pull_request_number\n        INNER JOIN contributor as author ON author.id = pr.author_id\n        INNER JOIN contributor as participant ON participant.id = prtcpnt.participant_id\n    WHERE $__timeFilter(shared_for_review_date)\n      AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n      AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n      AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n      AND ('$include_bots_activities'='Yes' OR NOT participant.is_bot_user)\n      AND ('$include_bots_activities'='Yes' OR NOT author.is_bot_user)\n    GROUP BY pr.project_name, pr.repository_name, pr.pull_request_number, $group_by_field, pr.merged_date, pr.shared_for_review_date, pr.initial_commit_date\n) AS activity_stats\nGROUP BY grouping_field\nORDER BY AVG((GREATEST(EXTRACT(EPOCH FROM (shared_for_review_date-initial_commit_date)), 0)))\n        +AVG(EXTRACT(EPOCH FROM (first_response_date-shared_for_review_date)))\n        +AVG(EXTRACT(EPOCH FROM (merged_date-first_response_date)))\n        +AVG(EXTRACT(EPOCH FROM (merged_date-last_approval_date)))\n",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "Typical PR timings (including outliers)",
+      "type": "barchart"
+    },
+    {
       "collapsed": false,
       "gridPos": {
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 56
+        "y": 69
       },
       "id": 22,
       "panels": [],
@@ -1952,7 +2072,7 @@
         "h": 13,
         "w": 12,
         "x": 0,
-        "y": 57
+        "y": 70
       },
       "id": 1,
       "options": {
@@ -2070,7 +2190,7 @@
         "h": 13,
         "w": 12,
         "x": 12,
-        "y": 57
+        "y": 70
       },
       "id": 35,
       "options": {
@@ -2179,7 +2299,7 @@
         "h": 13,
         "w": 12,
         "x": 0,
-        "y": 70
+        "y": 83
       },
       "id": 2,
       "options": {
@@ -2295,7 +2415,7 @@
         "h": 13,
         "w": 12,
         "x": 12,
-        "y": 70
+        "y": 83
       },
       "id": 13,
       "options": {
@@ -2410,7 +2530,7 @@
         "h": 13,
         "w": 12,
         "x": 0,
-        "y": 83
+        "y": 96
       },
       "id": 14,
       "options": {
@@ -2525,7 +2645,7 @@
         "h": 13,
         "w": 12,
         "x": 12,
-        "y": 83
+        "y": 96
       },
       "id": 20,
       "options": {
@@ -2593,125 +2713,6 @@
     },
     {
       "datasource": {
-        "type": "grafana-postgresql-datasource",
-        "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "fillOpacity": 80,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "lineWidth": 1,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green"
-              }
-            ]
-          },
-          "unit": "s"
-        },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byType",
-              "options": "number"
-            },
-            "properties": [
-              {
-                "id": "custom.axisPlacement",
-                "value": "hidden"
-              }
-            ]
-          }
-        ]
-      },
-      "gridPos": {
-        "h": 13,
-        "w": 24,
-        "x": 0,
-        "y": 96
-      },
-      "id": 12,
-      "options": {
-        "barRadius": 0,
-        "barWidth": 0.8,
-        "fullHighlight": false,
-        "groupWidth": 0.8,
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "orientation": "horizontal",
-        "showValue": "never",
-        "stacking": "normal",
-        "tooltip": {
-          "mode": "multi",
-          "sort": "none"
-        },
-        "xTickLabelRotation": 0,
-        "xTickLabelSpacing": 0
-      },
-      "pluginVersion": "11.3.0",
-      "targets": [
-        {
-          "datasource": {
-            "type": "postgres",
-            "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
-          },
-          "editorMode": "code",
-          "format": "table",
-          "rawQuery": true,
-          "rawSql": "SELECT grouping_field AS \"$group_by_field\",\n  AVG((GREATEST(EXTRACT(EPOCH FROM (shared_for_review_date-initial_commit_date)), 0))) AS \"Development time\",\n  AVG(EXTRACT(EPOCH FROM (first_response_date-shared_for_review_date))) AS \"First reaction got in\",\n  AVG(EXTRACT(EPOCH FROM (merged_date-first_response_date))) AS \"Rework time\",\n  AVG(EXTRACT(EPOCH FROM (merged_date-last_approval_date))) AS \"Idle after approve\"\nFROM (SELECT\n        $group_by_field as grouping_field,\n        pr.merged_date,\n        pr.shared_for_review_date,\n        pr.initial_commit_date,\n        MIN(LEAST(COALESCE(first_approval_date, first_comment_date),COALESCE(first_comment_date, first_approval_date))) AS first_response_date,\n        MAX(last_approval_date) as last_approval_date\n    FROM pull_request AS pr\n        INNER JOIN pull_request_participant AS prtcpnt ON pr.project_name = prtcpnt.project_name AND pr.repository_name = prtcpnt.repository_name AND pr.pull_request_number = prtcpnt.pull_request_number\n        INNER JOIN contributor as author ON author.id = pr.author_id\n        INNER JOIN contributor as participant ON participant.id = prtcpnt.participant_id\n    WHERE $__timeFilter(shared_for_review_date)\n      AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n      AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n      AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n      AND ('$include_bots_activities'='Yes' OR NOT participant.is_bot_user)\n      AND ('$include_bots_activities'='Yes' OR NOT author.is_bot_user)\n    GROUP BY pr.project_name, pr.repository_name, pr.pull_request_number, $group_by_field, pr.merged_date, pr.shared_for_review_date, pr.initial_commit_date\n) AS activity_stats\nGROUP BY grouping_field\nORDER BY AVG((GREATEST(EXTRACT(EPOCH FROM (shared_for_review_date-initial_commit_date)), 0)))\n        +AVG(EXTRACT(EPOCH FROM (first_response_date-shared_for_review_date)))\n        +AVG(EXTRACT(EPOCH FROM (merged_date-first_response_date)))\n        +AVG(EXTRACT(EPOCH FROM (merged_date-last_approval_date)))\n",
-          "refId": "A",
-          "sql": {
-            "columns": [
-              {
-                "parameters": [],
-                "type": "function"
-              }
-            ],
-            "groupBy": [
-              {
-                "property": {
-                  "type": "string"
-                },
-                "type": "groupBy"
-              }
-            ],
-            "limit": 50
-          }
-        }
-      ],
-      "title": "Typical PR timings (including outliers)",
-      "type": "barchart"
-    },
-    {
-      "datasource": {
         "type": "postgres",
         "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
       },
@@ -2747,7 +2748,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "#EAB839",
@@ -2804,6 +2806,7 @@
         "xTickLabelRotation": 0,
         "xTickLabelSpacing": 0
       },
+      "pluginVersion": "11.3.0",
       "targets": [
         {
           "datasource": {
@@ -2874,7 +2877,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "#EAB839",
@@ -2931,6 +2935,7 @@
         "xTickLabelRotation": 0,
         "xTickLabelSpacing": 0
       },
+      "pluginVersion": "11.3.0",
       "targets": [
         {
           "datasource": {
@@ -3001,7 +3006,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "#EAB839",
@@ -3058,6 +3064,7 @@
         "xTickLabelRotation": 0,
         "xTickLabelSpacing": 0
       },
+      "pluginVersion": "11.3.0",
       "targets": [
         {
           "datasource": {
@@ -3128,7 +3135,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "#EAB839",
@@ -3185,6 +3193,7 @@
         "xTickLabelRotation": 0,
         "xTickLabelSpacing": 0
       },
+      "pluginVersion": "11.3.0",
       "targets": [
         {
           "datasource": {
@@ -3477,8 +3486,8 @@
       },
       {
         "current": {
-          "text": "0.01",
-          "value": "0.01"
+          "text": "0.03",
+          "value": "0.03"
         },
         "description": "How many percent of the lowest/highest values be excluded from the stats",
         "includeAll": false,
@@ -3491,12 +3500,12 @@
             "value": "0"
           },
           {
-            "selected": true,
+            "selected": false,
             "text": "+/-1%",
             "value": "0.01"
           },
           {
-            "selected": false,
+            "selected": true,
             "text": "+/-3%",
             "value": "0.03"
           },
