@@ -20,7 +20,7 @@
 - Run `docker-compose -f assets/docker-compose.yml up -d` to start Postgres and Grafana. It also configures Grafana
   datasource and dashboard and postgress database.
 - Run `npm run start` to start the import process.
-- Alternatively, you can run `docker-compose -f assets/docker-compose.yml -f assets/docker-compose.dev.yml up -d` to build and run the
+- Alternatively, you can run `docker-compose -f assets/docker-compose.yml -f assets/docker-compose.dev.yml up -d --build` to build and run the
   importer app in docker as well.
 - Occasionally, there may be irregularities in the data. For instance, both the GitHub and Bitbucket APIs sometimes fail
   to return data about commits (see [this as example](https://github.com/grafana/grafana/pull/637)). I recommend

@@ -88,6 +88,16 @@ export class GitHubAPI {
     }
 
     private async checkRateLimits(response: AxiosResponse<any>) {
+        if (+this.pauseOnRateLimitThreshold && response.headers["x-ratelimit-remaining"] <= 100) {
+            const resetTime = +response.headers["x-ratelimit-reset"] * 1000;
+            const currentTime = Date.now();
+            const waitTime = resetTime - currentTime;
+            const waitTimeString = convertMillisecondsToHumanReadableTime(waitTime);
+
+            console.warn(`🫸 GitHub API rate limit exceeded. Waiting for ${waitTimeString}...`);
+            await new Promise(resolve => setTimeout(resolve, waitTime));
+        }
+
         function convertMillisecondsToHumanReadableTime(milliseconds: number): string {
             let seconds = milliseconds / 1000;
             const units: [string, number][] = [
@@ -107,16 +117,6 @@ export class GitHubAPI {
             }
 
             return parts.join(", ");
-        }
-
-        if (this.pauseOnRateLimitThreshold && response.headers["x-ratelimit-remaining"] === "100") {
-            const resetTime = parseInt(response.headers["x-ratelimit-reset"], 10) * 1000;
-            const currentTime = Date.now();
-            const waitTime = resetTime - currentTime;
-            const waitTimeString = convertMillisecondsToHumanReadableTime(waitTime);
-
-            console.warn(`🫸 GitHub API rate limit exceeded. Waiting for ${waitTimeString}...`);
-            await new Promise(resolve => setTimeout(resolve, waitTime));
         }
     }
 
