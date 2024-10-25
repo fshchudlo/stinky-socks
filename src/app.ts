@@ -18,12 +18,6 @@ async function runDataImports() {
     }
 }
 
-const originalLog = console.log;
-console.log = (...args) => {
-    const timestamp = new Date().toLocaleTimeString();
-    originalLog(`[${timestamp}]`, ...args);
-};
-
 MetricsDB.initialize().then(() => {
     runDataImports().catch(error => console.error(error));
 
