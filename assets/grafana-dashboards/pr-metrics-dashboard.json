@@ -1401,7 +1401,7 @@
               "options": {
                 "mode": "exclude",
                 "names": [
-                  "Lines changed"
+                  "PRs count"
                 ],
                 "prefix": "All except:",
                 "readOnly": true
