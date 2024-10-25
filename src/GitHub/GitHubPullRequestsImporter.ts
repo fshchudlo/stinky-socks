@@ -46,7 +46,7 @@ export class GitHubPullRequestsImporter {
         const pageSize = 100;
         const lastUpdateDateOfStoredPRs: Date | null = await MetricsDB.getPRsMaxDate("updatedDate", this.teamName, this.project.owner, repositoryName);
         const importedPRsCount = await MetricsDB.getPRsCount(this.teamName, this.project.owner, repositoryName);
-        let pageNumber = Math.floor(importedPRsCount / pageSize);
+        let pageNumber = importedPRsCount ? Math.floor(importedPRsCount / pageSize) : 1;
 
         while (true) {
             const timelogLabel = `💾 ${this.teamName}/${repositoryName}: successfully processed pull requests #${pageSize * (pageNumber - 1)}-${pageSize * pageNumber}.`;
