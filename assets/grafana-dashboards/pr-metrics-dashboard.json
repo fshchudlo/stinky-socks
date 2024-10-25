@@ -26,7 +26,6 @@
   "graphTooltip": 1,
   "id": 1,
   "links": [],
-  "liveNow": false,
   "panels": [
     {
       "collapsed": false,
@@ -93,6 +92,7 @@
         "graphMode": "area",
         "justifyMode": "auto",
         "orientation": "auto",
+        "percentChangeColorMode": "standard",
         "reduceOptions": {
           "calcs": [
             "lastNotNull"
@@ -104,7 +104,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "10.4.7",
+      "pluginVersion": "11.3.0",
       "targets": [
         {
           "datasource": {
@@ -183,6 +183,7 @@
         "graphMode": "area",
         "justifyMode": "auto",
         "orientation": "auto",
+        "percentChangeColorMode": "standard",
         "reduceOptions": {
           "calcs": [
             "lastNotNull"
@@ -194,7 +195,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "10.4.7",
+      "pluginVersion": "11.3.0",
       "targets": [
         {
           "datasource": {
@@ -272,6 +273,7 @@
         "graphMode": "area",
         "justifyMode": "auto",
         "orientation": "auto",
+        "percentChangeColorMode": "standard",
         "reduceOptions": {
           "calcs": [
             "lastNotNull"
@@ -283,7 +285,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "10.4.7",
+      "pluginVersion": "11.3.0",
       "targets": [
         {
           "datasource": {
@@ -362,6 +364,7 @@
         "graphMode": "area",
         "justifyMode": "auto",
         "orientation": "auto",
+        "percentChangeColorMode": "standard",
         "reduceOptions": {
           "calcs": [
             "lastNotNull"
@@ -373,7 +376,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "10.4.7",
+      "pluginVersion": "11.3.0",
       "targets": [
         {
           "datasource": {
@@ -452,6 +455,7 @@
         "graphMode": "area",
         "justifyMode": "auto",
         "orientation": "auto",
+        "percentChangeColorMode": "standard",
         "reduceOptions": {
           "calcs": [
             "lastNotNull"
@@ -463,7 +467,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "10.4.7",
+      "pluginVersion": "11.3.0",
       "targets": [
         {
           "datasource": {
@@ -516,6 +520,7 @@
             "axisPlacement": "auto",
             "axisSoftMin": 0,
             "barAlignment": 0,
+            "barWidthFactor": 0.6,
             "drawStyle": "line",
             "fillOpacity": 0,
             "gradientMode": "none",
@@ -606,6 +611,7 @@
           "sort": "none"
         }
       },
+      "pluginVersion": "11.3.0",
       "targets": [
         {
           "datasource": {
@@ -777,8 +783,9 @@
         "defaults": {
           "color": {
             "fixedColor": "light-blue",
-            "mode": "thresholds"
+            "mode": "fixed"
           },
+          "decimals": 0,
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
@@ -786,33 +793,26 @@
               {
                 "color": "green",
                 "value": null
-              },
-              {
-                "color": "#EAB839",
-                "value": 10
-              },
-              {
-                "color": "red",
-                "value": 25
               }
             ]
           },
-          "unit": "percent"
+          "unit": "locale"
         },
         "overrides": []
       },
       "gridPos": {
         "h": 3,
-        "w": 6,
+        "w": 5,
         "x": 0,
         "y": 16
       },
-      "id": 26,
+      "id": 47,
       "options": {
         "colorMode": "value",
         "graphMode": "area",
         "justifyMode": "auto",
         "orientation": "horizontal",
+        "percentChangeColorMode": "standard",
         "reduceOptions": {
           "calcs": [
             "lastNotNull"
@@ -824,7 +824,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "10.4.7",
+      "pluginVersion": "11.3.0",
       "targets": [
         {
           "dataset": "`stinky-socks`",
@@ -835,7 +835,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT SUM(CASE WHEN tests_were_touched THEN 0 ELSE 1 END)::decimal/COUNT(*)*100 AS \"PRs without tests touch\" \nFROM pull_request AS pr\n   INNER JOIN contributor as author ON author.id = pr.author_id\nWHERE $__timeFilter(shared_for_review_date)\n   AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n   AND (COALESCE($repository_name) IS NULL OR repository_name IN ($repository_name))   \n   AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n   AND ('$include_bots_activities'='Yes' OR NOT author.is_bot_user)",
+          "rawSql": "SELECT COUNT(*) as \"Average PR size\"\nFROM pull_request AS pr\n   INNER JOIN contributor as author ON author.id = pr.author_id\nWHERE $__timeFilter(shared_for_review_date)\n   AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n   AND (COALESCE($repository_name) IS NULL OR repository_name IN ($repository_name))   \n   AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n   AND ('$include_bots_activities'='Yes' OR NOT author.is_bot_user)",
           "refId": "A",
           "sql": {
             "columns": [
@@ -863,7 +863,7 @@
           "table": "pull_request"
         }
       ],
-      "title": "PRs without tests touch",
+      "title": "Pull requests count",
       "type": "stat"
     },
     {
@@ -877,6 +877,7 @@
             "fixedColor": "light-blue",
             "mode": "fixed"
           },
+          "decimals": 2,
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
@@ -887,22 +888,23 @@
               }
             ]
           },
-          "unit": "none"
+          "unit": "locale"
         },
         "overrides": []
       },
       "gridPos": {
         "h": 3,
-        "w": 6,
-        "x": 6,
+        "w": 5,
+        "x": 5,
         "y": 16
       },
-      "id": 27,
+      "id": 29,
       "options": {
         "colorMode": "value",
         "graphMode": "area",
         "justifyMode": "auto",
         "orientation": "horizontal",
+        "percentChangeColorMode": "standard",
         "reduceOptions": {
           "calcs": [
             "lastNotNull"
@@ -914,7 +916,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "10.4.7",
+      "pluginVersion": "11.3.0",
       "targets": [
         {
           "dataset": "`stinky-socks`",
@@ -925,7 +927,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT avg(diff_size) as \"Average PR size\"\nFROM pull_request AS pr\n   INNER JOIN contributor as author ON author.id = pr.author_id\nWHERE $__timeFilter(shared_for_review_date)\n   AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n   AND (COALESCE($repository_name) IS NULL OR repository_name IN ($repository_name))   \n   AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n   AND ('$include_bots_activities'='Yes' OR NOT author.is_bot_user)",
+          "rawSql": "SELECT AVG(reviewers_count) AS \"Reviewers count\" \nFROM pull_request AS pr\n   INNER JOIN contributor as author ON author.id = pr.author_id\nWHERE $__timeFilter(shared_for_review_date)\n   AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n   AND (COALESCE($repository_name) IS NULL OR repository_name IN ($repository_name))   \n   AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n   AND ('$include_bots_activities'='Yes' OR NOT author.is_bot_user)",
           "refId": "A",
           "sql": {
             "columns": [
@@ -953,7 +955,7 @@
           "table": "pull_request"
         }
       ],
-      "title": "Average diff size",
+      "title": "Average reviewers count",
       "type": "stat"
     },
     {
@@ -967,6 +969,7 @@
             "fixedColor": "light-blue",
             "mode": "fixed"
           },
+          "decimals": 2,
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
@@ -977,14 +980,14 @@
               }
             ]
           },
-          "unit": "none"
+          "unit": "locale"
         },
         "overrides": []
       },
       "gridPos": {
         "h": 3,
-        "w": 6,
-        "x": 12,
+        "w": 5,
+        "x": 10,
         "y": 16
       },
       "id": 28,
@@ -993,6 +996,7 @@
         "graphMode": "area",
         "justifyMode": "auto",
         "orientation": "horizontal",
+        "percentChangeColorMode": "standard",
         "reduceOptions": {
           "calcs": [
             "lastNotNull"
@@ -1004,7 +1008,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "10.4.7",
+      "pluginVersion": "11.3.0",
       "targets": [
         {
           "dataset": "`stinky-socks`",
@@ -1057,6 +1061,7 @@
             "fixedColor": "light-blue",
             "mode": "fixed"
           },
+          "decimals": 0,
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
@@ -1067,22 +1072,23 @@
               }
             ]
           },
-          "unit": "none"
+          "unit": "locale"
         },
         "overrides": []
       },
       "gridPos": {
         "h": 3,
-        "w": 6,
-        "x": 18,
+        "w": 5,
+        "x": 15,
         "y": 16
       },
-      "id": 29,
+      "id": 27,
       "options": {
         "colorMode": "value",
         "graphMode": "area",
         "justifyMode": "auto",
         "orientation": "horizontal",
+        "percentChangeColorMode": "standard",
         "reduceOptions": {
           "calcs": [
             "lastNotNull"
@@ -1094,7 +1100,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "10.4.7",
+      "pluginVersion": "11.3.0",
       "targets": [
         {
           "dataset": "`stinky-socks`",
@@ -1105,7 +1111,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT AVG(reviewers_count) AS \"Reviewers count\" \nFROM pull_request AS pr\n   INNER JOIN contributor as author ON author.id = pr.author_id\nWHERE $__timeFilter(shared_for_review_date)\n   AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n   AND (COALESCE($repository_name) IS NULL OR repository_name IN ($repository_name))   \n   AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n   AND ('$include_bots_activities'='Yes' OR NOT author.is_bot_user)",
+          "rawSql": "SELECT avg(diff_size) as \"Average PR size\"\nFROM pull_request AS pr\n   INNER JOIN contributor as author ON author.id = pr.author_id\nWHERE $__timeFilter(shared_for_review_date)\n   AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n   AND (COALESCE($repository_name) IS NULL OR repository_name IN ($repository_name))   \n   AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n   AND ('$include_bots_activities'='Yes' OR NOT author.is_bot_user)",
           "refId": "A",
           "sql": {
             "columns": [
@@ -1133,7 +1139,106 @@
           "table": "pull_request"
         }
       ],
-      "title": "Average reviewers count",
+      "title": "Average diff size",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "light-blue",
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "#EAB839",
+                "value": 10
+              },
+              {
+                "color": "red",
+                "value": 25
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 4,
+        "x": 20,
+        "y": 16
+      },
+      "id": 26,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "horizontal",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.3.0",
+      "targets": [
+        {
+          "dataset": "`stinky-socks`",
+          "datasource": {
+            "type": "postgres",
+            "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT SUM(CASE WHEN tests_were_touched THEN 0 ELSE 1 END)::decimal/COUNT(*)*100 AS \"PRs without tests touch\" \nFROM pull_request AS pr\n   INNER JOIN contributor as author ON author.id = pr.author_id\nWHERE $__timeFilter(shared_for_review_date)\n   AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n   AND (COALESCE($repository_name) IS NULL OR repository_name IN ($repository_name))   \n   AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n   AND ('$include_bots_activities'='Yes' OR NOT author.is_bot_user)",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [
+                  {
+                    "name": "author",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "name": "author",
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          },
+          "table": "pull_request"
+        }
+      ],
+      "title": "PRs without tests touch",
       "type": "stat"
     },
     {
@@ -1153,6 +1258,7 @@
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
+            "barWidthFactor": 0.6,
             "drawStyle": "line",
             "fillOpacity": 0,
             "gradientMode": "none",
@@ -1243,6 +1349,7 @@
           "sort": "none"
         }
       },
+      "pluginVersion": "11.3.0",
       "targets": [
         {
           "datasource": {
@@ -1393,6 +1500,7 @@
         "xTickLabelRotation": 0,
         "xTickLabelSpacing": 0
       },
+      "pluginVersion": "11.3.0",
       "targets": [
         {
           "datasource": {
@@ -1532,6 +1640,7 @@
         "xTickLabelRotation": 0,
         "xTickLabelSpacing": 0
       },
+      "pluginVersion": "11.3.0",
       "targets": [
         {
           "datasource": {
@@ -1641,7 +1750,7 @@
         "xTickLabelRotation": 0,
         "xTickLabelSpacing": 0
       },
-      "pluginVersion": "9.5.2",
+      "pluginVersion": "11.3.0",
       "targets": [
         {
           "datasource": {
@@ -1774,7 +1883,7 @@
         "xTickLabelRotation": 0,
         "xTickLabelSpacing": 0
       },
-      "pluginVersion": "9.5.2",
+      "pluginVersion": "11.3.0",
       "targets": [
         {
           "dataset": "`stinky-socks`",
@@ -1892,7 +2001,7 @@
         "xTickLabelRotation": 0,
         "xTickLabelSpacing": 0
       },
-      "pluginVersion": "9.5.2",
+      "pluginVersion": "11.3.0",
       "targets": [
         {
           "datasource": {
@@ -2001,7 +2110,7 @@
         "xTickLabelRotation": 0,
         "xTickLabelSpacing": 0
       },
-      "pluginVersion": "9.5.2",
+      "pluginVersion": "11.3.0",
       "targets": [
         {
           "dataset": "`stinky-socks`",
@@ -2117,7 +2226,7 @@
         "xTickLabelRotation": 0,
         "xTickLabelSpacing": 0
       },
-      "pluginVersion": "9.5.2",
+      "pluginVersion": "11.3.0",
       "targets": [
         {
           "dataset": "`stinky-socks`",
@@ -2232,7 +2341,7 @@
         "xTickLabelRotation": 0,
         "xTickLabelSpacing": 0
       },
-      "pluginVersion": "9.5.2",
+      "pluginVersion": "11.3.0",
       "targets": [
         {
           "dataset": "`stinky-socks`",
@@ -2347,7 +2456,7 @@
         "xTickLabelRotation": 0,
         "xTickLabelSpacing": 0
       },
-      "pluginVersion": "9.5.2",
+      "pluginVersion": "11.3.0",
       "targets": [
         {
           "dataset": "`stinky-socks`",
@@ -2475,7 +2584,7 @@
         "xTickLabelRotation": 0,
         "xTickLabelSpacing": 0
       },
-      "pluginVersion": "9.5.2",
+      "pluginVersion": "11.3.0",
       "targets": [
         {
           "datasource": {
@@ -2546,8 +2655,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "#EAB839",
@@ -2674,8 +2782,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "#EAB839",
@@ -2802,8 +2909,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "#EAB839",
@@ -2930,8 +3036,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "#EAB839",
@@ -3158,16 +3263,15 @@
       "type": "row"
     }
   ],
+  "preload": false,
   "refresh": "",
-  "revision": 1,
-  "schemaVersion": 39,
+  "schemaVersion": 40,
   "tags": [],
   "templating": {
     "list": [
       {
         "allValue": "NULL",
         "current": {
-          "selected": false,
           "text": [
             "All"
           ],
@@ -3180,7 +3284,6 @@
           "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
         },
         "definition": "SELECT DISTINCT team_name FROM pull_request\nORDER BY team_name",
-        "hide": 0,
         "includeAll": true,
         "label": "Team",
         "multi": true,
@@ -3189,14 +3292,11 @@
         "query": "SELECT DISTINCT team_name FROM pull_request\nORDER BY team_name",
         "refresh": 1,
         "regex": "",
-        "skipUrlSync": false,
-        "sort": 0,
         "type": "query"
       },
       {
         "allValue": "NULL",
         "current": {
-          "selected": true,
           "text": [
             "All"
           ],
@@ -3209,7 +3309,6 @@
           "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
         },
         "definition": "SELECT DISTINCT (repository_name) \nFROM pull_request \nWHERE $__timeFilter(shared_for_review_date) \n   AND (COALESCE($team_name) IS NULL OR team_name IN ($team_name))    \nORDER BY repository_name",
-        "hide": 0,
         "includeAll": true,
         "label": "Repository name",
         "multi": true,
@@ -3218,14 +3317,12 @@
         "query": "SELECT DISTINCT (repository_name) \nFROM pull_request \nWHERE $__timeFilter(shared_for_review_date) \n   AND (COALESCE($team_name) IS NULL OR team_name IN ($team_name))    \nORDER BY repository_name",
         "refresh": 2,
         "regex": "",
-        "skipUrlSync": false,
         "sort": 1,
         "type": "query"
       },
       {
         "allValue": "NULL",
         "current": {
-          "selected": true,
           "text": [
             "All"
           ],
@@ -3238,7 +3335,6 @@
           "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
         },
         "definition": "SELECT DISTINCT contributor.id as __value, contributor.nickname as __text FROM pull_request \nINNER JOIN contributor ON pull_request.author_id = contributor.id\nWHERE $__timeFilter(shared_for_review_date) \nAND (COALESCE($team_name) IS NULL OR pull_request.team_name IN ($team_name))    \nAND (COALESCE($repository_name) IS NULL OR repository_name IN ($repository_name))\nORDER BY contributor.nickname",
-        "hide": 0,
         "includeAll": true,
         "label": "PR author",
         "multi": true,
@@ -3247,20 +3343,15 @@
         "query": "SELECT DISTINCT contributor.id as __value, contributor.nickname as __text FROM pull_request \nINNER JOIN contributor ON pull_request.author_id = contributor.id\nWHERE $__timeFilter(shared_for_review_date) \nAND (COALESCE($team_name) IS NULL OR pull_request.team_name IN ($team_name))    \nAND (COALESCE($repository_name) IS NULL OR repository_name IN ($repository_name))\nORDER BY contributor.nickname",
         "refresh": 2,
         "regex": "",
-        "skipUrlSync": false,
-        "sort": 0,
         "type": "query"
       },
       {
         "current": {
-          "selected": false,
-          "text": "Repository",
+          "text": "pr.repository_name",
           "value": "pr.repository_name"
         },
-        "hide": 0,
         "includeAll": false,
         "label": "Group by",
-        "multi": false,
         "name": "group_by_field",
         "options": [
           {
@@ -3275,20 +3366,15 @@
           }
         ],
         "query": "Repository : pr.repository_name, Author : author.nickname",
-        "queryValue": "",
-        "skipUrlSync": false,
         "type": "custom"
       },
       {
         "current": {
-          "selected": false,
           "text": "No",
           "value": "No"
         },
-        "hide": 0,
         "includeAll": false,
         "label": "Include bots activities",
-        "multi": false,
         "name": "include_bots_activities",
         "options": [
           {
@@ -3303,21 +3389,16 @@
           }
         ],
         "query": "No,Yes",
-        "queryValue": "",
-        "skipUrlSync": false,
         "type": "custom"
       },
       {
         "current": {
-          "selected": true,
-          "text": "+/-1%",
+          "text": "0.01",
           "value": "0.01"
         },
         "description": "How many percent of the lowest/highest values be excluded from the stats",
-        "hide": 0,
         "includeAll": false,
         "label": "Percentage of outliers to exclude",
-        "multi": false,
         "name": "percent_of_outliers_to_exclude",
         "options": [
           {
@@ -3347,20 +3428,15 @@
           }
         ],
         "query": "0% : 0, +/-1% : 0.01, +/-3% : 0.03, +/-5% : 0.05, +/-10% : 0.1",
-        "queryValue": "",
-        "skipUrlSync": false,
         "type": "custom"
       },
       {
         "current": {
-          "selected": true,
-          "text": "Weeks",
+          "text": "1w",
           "value": "1w"
         },
-        "hide": 0,
         "includeAll": false,
         "label": "Group by period",
-        "multi": false,
         "name": "group_by_period",
         "options": [
           {
@@ -3390,8 +3466,6 @@
           }
         ],
         "query": "Days : 1d,  Weeks : 1w, Months : 1M, Quarters : 3M, Years : 1y",
-        "queryValue": "",
-        "skipUrlSync": false,
         "type": "custom"
       }
     ]
