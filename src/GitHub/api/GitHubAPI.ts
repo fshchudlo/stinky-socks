@@ -88,8 +88,8 @@ export class GitHubAPI {
     }
 
     private async checkRateLimits(response: AxiosResponse<any>) {
-        if (this.pauseOnRateLimitThreshold && +response.headers["x-ratelimit-remaining"] <= 100) {
-            const resetTime = +response.headers["x-ratelimit-reset"] * 1000;
+        if (this.pauseOnRateLimitThreshold && parseInt(response.headers["x-ratelimit-remaining"], 10) <= 100) {
+            const resetTime = parseInt(response.headers["x-ratelimit-reset"], 10) * 1000;
             const currentTime = Date.now();
             const waitTime = resetTime - currentTime;
             const waitTimeString = convertMillisecondsToHumanReadableTime(waitTime);
