@@ -1,6 +1,8 @@
 version: '3.8'
 services:
   stinky-socks:
+    depends_on:
+      - postgres
     build:
       context: ../
       dockerfile: Dockerfile
