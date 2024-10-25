@@ -11,56 +11,6 @@ export class GitHubAPI {
         this.pauseOnRateLimitThreshold = addressRateLimits;
     }
 
-    private async get(url: string, params: any = undefined): Promise<any> {
-        const config: AxiosRequestConfig = {
-            headers: {
-                "Authorization": `token ${this.token}`,
-                "Accept": "application/vnd.github.v3+json"
-            },
-            params: params
-        };
-        const response = await axios.get(url, config);
-
-        await this.checkRateLimits(response);
-
-        if (response.status === 200) {
-            return response.data;
-        }
-        throw new Error(`Error executing request for ${url} message: ${response.statusText}`);
-    }
-
-    private async checkRateLimits(response: AxiosResponse<any>) {
-        if (this.pauseOnRateLimitThreshold && response.headers["x-ratelimit-remaining"] === "100") {
-            const resetTime = parseInt(response.headers["x-ratelimit-reset"], 10) * 1000;
-            const currentTime = Date.now();
-            const waitTime = resetTime - currentTime;
-
-            console.warn(`🫸 GitHub API rate limit exceeded. Waiting for ${waitTime / 1000} seconds...`);
-            await new Promise(resolve => setTimeout(resolve, waitTime));
-        }
-    }
-
-    private async getFullList(url: string, params: any = undefined): Promise<any[]> {
-        const pageSize = params?.per_page ?? 100;
-        const requestParams = {
-            page: params?.page ?? 1,
-            per_page: pageSize,
-            ...params
-        };
-
-        const result: any[] = [];
-        while (true) {
-            const response = await this.get(url, requestParams);
-
-            result.push(...response);
-
-            if (response.length < pageSize)
-                break;
-            requestParams.page++;
-        }
-        return result;
-    }
-
     async fetchAllRepositories(owner: string): Promise<any[]> {
         const repositories = await this.getFullList(`${this.baseUrl}/orgs/${owner}/repos`);
         return repositories.filter(repo => !repo.archived && !repo.disabled);
@@ -97,4 +47,78 @@ export class GitHubAPI {
         const url = `${this.baseUrl}/repos/${owner}/${repo}/pulls/${pullRequestId}/files`;
         return await this.getFullList(url);
     }
+
+    private async get(url: string, params: any = undefined): Promise<any> {
+        const config: AxiosRequestConfig = {
+            headers: {
+                "Authorization": `token ${this.token}`,
+                "Accept": "application/vnd.github.v3+json"
+            },
+            params: params
+        };
+        const response = await axios.get(url, config);
+
+        await this.checkRateLimits(response);
+
+        if (response.status === 200) {
+            return response.data;
+        }
+        throw new Error(`Error executing request for ${url} message: ${response.statusText}`);
+    }
+
+    private async getFullList(url: string, params: any = undefined): Promise<any[]> {
+        const pageSize = params?.per_page ?? 100;
+        const requestParams = {
+            page: params?.page ?? 1,
+            per_page: pageSize,
+            ...params
+        };
+
+        const result: any[] = [];
+        while (true) {
+            const response = await this.get(url, requestParams);
+
+            result.push(...response);
+
+            if (response.length < pageSize)
+                break;
+            requestParams.page++;
+        }
+        return result;
+    }
+
+    private async checkRateLimits(response: AxiosResponse<any>) {
+        function convertMillisecondsToHumanReadableTime(milliseconds: number): string {
+            let seconds = milliseconds / 1000;
+            const units: [string, number][] = [
+                ["hour", 3600],
+                ["minute", 60],
+                ["second", 1]
+            ];
+
+            const parts: string[] = [];
+
+            for (const [unitName, unitSeconds] of units) {
+                const unitValue = Math.floor(seconds / unitSeconds);
+                if (unitValue > 0) {
+                    parts.push(`${unitValue} ${unitName}${unitValue > 1 ? "s" : ""}`);
+                }
+                seconds %= unitSeconds;
+            }
+
+            return parts.join(", ");
+        }
+
+        if (this.pauseOnRateLimitThreshold && response.headers["x-ratelimit-remaining"] === "100") {
+            const resetTime = parseInt(response.headers["x-ratelimit-reset"], 10) * 1000;
+            const currentTime = Date.now();
+            const waitTime = resetTime - currentTime;
+            const waitTimeString = convertMillisecondsToHumanReadableTime(waitTime);
+
+            console.warn(`🫸 GitHub API rate limit exceeded. Waiting for ${waitTimeString}...`);
+            await new Promise(resolve => setTimeout(resolve, waitTime));
+        }
+    }
+
+
 }
