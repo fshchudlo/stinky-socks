@@ -1,0 +1,18 @@
+version: '3.8'
+services:
+  stinky-socks:
+    build:
+      context: ../
+      dockerfile: Dockerfile
+    image: stinky-socks-importer
+    pull_policy: never
+    container_name: "stinky-socks-importer"
+    restart: always
+    command: npm run start
+    environment:
+      - NODE_ENV=development
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_PASSWORD=CHANGE-ME!
+      - DB_USERNAME=stinky-socks
+      - DB_NAME=stinky-socks
