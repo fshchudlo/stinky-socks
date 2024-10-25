@@ -802,7 +802,7 @@
       },
       "gridPos": {
         "h": 3,
-        "w": 5,
+        "w": 4,
         "x": 0,
         "y": 16
       },
@@ -894,8 +894,8 @@
       },
       "gridPos": {
         "h": 3,
-        "w": 5,
-        "x": 5,
+        "w": 4,
+        "x": 4,
         "y": 16
       },
       "id": 29,
@@ -986,8 +986,8 @@
       },
       "gridPos": {
         "h": 3,
-        "w": 5,
-        "x": 10,
+        "w": 4,
+        "x": 8,
         "y": 16
       },
       "id": 28,
@@ -1078,8 +1078,8 @@
       },
       "gridPos": {
         "h": 3,
-        "w": 5,
-        "x": 15,
+        "w": 4,
+        "x": 12,
         "y": 16
       },
       "id": 27,
@@ -1178,7 +1178,7 @@
       "gridPos": {
         "h": 3,
         "w": 4,
-        "x": 20,
+        "x": 16,
         "y": 16
       },
       "id": 26,
@@ -1243,6 +1243,98 @@
     },
     {
       "datasource": {
+        "type": "postgres",
+        "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "light-blue",
+            "mode": "fixed"
+          },
+          "decimals": 0,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "locale"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 4,
+        "x": 20,
+        "y": 16
+      },
+      "id": 48,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "horizontal",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.3.0",
+      "targets": [
+        {
+          "dataset": "`stinky-socks`",
+          "datasource": {
+            "type": "postgres",
+            "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT SUM(diff_size) as \"Total diff\"\nFROM pull_request AS pr\n   INNER JOIN contributor as author ON author.id = pr.author_id\nWHERE $__timeFilter(shared_for_review_date)\n   AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n   AND (COALESCE($repository_name) IS NULL OR repository_name IN ($repository_name))   \n   AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n   AND ('$include_bots_activities'='Yes' OR NOT author.is_bot_user)",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [
+                  {
+                    "name": "author",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "name": "author",
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          },
+          "table": "pull_request"
+        }
+      ],
+      "title": "Total diff",
+      "type": "stat"
+    },
+    {
+      "datasource": {
         "type": "grafana-postgresql-datasource",
         "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
       },
@@ -1298,7 +1390,8 @@
                 "value": 80
               }
             ]
-          }
+          },
+          "unit": "locale"
         },
         "overrides": [
           {
@@ -1308,7 +1401,7 @@
               "options": {
                 "mode": "exclude",
                 "names": [
-                  "PRs count"
+                  "Lines changed"
                 ],
                 "prefix": "All except:",
                 "readOnly": true
@@ -1359,7 +1452,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT \n   $__timeGroupAlias(shared_for_review_date, $group_by_period),\n   COUNT(*) AS \"PRs count\",\n   AVG(reviewers_count) AS \"Reviewers count\",\n   AVG(total_comments_count) AS \"Comments count\",\n   AVG(diff_size) AS \"Diff size\",\n   SUM(CASE WHEN tests_were_touched THEN 0 ELSE 1 END)::decimal/COUNT(*)*100 AS \"PRs without tests changes\" \nFROM pull_request AS pr\n   INNER JOIN contributor as author ON author.id = pr.author_id\nWHERE (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n   AND (COALESCE($repository_name) IS NULL OR repository_name IN ($repository_name))   \n   AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n   AND ('$include_bots_activities'='Yes' OR NOT author.is_bot_user)\nGROUP BY 1\nORDER BY $__timeGroup(shared_for_review_date, $group_by_period)",
+          "rawSql": "SELECT \n   $__timeGroupAlias(shared_for_review_date, $group_by_period),\n   COUNT(*) AS \"PRs count\",\n   AVG(reviewers_count) AS \"Reviewers count\",\n   AVG(total_comments_count) AS \"Comments count\",\n   AVG(diff_size) AS \"Diff size\",\n   SUM(CASE WHEN tests_were_touched THEN 0 ELSE 1 END)::decimal/COUNT(*)*100 AS \"PRs without tests changes\",\n   SUM(diff_size) as \"Lines changed\"\nFROM pull_request AS pr\n   INNER JOIN contributor as author ON author.id = pr.author_id\nWHERE (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n   AND (COALESCE($repository_name) IS NULL OR repository_name IN ($repository_name))   \n   AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n   AND ('$include_bots_activities'='Yes' OR NOT author.is_bot_user)\nGROUP BY 1\nORDER BY $__timeGroup(shared_for_review_date, $group_by_period)",
           "refId": "A",
           "sql": {
             "columns": [
@@ -2534,8 +2627,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               }
             ]
           },
@@ -3297,12 +3389,8 @@
       {
         "allValue": "NULL",
         "current": {
-          "text": [
-            "All"
-          ],
-          "value": [
-            "$__all"
-          ]
+          "text": "All",
+          "value": "$__all"
         },
         "datasource": {
           "type": "postgres",
@@ -3323,12 +3411,8 @@
       {
         "allValue": "NULL",
         "current": {
-          "text": [
-            "All"
-          ],
-          "value": [
-            "$__all"
-          ]
+          "text": "All",
+          "value": "$__all"
         },
         "datasource": {
           "type": "postgres",
@@ -3432,8 +3516,8 @@
       },
       {
         "current": {
-          "text": "1w",
-          "value": "1w"
+          "text": "1M",
+          "value": "1M"
         },
         "includeAll": false,
         "label": "Group by period",
@@ -3445,12 +3529,12 @@
             "value": "1d"
           },
           {
-            "selected": true,
+            "selected": false,
             "text": "Weeks",
             "value": "1w"
           },
           {
-            "selected": false,
+            "selected": true,
             "text": "Months",
             "value": "1M"
           },
@@ -3471,7 +3555,7 @@
     ]
   },
   "time": {
-    "from": "now-90d",
+    "from": "now-1y",
     "to": "now"
   },
   "timepicker": {},
