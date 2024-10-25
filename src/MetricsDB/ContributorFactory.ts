@@ -4,16 +4,19 @@ import { Repository } from "typeorm";
 import { createCache } from "cache-manager";
 import { AppConfig } from "../app.config";
 
-const firstAdjectives = [
-    "Brave", "Clever", "Witty", "Kind", "Fierce", "Happy", "Jolly", "Sneaky", "Bouncy", "Dizzy",
-    "Goofy", "Zippy", "Lucky", "Fluffy", "Cheerful", "Grumpy", "Wacky", "Puzzled", "Eccentric", "Spunky",
-    "Quirky", "Funky", "Chirpy", "Nifty", "Snappy", "Peppy", "Perky", "Whizzy", "Zany", "Breezy"
+const colors = [
+    "Red", "Orange", "Yellowish", "Greenish", "Bluish", "Purplish", "Pinkish", "Brownish", "Blackish", "Whitish",
+    "Grayish", "Teal", "Turquoise", "Magenta", "Lavender", "Coral", "Golden", "Silvery", "Beige", "Ivory", "Indigo",
+    "Violet", "Minty", "Crimson", "Olive", "Maroon", "Navy", "Amber", "Cyan", "Azure", "Lime", "Cobalt", "Copper"
 ];
 
-const secondAdjectives: string[] = [
-    "Silly", "Bubbly", "Jazzy", "Snazzy", "Zesty", "Wobbly", "Dandy", "Doodle", "Loopy", "Perky",
-    "Wiggly", "Sassy", "Peppy", "Swirly", "Fizzy", "Chipper", "Zippy", "Poppy", "Snappy", "Plucky",
-    "Sprightly", "Mellow", "Jumpy", "Giddy", "Cheeky", "Spiffy", "Frothy", "Breezy", "Chirpy", "Nifty"
+const adjectives: string[] = [
+    "Bubbly", "Jazzy", "Snazzy", "Zesty", "Wobbly", "Dandy", "Doodle", "Loopy", "Perky",
+    "Wiggly", "Sassy", "Peppy", "Swirly", "Fizzy", "Chipper", "Zippy", "Poppy", "Plucky",
+    "Sprightly", "Mellow", "Jumpy", "Giddy", "Cheeky", "Spiffy", "Frothy", "Breezy", "Nifty",
+    "Brave", "Clever", "Witty", "Kind", "Fierce", "Happy", "Jolly", "Sneaky", "Bouncy", "Dizzy",
+    "Goofy", "Lucky", "Fluffy", "Cheerful", "Grumpy", "Wacky", "Puzzled", "Eccentric", "Spunky",
+    "Quirky", "Funky", "Chirpy", "Snappy", "Whizzy", "Zany"
 ];
 
 const animals = [
@@ -81,16 +84,10 @@ export class ContributorFactory {
     }
 
     private static generateNickname(): string {
-        const adjectives = [
-            firstAdjectives[Math.floor(Math.random() * firstAdjectives.length)],
-            secondAdjectives[Math.floor(Math.random() * firstAdjectives.length)]
-        ];
-
+        const color = colors[Math.floor(Math.random() * colors.length)];
+        const adjective = adjectives[Math.floor(Math.random() * colors.length)];
         const animal = animals[Math.floor(Math.random() * animals.length)];
-
-        const adjectivesString = (Math.floor(Math.random() * 2) > 0 ? adjectives.reverse() : adjectives).join(" ");
-
-        return `${adjectivesString} ${animal}`;
+        return `${color} ${adjective} ${animal}`;
     }
 
 }
