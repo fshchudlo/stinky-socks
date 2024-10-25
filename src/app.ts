@@ -12,6 +12,7 @@ async function runDataImports() {
     }
     try {
         isImportRunning = true;
+        console.log(`🚀 Starting the import!`);
         await importTeamProjects();
     } finally {
         isImportRunning = false;
