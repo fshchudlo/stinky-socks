@@ -27,6 +27,21 @@ services:
     volumes:
       - ./grafana-provisioning:/etc/grafana/provisioning
       - ./grafana-dashboards:/var/lib/grafana/dashboards
+  stinky-socks:
+    build:
+      context: ../
+      dockerfile: Dockerfile
+    image: stinky-socks-importer
+    pull_policy: never
+    container_name: "stinky-socks-importer"
+    restart: always
+    environment:
+      - NODE_ENV=development
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_PASSWORD=CHANGE-ME!
+      - DB_USERNAME=stinky-socks
+      - DB_NAME=stinky-socks
 
 volumes:
   postgres_data:

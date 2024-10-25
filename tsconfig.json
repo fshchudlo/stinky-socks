@@ -10,6 +10,7 @@
         "strict": true,
         "strictNullChecks": true,
         "strictPropertyInitialization": false,
+        "sourceMap": true,
         "moduleResolution": "node",
         "outDir": "./dist",
         "paths": {
