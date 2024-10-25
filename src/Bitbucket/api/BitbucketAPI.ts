@@ -15,11 +15,11 @@ export type BitbucketPagedResponse<T> = {
 }
 
 export class BitbucketAPI {
-    private readonly baseUrl: string;
+    private readonly baseApiUrl: string;
     private readonly token: string;
 
     constructor(baseUrl: string, token: string) {
-        this.baseUrl = baseUrl;
+        this.baseApiUrl = `${baseUrl}/rest/api/1.0`;
         this.token = token;
     }
 
@@ -57,12 +57,12 @@ export class BitbucketAPI {
     }
 
     async fetchAllRepositories(projectKey: string): Promise<any[]> {
-        const url = `${this.baseUrl}/projects/${projectKey}/repos/`;
+        const url = `${this.baseApiUrl}/projects/${projectKey}/repos/`;
         return await this.getFullList(url);
     }
 
     async getMergedPullRequests(projectKey: string, repositorySlug: string, start: number, limit: number): Promise<BitbucketPagedResponse<BitbucketPullRequestModel>> {
-        const url = `${this.baseUrl}/projects/${projectKey}/repos/${repositorySlug}/pull-requests`;
+        const url = `${this.baseApiUrl}/projects/${projectKey}/repos/${repositorySlug}/pull-requests`;
 
         return (await this.get(url, {
             state: "MERGED",
@@ -73,17 +73,17 @@ export class BitbucketAPI {
     }
 
     async getPullRequestActivities(projectKey: string, repositorySlug: string, pullRequestId: number): Promise<BitbucketPullRequestActivityModel[]> {
-        const url = `${this.baseUrl}/projects/${projectKey}/repos/${repositorySlug}/pull-requests/${pullRequestId}/activities`;
+        const url = `${this.baseApiUrl}/projects/${projectKey}/repos/${repositorySlug}/pull-requests/${pullRequestId}/activities`;
         return await this.getFullList(url);
     }
 
     async getPullRequestCommits(projectKey: string, repositorySlug: string, pullRequestId: number): Promise<BitbucketCommitModel[]> {
-        const url = `${this.baseUrl}/projects/${projectKey}/repos/${repositorySlug}/pull-requests/${pullRequestId}/commits`;
+        const url = `${this.baseApiUrl}/projects/${projectKey}/repos/${repositorySlug}/pull-requests/${pullRequestId}/commits`;
         return await this.getFullList(url);
     }
 
     async getPullRequestDiff(projectKey: string, repositorySlug: string, pullRequestId: number): Promise<BitbucketDiffModel> {
-        const url = `${this.baseUrl}/projects/${projectKey}/repos/${repositorySlug}/pull-requests/${pullRequestId}/diff`;
+        const url = `${this.baseApiUrl}/projects/${projectKey}/repos/${repositorySlug}/pull-requests/${pullRequestId}/diff`;
         return await this.get(url);
     }
 }

@@ -63,7 +63,7 @@ async function importGitHubPullRequests(team: TeamImportSettings) {
     for (const gitHubProject of team.gitHubProjects || []) {
         console.group(`🔁 Importing pull requests for '${gitHubProject.owner}' project`);
 
-        const gitHubAPI = new GitHubAPI(gitHubProject.auth.apiToken, false);
+        const gitHubAPI = new GitHubAPI(gitHubProject.auth.apiToken, true);
         await new GitHubPullRequestsImporter(gitHubAPI, team.teamName, gitHubProject).importPullRequests();
 
         console.log(`🔁 Import of pull requests for '${gitHubProject.owner}' project completed`);
