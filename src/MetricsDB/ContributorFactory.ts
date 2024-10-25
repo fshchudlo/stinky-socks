@@ -76,7 +76,7 @@ export class ContributorFactory {
             if (!existingContributor) {
                 isUnique = true;
             } else {
-                console.log(`😲 Nickname "${nickname}" is already taken. Checking for another one...`);
+                console.log(`👻 Nickname "${nickname}" is already taken. Checking for another one...`);
             }
         } while (!isUnique);
 
