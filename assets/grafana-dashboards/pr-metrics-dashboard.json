@@ -2760,7 +2760,8 @@
                 "value": 3600
               }
             ]
-          }
+          },
+          "unit": "locale"
         },
         "overrides": [
           {
@@ -2816,7 +2817,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT\n   CASE\n      WHEN diff_size<100 THEN 50 * round(diff_size / 50)\n      WHEN diff_size<500 THEN 100 * round(diff_size / 100)\n      ELSE 1000 * round(diff_size / 1000)\n   END as \"Diff size\",\n   AVG(EXTRACT(EPOCH FROM (merged_date-shared_for_review_date))) AS \"Approval speed\"\nFROM pull_request AS pr\n   INNER JOIN contributor as author ON author.id = pr.author_id\nWHERE $__timeFilter(shared_for_review_date)\n   AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n   AND (COALESCE($repository_name) IS NULL OR repository_name IN ($repository_name))   \n   AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n   AND ('$include_bots_activities'='Yes' OR NOT author.is_bot_user)\nGROUP BY 1\nORDER BY \"Diff size\"",
+          "rawSql": "SELECT\n   CASE\n      WHEN diff_size<500 THEN 100 * round(diff_size / 100)\n      WHEN diff_size<5000 THEN 1000 * round(diff_size / 1000)\n      WHEN diff_size<50000 THEN 10000 * round(diff_size / 10000)\n      ELSE 50000 * round(diff_size / 50000)\n   END as \"Diff size\",\n   AVG(EXTRACT(EPOCH FROM (merged_date-shared_for_review_date))) AS \"Approval speed\"\nFROM pull_request AS pr\n   INNER JOIN contributor as author ON author.id = pr.author_id\nWHERE $__timeFilter(shared_for_review_date)\n   AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n   AND (COALESCE($repository_name) IS NULL OR repository_name IN ($repository_name))   \n   AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n   AND ('$include_bots_activities'='Yes' OR NOT author.is_bot_user)\nGROUP BY 1\nORDER BY \"Diff size\"",
           "refId": "A",
           "sql": {
             "columns": [
@@ -3018,7 +3019,8 @@
                 "value": 3600
               }
             ]
-          }
+          },
+          "unit": "locale"
         },
         "overrides": [
           {
@@ -3074,7 +3076,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT\n   CASE\n      WHEN diff_size<100 THEN 20 * round(diff_size / 20)\n      WHEN diff_size<500 THEN 100 * round(diff_size / 100)\n      ELSE 1000 * round(diff_size / 1000)\n   END as \"Diff size\",\n   AVG(total_comments_count) AS \"Comments count\"\nFROM pull_request AS pr\n   INNER JOIN contributor as author ON author.id = pr.author_id\nWHERE $__timeFilter(shared_for_review_date)\n   AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n   AND (COALESCE($repository_name) IS NULL OR repository_name IN ($repository_name))   \n   AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n   AND ('$include_bots_activities'='Yes' OR NOT author.is_bot_user)\nGROUP BY 1\nORDER BY \"Diff size\"",
+          "rawSql": "SELECT\n   CASE\n      WHEN diff_size<500 THEN 100 * round(diff_size / 100)\n      WHEN diff_size<5000 THEN 1000 * round(diff_size / 1000)\n      WHEN diff_size<50000 THEN 10000 * round(diff_size / 10000)\n      ELSE 50000 * round(diff_size / 50000)\n   END as \"Diff size\",\n   AVG(total_comments_count) AS \"Comments count\"\nFROM pull_request AS pr\n   INNER JOIN contributor as author ON author.id = pr.author_id\nWHERE $__timeFilter(shared_for_review_date)\n   AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n   AND (COALESCE($repository_name) IS NULL OR repository_name IN ($repository_name))   \n   AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n   AND ('$include_bots_activities'='Yes' OR NOT author.is_bot_user)\nGROUP BY 1\nORDER BY \"Diff size\"",
           "refId": "A",
           "sql": {
             "columns": [
