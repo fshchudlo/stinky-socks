@@ -88,9 +88,17 @@ export class GitHubAPI {
     }
 
     private async checkRateLimits(response: AxiosResponse<any>) {
-        if (this.pauseOnRateLimitThreshold && parseInt(response.headers["x-ratelimit-remaining"], 10) <= 100) {
+        if (this.pauseOnRateLimitThreshold && parseInt(response.headers["x-ratelimit-remaining"], 10) <= 10) {
             const resetTime = parseInt(response.headers["x-ratelimit-reset"], 10) * 1000;
             const waitTime = resetTime - Date.now();
+
+            // We run requests in parallel, and it's possible that a request was blocked because this check was triggered by another request.
+            // By the time it resumes execution, the rate limit may have already reset.
+            // To avoid redundant waiting, we recheck the actual wait time, as it represents an absolute value.
+            if (waitTime <= 0) {
+                return;
+            }
+
             const waitTimeString = convertMillisecondsToHumanReadableTime(waitTime);
 
             console.warn(`🫸 The GitHub API rate limit exceeded. Waiting for ${waitTimeString}...`);
