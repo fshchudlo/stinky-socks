@@ -80,6 +80,7 @@ export abstract class PullRequest {
 
     public calculateTimings() {
         this.firstReactionDate = this.participants
+            .filter(p => !p.participant.isBotUser)
             .flatMap(p => [p.firstCommentDate, p.firstReviewDate, p.firstApprovalDate])
             .filter(d => d)
             .map(d => <Date>d)
@@ -88,6 +89,7 @@ export abstract class PullRequest {
 
 
         this.lastApprovalDate = this.participants
+            .filter(p => !p.participant.isBotUser)
             .map(p => p.lastApprovalDate)
             .filter(d => d)
             .map(d => <Date>d)
