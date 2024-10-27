@@ -177,7 +177,7 @@ export abstract class PullRequest {
             errors.push("`participant.lastApprovalDate` is bigger than `mergedDate`. Recheck the import logic and timezones handling on this sample.");
         }
         if (errors.length > 0) {
-            this.integrityErrors = errors.join("\n");
+            this.integrityErrors = JSON.stringify(errors);
 
             console.warn(`☣️ PullRequest ${this.projectName}/${this.repositoryName}/${this.pullRequestNumber} has the following integrity errors:
             \t• ${errors.join("\n\t• ")}

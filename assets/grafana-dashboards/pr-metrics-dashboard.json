@@ -3441,6 +3441,30 @@
                 "value": true
               }
             ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "0"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 757
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "integrity_errors"
+            },
+            "properties": [
+              {
+                "id": "custom.hidden",
+                "value": true
+              }
+            ]
           }
         ]
       },
@@ -3499,16 +3523,10 @@
       "title": "PRs having integrity errors",
       "transformations": [
         {
-          "disabled": true,
-          "id": "groupToNestedTable",
+          "id": "extractFields",
           "options": {
-            "fields": {
-              "integrity_errors": {
-                "aggregations": [],
-                "operation": "groupby"
-              }
-            },
-            "showSubframeHeaders": true
+            "format": "json",
+            "source": "integrity_errors"
           }
         }
       ],
