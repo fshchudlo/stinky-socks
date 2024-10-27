@@ -3497,6 +3497,21 @@
         }
       ],
       "title": "PRs having integrity errors",
+      "transformations": [
+        {
+          "disabled": true,
+          "id": "groupToNestedTable",
+          "options": {
+            "fields": {
+              "integrity_errors": {
+                "aggregations": [],
+                "operation": "groupby"
+              }
+            },
+            "showSubframeHeaders": true
+          }
+        }
+      ],
       "type": "table"
     }
   ],
