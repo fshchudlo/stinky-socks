@@ -9,10 +9,13 @@ import calculatePrSharedForReviewDate from "./helpers/calculatePrSharedForReview
 
 export class GitHubPullRequest extends PullRequest {
     public async init(model: ImportParams) {
-        return await (await this.initializeBaseProperties(model))
-            .initializeDates(model)
+        await this.initializeBaseProperties(model);
+
+        await this.initializeDates(model)
             .calculateCommitStats(model)
             .initializeParticipants(model);
+
+        return this.validateDataIntegrity();
     }
 
     private async initializeBaseProperties(model: ImportParams) {
@@ -44,9 +47,10 @@ export class GitHubPullRequest extends PullRequest {
         this.mergedDate = new Date(model.pullRequest.merged_at);
 
         const commitTimestamps = model.pullRequestActivities.filter(ActivityTraits.isCommitedEvent).map((c) => new Date(c.author.date).getTime());
-        this.initialCommitDate = new Date(Math.min(...commitTimestamps));
-        this.lastCommitDate = new Date(Math.max(...commitTimestamps));
-
+        if (commitTimestamps.length > 0) {
+            this.initialCommitDate = new Date(Math.min(...commitTimestamps));
+            this.lastCommitDate = new Date(Math.max(...commitTimestamps));
+        }
         return this;
     }
 

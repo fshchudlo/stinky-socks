@@ -5,35 +5,35 @@ import { Contributor } from "./Contributor";
 @Entity()
 export abstract class PullRequestParticipant {
     @PrimaryColumn()
-    protected teamName: string;
+    teamName: string;
 
     @PrimaryColumn()
-    protected projectName: string;
+    projectName: string;
 
     @PrimaryColumn()
-    protected repositoryName: string;
+    repositoryName: string;
 
     @PrimaryColumn()
-    protected pullRequestNumber: number;
+    pullRequestNumber: number;
 
     @PrimaryColumn()
     //Without this typeorm makes really strange things when doing upsert logic
-    protected participantIdForPrimaryKeyHack: number;
+    participantIdForPrimaryKeyHack: number;
 
     @Column({ nullable: true })
-    protected firstCommentDate?: Date;
+    firstCommentDate?: Date;
 
     @Column({ nullable: true })
-    protected firstApprovalDate?: Date;
+    firstApprovalDate?: Date;
 
     @Column({ nullable: true })
-    protected lastCommentDate?: Date;
+    lastCommentDate?: Date;
 
     @Column({ nullable: true })
-    protected lastApprovalDate?: Date;
+    lastApprovalDate?: Date;
 
     @Column()
-    protected commentsCount: number;
+    commentsCount: number;
 
     @ManyToOne(() => PullRequest, (pr) => pr.participants, { onDelete: "CASCADE" })
     // ⚠️ remove snake naming after this bugfix merge: https://github.com/typeorm/typeorm/pull/11062

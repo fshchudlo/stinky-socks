@@ -25,11 +25,19 @@
   for its logs:
   ```docker-compose -f assets/docker-compose.yml -f assets/docker-compose.dev.yml up -d --build && docker logs stinky-socks-importer --follow```
 
-> 💡 There may be irregularities in the data. For instance, both the GitHub and Bitbucket APIs sometimes return no data
-> about commits (see [this as example](https://github.com/grafana/grafana/pull/637)).
+> 💡 People use tools in diverse ways, and the importer logic may not always account for every scenario. Time zones, Git
+> history rewrites, and occasional quirks in Bitbucket and GitHub APIs (like missing commit data for pull requests, as
+> in
+> [this example](https://github.com/grafana/grafana/pull/637)) can all impact data consistency.
 >
-> I recommend thoroughly filtering such data using the `pullRequestsFilterFn` function
-> in [app.importConfig.ts](src/app.importConfig.ts) to prevent noising of the dataset.
+> To manage this, the [PullRequest.ts](src/MetricsDB/PullRequest.ts) class includes a `validateDataIntegrity` method.
+> Validation errors are logged during
+> import, and while invalid pull requests are stored in the database, they’re excluded from Grafana panels.
+>
+> I recommend carefully reviewing this data to spot any irregularities.
+>
+> This feature is also could helpful if you’re building your own importer for the SCM system of your need (and we’d love your
+> contributions!).
 
 ### Running unit tests
 

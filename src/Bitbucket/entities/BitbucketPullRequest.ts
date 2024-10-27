@@ -7,10 +7,11 @@ import { PullRequestAuthorRole } from "../../MetricsDB/PullRequestAuthorRole";
 
 export class BitbucketPullRequest extends PullRequest {
     public async init(model: ImportParams): Promise<BitbucketPullRequest> {
-        return await (await this.initializeBaseProperties(model))
-            .initializeDates(model)
+        await this.initializeBaseProperties(model);
+        await this.initializeDates(model)
             .calculateCommitStats(model)
             .initializeParticipants(model);
+        return this.validateDataIntegrity();
     }
 
     private async initializeBaseProperties(model: ImportParams) {
@@ -40,9 +41,10 @@ export class BitbucketPullRequest extends PullRequest {
         this.mergedDate = new Date(model.pullRequest.closedDate);
 
         const commitTimestamps = model.commits.map((c) => c.authorTimestamp as number);
-        this.initialCommitDate = new Date(Math.min(...commitTimestamps));
-        this.lastCommitDate = new Date(Math.max(...commitTimestamps));
-
+        if (commitTimestamps.length > 0) {
+            this.initialCommitDate = new Date(Math.min(...commitTimestamps));
+            this.lastCommitDate = new Date(Math.max(...commitTimestamps));
+        }
         return this;
     }
 
