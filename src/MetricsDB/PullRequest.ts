@@ -179,8 +179,7 @@ export abstract class PullRequest {
         if (errors.length > 0) {
             this.integrityErrors = JSON.stringify(errors);
 
-            console.warn(`☣️ PullRequest ${this.projectName}/${this.repositoryName}/${this.pullRequestNumber} has the following integrity errors:
-            \t• ${errors.join("\n\t• ")}
+            console.warn(`☣️ PullRequest ${this.projectName}/${this.repositoryName}/${this.pullRequestNumber} has the following integrity errors:\n\t• ${errors.join("\n\t• ")}
             You can check all inconsistent PRs on Grafana dashboard or take a look to this pull request now: ${this.viewURL}.`);
         }
         return this;
