@@ -3,6 +3,7 @@ import { BitbucketPullRequestParticipant } from "./BitbucketPullRequestParticipa
 import { BitbucketDiffModel, BitbucketPullRequestActivityModel } from "../api/BitbucketAPI.contracts";
 import { ContributorFactory } from "../../MetricsDB/ContributorFactory";
 import { ImportParams } from "./ImportParams";
+import { PullRequestAuthorRole } from "../../MetricsDB/PullRequestAuthorRole";
 
 export class BitbucketPullRequest extends PullRequest {
     public async init(model: ImportParams): Promise<BitbucketPullRequest> {
@@ -20,7 +21,7 @@ export class BitbucketPullRequest extends PullRequest {
         this.viewURL = model.pullRequest.links.self[0].href;
         this.targetBranch = model.pullRequest.toRef.displayId;
         this.reviewersCount = model.pullRequest.reviewers.length;
-        this.authorRole = "MEMBER";
+        this.authorRole = PullRequestAuthorRole.MEMBER;
         this.createdDate = new Date(model.pullRequest.createdDate);
         this.updatedDate = new Date(model.pullRequest.updatedDate);
 

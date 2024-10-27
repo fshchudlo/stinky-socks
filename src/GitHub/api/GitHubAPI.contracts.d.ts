@@ -1,5 +1,7 @@
+import { PullRequestAuthorRole } from "../../MetricsDB/PullRequestAuthorRole";
+
 export type GitHubPullRequestModel = {
-    author_association: "COLLABORATOR" | "CONTRIBUTOR" | "FIRST_TIMER" | "FIRST_TIME_CONTRIBUTOR" | "MEMBER" | "OWNER" | "MANNEQUIN" | "NONE";
+    author_association: PullRequestAuthorRole;
     base: {
         repo: {
             owner: GitHubUserModel;

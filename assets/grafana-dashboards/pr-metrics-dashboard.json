@@ -3426,6 +3426,7 @@
           "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
         },
         "definition": "SELECT \nDISTINCT author_role\nFROM pull_request \n    INNER JOIN contributor ON pull_request.author_id = contributor.id\n    WHERE $__timeFilter(shared_for_review_date) \n        AND (COALESCE($team_name) IS NULL OR pull_request.team_name IN ($team_name))    \n        AND (COALESCE($repository_name) IS NULL OR repository_name IN ($repository_name))",
+        "description": "• OWNER: the author is the owner of the repository.\n\n• MEMBER: the author is a member of the organization that owns the repository.\n\n• COLLABORATOR: the author has write access to the repository.\n\n• FIRST_TIMER: the author is making their first contribution to any repository in the organization.\n\n• FIRST_TIME_CONTRIBUTOR: the author is contributing to this particular repository for the first time.\n\n• CONTRIBUTOR: the author has previously committed to the repository but is not necessarily a member or collaborator.\n\n• MANNEQUIN: the author is a placeholder for a previously deleted user.\n\n• NONE: the author has no affiliation with the repository.",
         "includeAll": true,
         "label": "Author role",
         "multi": true,
