@@ -96,7 +96,7 @@ export abstract class PullRequest {
 
         // sharedForReviewDate
         if (this.initialCommitDate && this.sharedForReviewDate.getTime() < this.initialCommitDate.getTime()) {
-            errors.push("`sharedForReviewDate` is less than `initialCommitDate`. Recheck the import logic and timezones handling on this sample.");
+            errors.push("`sharedForReviewDate` is less than `initialCommitDate`. Seems like git history was rewritten or there is an error in import logic.");
         }
         if (this.sharedForReviewDate.getTime() > this.mergedDate.getTime()) {
             errors.push("`sharedForReviewDate` is bigger than `mergedDate`. Recheck the import logic and timezones handling on this sample.");
