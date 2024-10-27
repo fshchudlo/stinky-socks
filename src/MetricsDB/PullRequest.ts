@@ -80,10 +80,10 @@ export abstract class PullRequest {
 
     public calculateTimings() {
         this.firstReactionDate = this.participants
-            .flatMap(p => [p.firstCommentDate, p.firstApprovalDate])
+            .flatMap(p => [p.firstCommentDate, p.firstReviewDate, p.firstApprovalDate])
             .filter(d => d)
             .map(d => <Date>d)
-            .filter(d => d.getTime() < this.mergedDate.getTime())
+            .filter(d => d.getTime() < this.mergedDate.getTime() && d.getTime() > this.sharedForReviewDate.getTime())
             .reduce((minDate: Date | null, date) => !minDate || date!.getTime() < (<Date>minDate).getTime() ? date : minDate, null);
 
 
@@ -93,7 +93,11 @@ export abstract class PullRequest {
             .map(d => <Date>d)
             .reduce((maxDate: Date | null, date) => !maxDate || date!.getTime() > (<Date>maxDate).getTime() ? date : maxDate, null);
 
-        this.reworkCompletedDate = this.lastApprovalDate || this.mergedDate;
+        this.reworkCompletedDate = [this.lastCommitDate, this.lastApprovalDate]
+            .filter(d => d)
+            .filter(d => d!.getTime() > this.sharedForReviewDate.getTime())
+            .reduce((maxDate: Date | null, date) => !maxDate || date!.getTime() > (<Date>maxDate).getTime() ? date : maxDate, null);
+
         return this;
     }
 
@@ -154,9 +158,6 @@ export abstract class PullRequest {
         }
         if (this.participants.some(p => this.initialCommitDate && p.firstCommentDate && p.firstCommentDate.getTime() < this.initialCommitDate.getTime())) {
             errors.push("`participant.firstCommentDate` is less than `pullRequest.initialCommitDate`. Recheck the import logic and timezones handling on this sample.");
-        }
-        if (this.participants.some(p => p.firstCommentDate && p.firstCommentDate.getTime() > this.mergedDate.getTime())) {
-            errors.push("`participant.firstCommentDate` is bigger than `pullRequest.mergedDate`. Recheck the import logic and timezones handling on this sample.");
         }
         if (this.participants.some(p => p.firstCommentDate && p.lastCommentDate && p.firstCommentDate.getTime() > p.lastCommentDate.getTime())) {
             errors.push("`participant.firstCommentDate` is bigger than `participant.lastCommentDate`. Recheck the import logic and timezones handling on this sample.");

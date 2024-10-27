@@ -35,7 +35,7 @@ export type BitbucketPullRequestActivityModel = {
     createdDate: number;
     addedReviewers?: BitbucketUserModel[];
     user: BitbucketUserModel;
-    action: "COMMENTED" | "APPROVED";
+    action: "COMMENTED" | "APPROVED" | "REVIEWED";
     fromHash?: string;
     previousFromHash?: string;
 };

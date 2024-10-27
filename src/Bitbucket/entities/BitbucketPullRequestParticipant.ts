@@ -7,6 +7,7 @@ export class BitbucketPullRequestParticipant extends PullRequestParticipant {
         super();
         this.initializeBaseProperties(teamName, pullRequestData, participantUser)
             .setCommentStats(participantActivities)
+            .setReviewStats(participantActivities)
             .setApprovalStats(participantActivities);
     }
 
@@ -38,6 +39,16 @@ export class BitbucketPullRequestParticipant extends PullRequestParticipant {
         const approvalTimestamps = approvals.map(a => a.createdDate);
         this.firstApprovalDate = approvalTimestamps.length ? new Date(Math.min(...approvalTimestamps)) : null as any;
         this.lastApprovalDate = approvalTimestamps.length ? new Date(Math.max(...approvalTimestamps)) : null as any;
+        return this;
+    }
+
+    private setReviewStats(participantActivities: BitbucketPullRequestActivityModel[]) {
+        const reviews = participantActivities
+            .filter(a => a.action === "REVIEWED");
+
+        const reviewsTimestamps = reviews.map(a => a.createdDate);
+        this.firstReviewDate = reviewsTimestamps.length ? new Date(Math.min(...reviewsTimestamps)) : null as any;
+        this.lastReviewDate = reviewsTimestamps.length ? new Date(Math.max(...reviewsTimestamps)) : null as any;
         return this;
     }
 

@@ -24,10 +24,16 @@ export abstract class PullRequestParticipant {
     firstCommentDate?: Date;
 
     @Column({ nullable: true })
+    firstReviewDate?: Date;
+
+    @Column({ nullable: true })
     firstApprovalDate?: Date;
 
     @Column({ nullable: true })
     lastCommentDate?: Date;
+
+    @Column({ nullable: true })
+    lastReviewDate?: Date;
 
     @Column({ nullable: true })
     lastApprovalDate?: Date;

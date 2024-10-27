@@ -9,6 +9,7 @@ export class GitHubPullRequestParticipant extends PullRequestParticipant {
         super();
         this.initializeBaseProperties(teamName, pullRequestData, participantUser)
             .setCommentStats(participantActivities)
+            .setReviewStats(participantActivities)
             .setApprovalStats(participantActivities);
     }
 
@@ -30,6 +31,15 @@ export class GitHubPullRequestParticipant extends PullRequestParticipant {
         return this;
     }
 
+    private setReviewStats(participantActivities: GitHubPullRequestActivityModel[]) {
+        const reviews = participantActivities
+            .filter(ActivityTraits.isReviewedEvent);
+
+        const reviewTimestamps = reviews.map(a => new Date(a.submitted_at!).getTime());
+        this.firstReviewDate = reviewTimestamps.length ? new Date(Math.min(...reviewTimestamps)) : null as any;
+        this.lastReviewDate = reviewTimestamps.length ? new Date(Math.max(...reviewTimestamps)) : null as any;
+        return this;
+    }
     private setApprovalStats(participantActivities: GitHubPullRequestActivityModel[]) {
         const approvals = participantActivities
             .filter(ActivityTraits.isReviewedEvent)
