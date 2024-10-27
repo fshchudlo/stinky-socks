@@ -11,9 +11,9 @@ describe("Import single PR debug helper", () => {
         const gitHubAPI = new GitHubAPI(process.env.GITHUB_API_TOKEN as string);
 
         const [pullRequest, activities, files] = await Promise.all([
-            gitHubAPI.getPullRequest("grafana", "grafana", 15466),
-            gitHubAPI.getPullRequestActivities("grafana", "grafana", 15466),
-            gitHubAPI.getPullRequestFiles("grafana", "grafana", 15466)
+            gitHubAPI.getPullRequest("grafana", "grafana", 4131),
+            gitHubAPI.getPullRequestActivities("grafana", "grafana", 4131),
+            gitHubAPI.getPullRequestFiles("grafana", "grafana", 4131)
         ]);
         const pullRequestEntity = await new GitHubPullRequest().init({
                 teamName: "grafana",

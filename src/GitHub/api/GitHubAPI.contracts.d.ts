@@ -25,7 +25,8 @@ export type GitHubPullRequestActivityModel =
     | GitHubPullRequestActivityCommentedModel
     | GitHubPullRequestActivityReviewRequestedModel
     | GitHubPullRequestActivityReviewedModel
-    | GitHubPullRequestActivityReadyForReviewModel;
+    | GitHubPullRequestActivityReadyForReviewModel
+    | GitHubPullRequestActivityMergedModel;
 
 export type GitHubPullRequestActivityLineCommentedModel = {
     event: "line-commented";
@@ -63,6 +64,11 @@ export type GitHubPullRequestActivityReviewedModel = {
     state: "approved" | "changes_requested" | "commented" | "dismissed" | "pending";
     submitted_at: string;
     user?: GitHubUserModel;
+};
+export type GitHubPullRequestActivityMergedModel = {
+    event: "merged";
+    created_at: string;
+    actor: GitHubUserModel;
 };
 export type GitHubPullRequestActivityReadyForReviewModel = {
     event: "ready_for_review";

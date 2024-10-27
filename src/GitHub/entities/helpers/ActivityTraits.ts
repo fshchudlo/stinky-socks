@@ -1,7 +1,7 @@
 import {
     GitHubPullRequestActivityCommentedModel,
     GitHubPullRequestActivityCommitedModel,
-    GitHubPullRequestActivityLineCommentedModel,
+    GitHubPullRequestActivityLineCommentedModel, GitHubPullRequestActivityMergedModel,
     GitHubPullRequestActivityModel,
     GitHubPullRequestActivityReadyForReviewModel,
     GitHubPullRequestActivityReviewedModel,
@@ -26,5 +26,8 @@ export const ActivityTraits = {
     },
     isReviewedEvent(event: GitHubPullRequestActivityModel): event is GitHubPullRequestActivityReviewedModel {
         return event.event === "reviewed";
+    },
+    isMergedEvent(event: GitHubPullRequestActivityModel): event is GitHubPullRequestActivityMergedModel {
+        return event.event === "merged";
     }
 };
