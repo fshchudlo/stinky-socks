@@ -32,11 +32,20 @@ export abstract class PullRequest {
     @Column()
     protected sharedForReviewDate: Date;
 
-    @Column({ nullable: true })
-    protected initialCommitDate?: Date;
+    @Column({ nullable: true, type: "timestamp" })
+    protected initialCommitDate: Date | null;
 
-    @Column({ nullable: true })
-    protected lastCommitDate?: Date;
+    @Column({ nullable: true, type: "timestamp" })
+    protected lastCommitDate: Date | null;
+
+    @Column({ nullable: true, type: "timestamp" })
+    protected firstReactionDate: Date | null;
+
+    @Column({ nullable: true, type: "timestamp" })
+    protected lastApprovalDate: Date | null;
+
+    @Column({ nullable: true, type: "timestamp" })
+    protected reworkCompletedDate: Date | null;
 
     @Column()
     protected mergedDate: Date;
@@ -56,8 +65,8 @@ export abstract class PullRequest {
     @Column({ type: "varchar" })
     protected authorRole: PullRequestAuthorRole;
 
-    @Column({ nullable: true })
-    protected integrityErrors?: string;
+    @Column({ nullable: true, type: "varchar" })
+    protected integrityErrors: string | null;
 
     @OneToMany(() => PullRequestParticipant, (participant) => participant.pullRequest, {
         cascade: true
@@ -68,6 +77,25 @@ export abstract class PullRequest {
     @JoinColumn()
     author: Contributor;
 
+
+    public calculateTimings() {
+        this.firstReactionDate = this.participants
+            .flatMap(p => [p.firstCommentDate, p.firstApprovalDate])
+            .filter(d => d)
+            .map(d => <Date>d)
+            .filter(d => d.getTime() < this.mergedDate.getTime())
+            .reduce((minDate: Date | null, date) => !minDate || date!.getTime() < (<Date>minDate).getTime() ? date : minDate, null);
+
+
+        this.lastApprovalDate = this.participants
+            .map(p => p.lastApprovalDate)
+            .filter(d => d)
+            .map(d => <Date>d)
+            .reduce((maxDate: Date | null, date) => !maxDate || date!.getTime() > (<Date>maxDate).getTime() ? date : maxDate, null);
+
+        this.reworkCompletedDate = this.lastApprovalDate || this.mergedDate;
+        return this;
+    }
 
     public validateDataIntegrity() {
         const errors: string[] = [];

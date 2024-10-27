@@ -1,6 +1,8 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
 import { GitHubFileDiffModel, GitHubPullRequestActivityModel, GitHubPullRequestModel } from "./GitHubAPI.contracts";
 
+let rateLimitLockAcquired = false;
+
 export class GitHubAPI {
     private readonly token: string;
     private readonly baseUrl = "https://api.github.com";
@@ -95,15 +97,14 @@ export class GitHubAPI {
             // We run requests in parallel, and it's possible that a request was blocked because this check was triggered by another request.
             // By the time it resumes execution, the rate limit may have already reset.
             // To avoid redundant waiting, we recheck the actual wait time, as it represents an absolute value.
-            if (waitTime <= 0) {
+            if (waitTime <= 0 || rateLimitLockAcquired) {
                 return;
             }
 
-            const waitTimeString = convertMillisecondsToHumanReadableTime(waitTime);
-
-            console.warn(`🫸 The GitHub API rate limit exceeded. Waiting for ${waitTimeString}...`);
-            await new Promise(resolve => setTimeout(resolve, waitTime));
-            console.warn(`💃 The GitHub API rate limit is updated. Let's move on...`);
+            console.log(`🫸 The GitHub API rate limit exceeded. Waiting for ${convertMillisecondsToHumanReadableTime(waitTime)}...`);
+            rateLimitLockAcquired = true;
+            await new Promise(resolve => setTimeout(resolve, waitTime)).finally(() => rateLimitLockAcquired = false);
+            console.log(`💃 The GitHub API rate limit is updated. Let's move on...`);
         }
 
         function convertMillisecondsToHumanReadableTime(milliseconds: number): string {
@@ -127,6 +128,4 @@ export class GitHubAPI {
             return parts.join(", ");
         }
     }
-
-
 }

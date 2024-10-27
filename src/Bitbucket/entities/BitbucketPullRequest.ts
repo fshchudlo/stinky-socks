@@ -11,7 +11,7 @@ export class BitbucketPullRequest extends PullRequest {
         await this.initializeDates(model)
             .calculateCommitStats(model)
             .initializeParticipants(model);
-        return this.validateDataIntegrity();
+        return this.validateDataIntegrity().calculateTimings();
     }
 
     private async initializeBaseProperties(model: ImportParams) {

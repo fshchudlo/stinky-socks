@@ -15,7 +15,7 @@ export class GitHubPullRequest extends PullRequest {
             .calculateCommitStats(model)
             .initializeParticipants(model);
 
-        return this.validateDataIntegrity();
+        return this.validateDataIntegrity().calculateTimings();
     }
 
     private async initializeBaseProperties(model: ImportParams) {
