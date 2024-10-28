@@ -1,8 +1,8 @@
-import { PullRequestParticipant } from "../../MetricsDB/PullRequestParticipant";
+import { PullRequestParticipant } from "../../MetricsDB/entities/PullRequestParticipant";
 import { GitHubPullRequestActivityModel, GitHubPullRequestModel } from "../api/GitHubAPI.contracts";
 import { ActivityTraits } from "./helpers/ActivityTraits";
 import getCommentsTimestamps from "./helpers/getCommentsTimestamps";
-import { Contributor } from "../../MetricsDB/Contributor";
+import { Contributor } from "../../MetricsDB/entities/Contributor";
 
 export class GitHubPullRequestParticipant extends PullRequestParticipant {
     constructor(teamName: string, pullRequestData: GitHubPullRequestModel, participantActivities: GitHubPullRequestActivityModel[], participantUser: Contributor) {

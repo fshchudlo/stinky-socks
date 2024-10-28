@@ -30,7 +30,7 @@
 > in
 > [this example](https://github.com/grafana/grafana/pull/637)) can all impact data consistency.
 >
-> To manage this, the [PullRequest.ts](src/MetricsDB/PullRequest.ts) class includes a `validateDataIntegrity` method.
+> To manage this, the [PullRequest.ts](src/MetricsDB/entities/PullRequest.ts) class includes a `validateDataIntegrity` method.
 > Validation errors are logged during
 > import, and while invalid pull requests are stored in the database, they’re excluded from Grafana panels.
 >

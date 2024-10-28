@@ -1,6 +1,6 @@
-import { PullRequestParticipant } from "../../MetricsDB/PullRequestParticipant";
+import { PullRequestParticipant } from "../../MetricsDB/entities/PullRequestParticipant";
 import { BitbucketPullRequestActivityModel, BitbucketPullRequestModel } from "../api/BitbucketAPI.contracts";
-import { Contributor } from "../../MetricsDB/Contributor";
+import { Contributor } from "../../MetricsDB/entities/Contributor";
 
 export class BitbucketPullRequestParticipant extends PullRequestParticipant {
     constructor(teamName: string, pullRequestData: BitbucketPullRequestModel, participantActivities: BitbucketPullRequestActivityModel[], participantUser: Contributor) {

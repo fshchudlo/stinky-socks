@@ -1,9 +1,9 @@
 import { DataSource } from "typeorm";
 import { AppConfig } from "../app.config";
-import { PullRequest } from "./PullRequest";
-import { PullRequestParticipant } from "./PullRequestParticipant";
+import { PullRequest } from "./entities/PullRequest";
+import { PullRequestParticipant } from "./entities/PullRequestParticipant";
 import { SnakeNamingStrategy } from "typeorm-naming-strategies";
-import { Contributor } from "./Contributor";
+import { Contributor } from "./entities/Contributor";
 
 class MetricsDataSource extends DataSource {
     constructor() {
@@ -17,7 +17,7 @@ class MetricsDataSource extends DataSource {
             entities: [PullRequest, PullRequestParticipant, Contributor],
             namingStrategy: new SnakeNamingStrategy(),
             synchronize: false,
-            migrations: ["src/MetricsDB/migrations/*.ts"],
+            migrations: ["src/MetricsDB/migrations/entities/*.ts"],
             migrationsRun: true,
             logging: false
         });

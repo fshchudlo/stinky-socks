@@ -2,7 +2,7 @@ import { BitbucketAPI } from "./api/BitbucketAPI";
 import { BitbucketPullRequest } from "./entities/BitbucketPullRequest";
 import { MetricsDB } from "../MetricsDB/MetricsDB";
 import { Repository } from "typeorm";
-import { PullRequest } from "../MetricsDB/PullRequest";
+import { PullRequest } from "../MetricsDB/entities/PullRequest";
 import { BitbucketPullRequestModel } from "./api/BitbucketAPI.contracts";
 
 export type BitbucketProjectSettings = {

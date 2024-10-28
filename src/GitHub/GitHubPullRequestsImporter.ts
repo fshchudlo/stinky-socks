@@ -1,6 +1,6 @@
 import { GitHubAPI } from "./api/GitHubAPI";
 import { Repository } from "typeorm";
-import { PullRequest } from "../MetricsDB/PullRequest";
+import { PullRequest } from "../MetricsDB/entities/PullRequest";
 import { MetricsDB } from "../MetricsDB/MetricsDB";
 import { GitHubPullRequest } from "./entities/GitHubPullRequest";
 import { GitHubPullRequestModel } from "./api/GitHubAPI.contracts";

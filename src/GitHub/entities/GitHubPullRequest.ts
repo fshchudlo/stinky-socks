@@ -1,4 +1,4 @@
-import { PullRequest } from "../../MetricsDB/PullRequest";
+import { PullRequest } from "../../MetricsDB/entities/PullRequest";
 import { GitHubPullRequestParticipant } from "./GitHubPullRequestParticipant";
 import { ContributorFactory } from "../../MetricsDB/ContributorFactory";
 import { ActivityTraits } from "./helpers/ActivityTraits";

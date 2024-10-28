@@ -1,4 +1,4 @@
-import { PullRequestAuthorRole } from "../../MetricsDB/PullRequestAuthorRole";
+import { PullRequestAuthorRole } from "../../MetricsDB/entities/PullRequestAuthorRole";
 
 export type GitHubPullRequestModel = {
     author_association: PullRequestAuthorRole;

@@ -1,9 +1,9 @@
-import { PullRequest } from "../../MetricsDB/PullRequest";
+import { PullRequest } from "../../MetricsDB/entities/PullRequest";
 import { BitbucketPullRequestParticipant } from "./BitbucketPullRequestParticipant";
 import { BitbucketDiffModel, BitbucketPullRequestActivityModel } from "../api/BitbucketAPI.contracts";
 import { ContributorFactory } from "../../MetricsDB/ContributorFactory";
 import { ImportParams } from "./ImportParams";
-import { PullRequestAuthorRole } from "../../MetricsDB/PullRequestAuthorRole";
+import { PullRequestAuthorRole } from "../../MetricsDB/entities/PullRequestAuthorRole";
 
 export class BitbucketPullRequest extends PullRequest {
     public async init(model: ImportParams): Promise<BitbucketPullRequest> {

@@ -1,4 +1,4 @@
-import { Contributor } from "./Contributor";
+import { Contributor } from "./entities/Contributor";
 import { MetricsDB } from "./MetricsDB";
 import { Repository } from "typeorm";
 import { createCache } from "cache-manager";
