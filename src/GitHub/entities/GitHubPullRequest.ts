@@ -1,6 +1,6 @@
 import { PullRequest } from "../../MetricsDB/entities/PullRequest";
 import { GitHubPullRequestParticipant } from "./GitHubPullRequestParticipant";
-import { ContributorFactory } from "../../MetricsDB/ContributorFactory";
+import { UserFactory } from "../../MetricsDB/UserFactory";
 import { ActivityTraits } from "./helpers/ActivityTraits";
 import { ImportParams } from "./ImportParams";
 import getCommentsTimestamps from "./helpers/getCommentsTimestamps";
@@ -25,14 +25,14 @@ export class GitHubPullRequest extends PullRequest {
         this.pullRequestNumber = model.pullRequest.number;
         this.viewURL = model.pullRequest.html_url;
         this.targetBranch = model.pullRequest.base.ref;
-        this.reviewersCount = model.pullRequest.requested_reviewers.length;
+        this.requestedReviewersCount = model.pullRequest.requested_reviewers.length;
         this.authorRole = model.pullRequest.author_association;
         this.createdDate = new Date(model.pullRequest.created_at);
         this.updatedDate = new Date(model.pullRequest.updated_at);
 
 
         const authorLogin = model.pullRequest.user.login;
-        this.author = await ContributorFactory.fetchContributor({
+        this.author = await UserFactory.fetch({
             teamName: model.teamName,
             login: authorLogin,
             isBotUser: model.botUserNames.includes(authorLogin),
@@ -77,7 +77,7 @@ export class GitHubPullRequest extends PullRequest {
                 .filter(participantLogin => participantLogin !== model.pullRequest.user.login)
                 .map(async participantLogin => {
 
-                    const participantUser = await ContributorFactory.fetchContributor({
+                    const participantUser = await UserFactory.fetch({
                         teamName: model.teamName,
                         login: participantLogin,
                         isBotUser: model.botUserNames.includes(participantLogin),

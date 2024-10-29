@@ -1,5 +1,5 @@
 import { appImportConfig, TeamImportSettings } from "./app.importConfig";
-import { ContributorFactory } from "./MetricsDB/ContributorFactory";
+import { UserFactory } from "./MetricsDB/UserFactory";
 import { BitbucketAPI } from "./Bitbucket/api/BitbucketAPI";
 import { BitbucketPullRequestsImporter } from "./Bitbucket/BitbucketPullRequestsImporter";
 import { GitHubAPI } from "./GitHub/api/GitHubAPI";
@@ -13,7 +13,7 @@ export default async function importTeamProjects() {
     for (const team of appImportConfig.teams) {
         console.log(`🔁 Importing pull requests for '${team.teamName}' team`);
 
-        await ContributorFactory.preloadCacheByTeam(team.teamName);
+        await UserFactory.preloadCacheByTeam(team.teamName);
         await importBitbucketProjects(team);
         await importGitHubPullRequests(team);
     }

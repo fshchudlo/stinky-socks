@@ -1,6 +1,6 @@
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryColumn } from "typeorm";
 import { PullRequestParticipant } from "./PullRequestParticipant";
-import { Contributor } from "./Contributor";
+import { User } from "./User";
 import { PullRequestAuthorRole } from "./PullRequestAuthorRole";
 
 @Entity()
@@ -51,7 +51,7 @@ export abstract class PullRequest {
     protected mergedDate: Date;
 
     @Column()
-    protected reviewersCount: number;
+    protected requestedReviewersCount: number;
 
     @Column()
     protected totalCommentsCount: number;
@@ -73,9 +73,9 @@ export abstract class PullRequest {
     })
     participants: PullRequestParticipant[];
 
-    @ManyToOne(() => Contributor, (author) => author.pullRequests, { onDelete: "CASCADE" })
+    @ManyToOne(() => User, (author) => author.pullRequests, { onDelete: "CASCADE" })
     @JoinColumn()
-    author: Contributor;
+    author: User;
 
 
     public calculateTimings() {

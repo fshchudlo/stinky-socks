@@ -1,7 +1,7 @@
 import { PullRequest } from "../../MetricsDB/entities/PullRequest";
 import { BitbucketPullRequestParticipant } from "./BitbucketPullRequestParticipant";
 import { BitbucketDiffModel, BitbucketPullRequestActivityModel } from "../api/BitbucketAPI.contracts";
-import { ContributorFactory } from "../../MetricsDB/ContributorFactory";
+import { UserFactory } from "../../MetricsDB/UserFactory";
 import { ImportParams } from "./ImportParams";
 import { PullRequestAuthorRole } from "../../MetricsDB/entities/PullRequestAuthorRole";
 
@@ -21,13 +21,13 @@ export class BitbucketPullRequest extends PullRequest {
         this.pullRequestNumber = model.pullRequest.id;
         this.viewURL = model.pullRequest.links.self[0].href;
         this.targetBranch = model.pullRequest.toRef.displayId;
-        this.reviewersCount = model.pullRequest.reviewers.length;
+        this.requestedReviewersCount = model.pullRequest.reviewers.length;
         this.authorRole = PullRequestAuthorRole.MEMBER;
         this.createdDate = new Date(model.pullRequest.createdDate);
         this.updatedDate = new Date(model.pullRequest.updatedDate);
 
         const authorLogin = model.pullRequest.author.user.slug;
-        this.author = await ContributorFactory.fetchContributor({
+        this.author = await UserFactory.fetch({
             teamName: model.teamName,
             login: authorLogin,
             isBotUser: model.botUserSlugs.includes(authorLogin),
@@ -67,7 +67,7 @@ export class BitbucketPullRequest extends PullRequest {
             Array.from(allParticipants)
                 .filter(p => p !== model.pullRequest.author.user.slug)
                 .map(async participantName => {
-                    const participantUser = await ContributorFactory.fetchContributor({
+                    const participantUser = await UserFactory.fetch({
                         teamName: model.teamName,
                         login: participantName,
                         isBotUser: model.botUserSlugs.includes(participantName),

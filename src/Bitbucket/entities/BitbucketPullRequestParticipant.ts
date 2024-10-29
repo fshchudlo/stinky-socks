@@ -1,9 +1,9 @@
 import { PullRequestParticipant } from "../../MetricsDB/entities/PullRequestParticipant";
 import { BitbucketPullRequestActivityModel, BitbucketPullRequestModel } from "../api/BitbucketAPI.contracts";
-import { Contributor } from "../../MetricsDB/entities/Contributor";
+import { User } from "../../MetricsDB/entities/User";
 
 export class BitbucketPullRequestParticipant extends PullRequestParticipant {
-    constructor(teamName: string, pullRequestData: BitbucketPullRequestModel, participantActivities: BitbucketPullRequestActivityModel[], participantUser: Contributor) {
+    constructor(teamName: string, pullRequestData: BitbucketPullRequestModel, participantActivities: BitbucketPullRequestActivityModel[], participantUser: User) {
         super();
         this.initializeBaseProperties(teamName, pullRequestData, participantUser)
             .setCommentStats(participantActivities)
@@ -11,7 +11,7 @@ export class BitbucketPullRequestParticipant extends PullRequestParticipant {
             .setApprovalStats(participantActivities);
     }
 
-    private initializeBaseProperties(teamName: string, pullRequestData: BitbucketPullRequestModel, participantUser: Contributor) {
+    private initializeBaseProperties(teamName: string, pullRequestData: BitbucketPullRequestModel, participantUser: User) {
         this.teamName = teamName;
         this.projectName = pullRequestData.toRef.repository.project.key;
         this.repositoryName = pullRequestData.toRef.repository.slug;

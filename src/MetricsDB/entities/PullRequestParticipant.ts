@@ -1,6 +1,6 @@
 import { Entity, Column, ManyToOne, JoinColumn, PrimaryColumn } from "typeorm";
 import { PullRequest } from "./PullRequest";
-import { Contributor } from "./Contributor";
+import { User } from "./User";
 
 @Entity()
 export abstract class PullRequestParticipant {
@@ -50,8 +50,8 @@ export abstract class PullRequestParticipant {
     ])
     pullRequest: PullRequest;
 
-    @ManyToOne(() => Contributor, (participant) => participant.participations, { onDelete: "CASCADE" })
+    @ManyToOne(() => User, (participant) => participant.participations, { onDelete: "CASCADE" })
     @JoinColumn()
-    participant: Contributor;
+    participant: User;
 }
   

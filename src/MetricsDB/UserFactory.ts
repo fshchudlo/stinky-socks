@@ -1,4 +1,4 @@
-import { Contributor } from "./entities/Contributor";
+import { User } from "./entities/User";
 import { MetricsDB } from "./MetricsDB";
 import { Repository } from "typeorm";
 import { createCache } from "cache-manager";
@@ -24,36 +24,36 @@ const animals = [
     "Sloth", "Otter", "Kangaroo", "Raccoon", "Squirrel", "Turtle", "Llama", "Monkey", "Hippo", "Elephant",
     "Rabbit", "Hedgehog", "Parrot", "Owl", "Moose", "Duck", "Goose", "Ferret", "Octopus", "Platypus"
 ];
-const contributorRepo: Repository<Contributor> = MetricsDB.getRepository(Contributor);
-const contributorsCache = createCache();
+const userRepository: Repository<User> = MetricsDB.getRepository(User);
+const usersCache = createCache();
 
-export class ContributorFactory {
+export class UserFactory {
     public static async preloadCacheByTeam(teamName: string): Promise<void> {
-        const contributors = await contributorRepo.find({ where: { teamName: teamName } });
-        for (const contributor of contributors) {
-            const cacheKey = `${teamName}-${contributor.login}`;
-            await contributorsCache.set(cacheKey, contributor);
+        const users = await userRepository.find({ where: { teamName: teamName } });
+        for (const user of users) {
+            const cacheKey = `${teamName}-${user.login}`;
+            await usersCache.set(cacheKey, user);
         }
     }
 
-    public static async fetchContributor({ teamName, login, isBotUser, isFormerEmployee }: {
+    public static async fetch({ teamName, login, isBotUser, isFormerEmployee }: {
         teamName: string,
         login: string,
         isBotUser: boolean,
         isFormerEmployee: boolean
-    }): Promise<Contributor> {
+    }): Promise<User> {
         const cacheKey = `${teamName}-${login}`;
         login = AppConfig.userNameNormalizerFn(login);
 
-        return await contributorsCache.wrap(cacheKey, async () => {
-            let contributor = await contributorRepo.findOne({ where: { teamName, login } });
+        return await usersCache.wrap(cacheKey, async () => {
+            let user = await userRepository.findOne({ where: { teamName, login } });
 
-            if (contributor) {
-                return contributor;
+            if (user) {
+                return user;
             }
 
-            const nickname = await ContributorFactory.generateUniqueNickname(teamName);
-            contributor = contributorRepo.create({
+            const nickname = await UserFactory.generateUniqueNickname(teamName);
+            user = userRepository.create({
                 teamName,
                 login,
                 isBotUser,
@@ -61,8 +61,8 @@ export class ContributorFactory {
                 nickname
             });
 
-            await contributorRepo.save(contributor);
-            return contributor;
+            await userRepository.save(user);
+            return user;
         });
     }
 
@@ -71,9 +71,9 @@ export class ContributorFactory {
         let isUnique = false;
 
         do {
-            nickname = ContributorFactory.generateNickname();
-            const existingContributor = await contributorRepo.findOne({ where: { teamName, nickname } });
-            if (!existingContributor) {
+            nickname = UserFactory.generateNickname();
+            const existingUser = await userRepository.findOne({ where: { teamName, nickname } });
+            if (!existingUser) {
                 isUnique = true;
             } else {
                 console.log(`👻 Nickname "${nickname}" is already taken. Checking for another one...`);

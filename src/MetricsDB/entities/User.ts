@@ -6,7 +6,7 @@ import { PullRequest } from "./PullRequest";
 @Entity()
 @Unique(["teamName", "nickname"])
 @Unique(["teamName", "login"])
-export class Contributor {
+export class User {
     @PrimaryGeneratedColumn()
     id: number;
 
