@@ -67,7 +67,7 @@ export class GitHubPullRequest extends PullRequest {
             ...model.pullRequest.assignees.map(p => p.login),
             ...model.pullRequestActivities.filter(ActivityTraits.isMergedEvent).map(c => c.actor.login),
             ...model.pullRequestActivities.filter(ActivityTraits.isCommentedEvent).map(c => c.actor.login),
-            ...model.pullRequestActivities.filter(ActivityTraits.isLineCommentedEvent).flatMap(c => c.comments).map(c => c.user.login),
+            ...model.pullRequestActivities.filter(ActivityTraits.isLineCommentedEvent).flatMap(c => c.comments).map(c => c.user?.login),
             ...model.pullRequestActivities.filter(ActivityTraits.isReviewedEvent).map(c => c.user?.login || null)
         ]);
 
