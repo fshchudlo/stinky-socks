@@ -2,10 +2,10 @@ import { PullRequestParticipant } from "../../MetricsDB/entities/PullRequestPart
 import { GitHubPullRequestActivityModel, GitHubPullRequestModel } from "../api/GitHubAPI.contracts";
 import { ActivityTraits } from "./helpers/ActivityTraits";
 import getCommentsTimestamps from "./helpers/getCommentsTimestamps";
-import { User } from "../../MetricsDB/entities/User";
+import { Actor } from "../../MetricsDB/entities/Actor";
 
 export class GitHubPullRequestParticipant extends PullRequestParticipant {
-    constructor(teamName: string, pullRequestData: GitHubPullRequestModel, participantActivities: GitHubPullRequestActivityModel[], participantUser: User) {
+    constructor(teamName: string, pullRequestData: GitHubPullRequestModel, participantActivities: GitHubPullRequestActivityModel[], participantUser: Actor) {
         super();
         this.initializeBaseProperties(teamName, pullRequestData, participantUser)
             .setCommentStats(participantActivities)
@@ -13,7 +13,7 @@ export class GitHubPullRequestParticipant extends PullRequestParticipant {
             .setApprovalStats(participantActivities);
     }
 
-    private initializeBaseProperties(teamName: string, pullRequestData: GitHubPullRequestModel, participantUser: User) {
+    private initializeBaseProperties(teamName: string, pullRequestData: GitHubPullRequestModel, participantUser: Actor) {
         this.teamName = teamName;
         this.projectName = pullRequestData.base.repo.owner.login;
         this.repositoryName = pullRequestData.base.repo.name;

@@ -1,4 +1,4 @@
-import { User } from "./entities/User";
+import { Actor } from "./entities/Actor";
 import { MetricsDB } from "./MetricsDB";
 import { Repository } from "typeorm";
 import { createCache } from "cache-manager";
@@ -24,7 +24,7 @@ const animals = [
     "Sloth", "Otter", "Kangaroo", "Raccoon", "Squirrel", "Turtle", "Llama", "Monkey", "Hippo", "Elephant",
     "Rabbit", "Hedgehog", "Parrot", "Owl", "Moose", "Duck", "Goose", "Ferret", "Octopus", "Platypus"
 ];
-const userRepository: Repository<User> = MetricsDB.getRepository(User);
+const userRepository: Repository<Actor> = MetricsDB.getRepository(Actor);
 const usersCache = createCache();
 
 export class UserFactory {
@@ -41,7 +41,7 @@ export class UserFactory {
         login: string,
         isBotUser: boolean,
         isFormerEmployee: boolean
-    }): Promise<User> {
+    }): Promise<Actor> {
         const cacheKey = `${teamName}-${login}`;
         login = AppConfig.userNameNormalizerFn(login);
 

@@ -1,6 +1,6 @@
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryColumn } from "typeorm";
 import { PullRequestParticipant } from "./PullRequestParticipant";
-import { User } from "./User";
+import { Actor } from "./Actor";
 import { PullRequestAuthorRole } from "./PullRequestAuthorRole";
 
 @Entity()
@@ -73,9 +73,9 @@ export abstract class PullRequest {
     })
     participants: PullRequestParticipant[];
 
-    @ManyToOne(() => User, (author) => author.pullRequests, { onDelete: "CASCADE" })
+    @ManyToOne(() => Actor, (author) => author.pullRequests, { onDelete: "CASCADE" })
     @JoinColumn()
-    author: User;
+    author: Actor;
 
 
     public calculateTimings() {
