@@ -10,7 +10,7 @@ export type GitHubProjectSettings = {
     botUserNames: string[];
     formerEmployeeNames: string[];
     repositoriesSelector: (api: GitHubAPI) => Promise<string[]>;
-    pullRequestsFilterFn: (pr: GitHubPullRequestModel) => boolean,
+    pullRequestsFilterFn?: (pr: GitHubPullRequestModel) => boolean,
     auth: {
         apiToken: string;
     }
@@ -63,7 +63,7 @@ export class GitHubPullRequestsImporter {
                     continue;
                 }
 
-                if (this.project.pullRequestsFilterFn(pullRequest)) {
+                if (!this.project.pullRequestsFilterFn || this.project.pullRequestsFilterFn(pullRequest)) {
                     await this.savePullRequest(this.project, repositoryName, pullRequest);
                 } else {
                     console.warn(`⚠️ Pull request ${pullRequest.number} was filtered out by specified pullRequestsFilterFn function`);

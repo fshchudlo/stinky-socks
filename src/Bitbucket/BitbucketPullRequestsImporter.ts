@@ -10,7 +10,7 @@ export type BitbucketProjectSettings = {
     botUserSlugs: string[];
     formerEmployeeSlugs: string[];
     repositoriesSelector: (api: BitbucketAPI) => Promise<string[]>;
-    pullRequestsFilterFn: (pr: BitbucketPullRequestModel) => boolean,
+    pullRequestsFilterFn?: (pr: BitbucketPullRequestModel) => boolean,
     auth: {
         apiUrl: string;
         apiToken: string;
@@ -65,7 +65,7 @@ export class BitbucketPullRequestsImporter {
                     continue;
                 }
 
-                if (this.project.pullRequestsFilterFn(pullRequest)) {
+                if (!this.project.pullRequestsFilterFn || this.project.pullRequestsFilterFn(pullRequest)) {
                     await this.savePullRequest(this.project, repositoryName, pullRequest);
                 } else {
                     console.warn(`⚠️ Pull request ${pullRequest.id} was filtered out by specified pullRequestsFilterFn function`);
