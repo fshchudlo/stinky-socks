@@ -49,7 +49,7 @@ export class GitHubPullRequestsImporter {
         let pageNumber = importedPRsCount > pageSize ? Math.floor(importedPRsCount / pageSize) : 1;
 
         while (true) {
-            const timelogLabel = `💾 ${this.teamName}/${repositoryName}: successfully processed pull requests #${pageSize * (pageNumber - 1)}-${pageSize * pageNumber}.`;
+            const timelogLabel = `💾 ${this.teamName}/${repositoryName}: successfully processed pull requests #${(pageSize * (pageNumber - 1)).toLocaleString()}-${(pageSize * pageNumber).toLocaleString()}.`;
             console.time(timelogLabel);
 
             const pullRequestsChunk = await this.gitHubAPI.getClosedPullRequests(this.project.owner, repositoryName, pageNumber, pageSize);

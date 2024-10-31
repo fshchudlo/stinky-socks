@@ -207,6 +207,12 @@ export abstract class PullRequest {
         if (this.participants.some(p => p.lastApprovalDate && p.lastApprovalDate.getTime() > this.mergedDate.getTime())) {
             errors.push("`participant.lastApprovalDate` is bigger than `mergedDate`. Recheck the import logic and timezones handling on this sample.");
         }
+
+        if (this.diffSize === 0) {
+            errors.push("`diffSize` is 0.");
+        }
+
+
         if (errors.length > 0) {
             this.integrityErrors = JSON.stringify(errors);
 
