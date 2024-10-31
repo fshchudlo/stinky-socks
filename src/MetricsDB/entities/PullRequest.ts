@@ -209,7 +209,7 @@ export abstract class PullRequest {
         }
 
         if (this.diffSize === 0) {
-            errors.push("`diffSize` is 0.");
+            errors.push("`diffSize` is 0. Maybe there is binary files in the pull request?");
         }
 
 
