@@ -80,19 +80,24 @@ export class GitHubPullRequestsImporter {
     }
 
     private async savePullRequest(project: GitHubProjectSettings, repositoryName: string, pullRequest: GitHubPullRequestModel) {
-        const [activities, files] = await Promise.all([
-            this.gitHubAPI.getPullRequestActivities(project.owner, repositoryName, pullRequest.number),
-            this.gitHubAPI.getPullRequestFiles(project.owner, repositoryName, pullRequest.number)
-        ]);
-        const pullRequestEntity = await new GitHubPullRequest().init({
-                teamName: this.teamName,
-                botUserNames: project.botUserNames,
-                formerEmployeeNames: project.formerEmployeeNames,
-                pullRequest,
-                pullRequestActivities: activities,
-                files
-            }
-        );
-        await this.repository.save(pullRequestEntity);
+        try {
+            const [activities, files] = await Promise.all([
+                this.gitHubAPI.getPullRequestActivities(project.owner, repositoryName, pullRequest.number),
+                this.gitHubAPI.getPullRequestFiles(project.owner, repositoryName, pullRequest.number)
+            ]);
+            const pullRequestEntity = await new GitHubPullRequest().init({
+                    teamName: this.teamName,
+                    botUserNames: project.botUserNames,
+                    formerEmployeeNames: project.formerEmployeeNames,
+                    pullRequest,
+                    pullRequestActivities: activities,
+                    files
+                }
+            );
+            await this.repository.save(pullRequestEntity);
+        } catch (error) {
+            console.error(`❌ Error while saving pull request ${pullRequest.html_url}: ${error}`);
+            throw error;
+        }
     }
 }
