@@ -17,7 +17,7 @@ class MetricsDataSource extends DataSource {
             entities: [PullRequest, PullRequestParticipant, Actor],
             namingStrategy: new SnakeNamingStrategy(),
             synchronize: false,
-            migrations: ["src/MetricsDB/migrations/entities/*.ts"],
+            migrations: ["src/MetricsDB/migrations/*.ts"],
             migrationsRun: true,
             logging: false
         });

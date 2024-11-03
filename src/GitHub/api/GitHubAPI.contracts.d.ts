@@ -78,8 +78,9 @@ export type GitHubPullRequestActivityReadyForReviewModel = {
 
 
 export type GitHubFileDiffModel = {
+    additions: number;
+    deletions: number;
     filename: string;
-    changes: number;
 };
 export type GitHubUserModel = {
     login: string;

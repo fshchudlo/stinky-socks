@@ -11,7 +11,7 @@ export class BitbucketPullRequest extends PullRequest {
         await this.initializeDates(model)
             .calculateCommitStats(model)
             .initializeParticipants(model);
-        return this.validateDataIntegrity().calculateTimings();
+        return this.validateDataIntegrity().calculateAggregations();
     }
 
     private async initializeBaseProperties(model: ImportParams) {
@@ -52,7 +52,11 @@ export class BitbucketPullRequest extends PullRequest {
         this.totalCommentsCount = model.pullRequestActivities
             .filter(a => a.action === "COMMENTED")
             .filter(a => !model.botUserSlugs.includes(a.user.slug)).length;
-        this.diffSize = BitbucketPullRequest.getDiffSize(model.diff);
+
+        const diff = BitbucketPullRequest.getDiffSize(model.diff);
+        this.diffRowsAdded = diff.additions;
+        this.diffRowsDeleted = diff.deletions;
+
         this.testsWereTouched = BitbucketPullRequest.testsWereTouched(model.diff);
         return this;
     }
@@ -102,19 +106,22 @@ export class BitbucketPullRequest extends PullRequest {
         return activities.filter(a => a.user.slug === userName);
     }
 
-    private static getDiffSize(diffData: BitbucketDiffModel): number {
-        let linesChanged = 0;
+    private static getDiffSize(diffData: BitbucketDiffModel) {
+        const diff = { additions: 0, deletions: 0 };
         diffData.diffs.forEach(d => {
             if (!d.hunks) return;
             d.hunks.forEach(hunk => {
                 hunk.segments.forEach(segment => {
-                    if (segment.type === "ADDED" || segment.type === "DELETED") {
-                        linesChanged += segment.lines.length;
+                    if (segment.type === "ADDED") {
+                        diff.additions += segment.lines.length;
+                    }
+                    if (segment.type === "DELETED") {
+                        diff.deletions += segment.lines.length;
                     }
                 });
             });
         });
-        return linesChanged;
+        return diff;
     }
 
     private static testsWereTouched(prDiff: BitbucketDiffModel) {

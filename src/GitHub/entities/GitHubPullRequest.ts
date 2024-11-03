@@ -15,7 +15,7 @@ export class GitHubPullRequest extends PullRequest {
             .calculateCommitStats(model)
             .initializeParticipants(model);
 
-        return this.validateDataIntegrity().calculateTimings();
+        return this.validateDataIntegrity().calculateAggregations();
     }
 
     private async initializeBaseProperties(model: ImportParams) {
@@ -56,7 +56,10 @@ export class GitHubPullRequest extends PullRequest {
 
     private calculateCommitStats(model: ImportParams) {
         this.totalCommentsCount = getCommentsTimestamps(model.pullRequestActivities, model.botUserNames).length;
-        this.diffSize = model.files.reduce((acc, file) => acc + file.changes, 0);
+
+        this.diffRowsAdded = model.files.reduce((acc, file) => acc + file.additions, 0);
+        this.diffRowsDeleted = model.files.reduce((acc, file) => acc + file.deletions, 0);
+
         this.testsWereTouched = model.files.some(file => file.filename.toLowerCase().includes("test"));
         return this;
     }

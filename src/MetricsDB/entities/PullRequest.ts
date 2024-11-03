@@ -57,13 +57,19 @@ export abstract class PullRequest {
     protected totalCommentsCount: number;
 
     @Column({ type: "numeric" })
-    protected diffSize: number;
+    protected diffRowsAdded: number;
+
+    @Column({ type: "numeric" })
+    protected diffRowsDeleted: number;
 
     @Column()
     protected testsWereTouched: boolean;
 
     @Column({ type: "varchar" })
     protected authorRole: PullRequestAuthorRole;
+
+    @Column()
+    protected commitsHistoryWasRewritten: boolean;
 
     @Column({ nullable: true, type: "varchar" })
     protected integrityErrors: string | null;
@@ -78,7 +84,9 @@ export abstract class PullRequest {
     author: Actor;
 
 
-    public calculateTimings() {
+    public calculateAggregations() {
+        this.commitsHistoryWasRewritten = this.initialCommitDate ? this.initialCommitDate.getTime() > this.createdDate.getTime() : false;
+
         this.firstReactionDate = this.participants
             .filter(p => !p.participant.isBotUser)
             .flatMap(p => [p.firstCommentDate, p.firstReviewDate, p.firstApprovalDate])
@@ -120,18 +128,12 @@ export abstract class PullRequest {
         if (this.createdDate.getTime() > this.sharedForReviewDate.getTime()) {
             errors.push("`createdDate` is bigger than `sharedForReviewDate`. Recheck the import logic and timezones handling on this sample.");
         }
-        if (this.initialCommitDate && this.createdDate.getTime() < this.initialCommitDate.getTime()) {
-            errors.push("`createdDate` is less than `initialCommitDate`. Seems like git history was rewritten or there is an error in import logic.");
-        }
         if (this.createdDate.getTime() > this.mergedDate.getTime()) {
             errors.push("`createdDate` is bigger than `mergedDate`. Recheck the import logic and timezones handling on this sample.");
         }
         // updatedDate doesn't have any specific constraints except comparison with createdDate implemented above
 
         // sharedForReviewDate
-        if (this.initialCommitDate && this.sharedForReviewDate.getTime() < this.initialCommitDate.getTime()) {
-            errors.push("`sharedForReviewDate` is less than `initialCommitDate`. Seems like git history was rewritten or there is an error in import logic.");
-        }
         if (this.sharedForReviewDate.getTime() > this.mergedDate.getTime()) {
             errors.push("`sharedForReviewDate` is bigger than `mergedDate`. Recheck the import logic and timezones handling on this sample.");
         }
@@ -158,9 +160,6 @@ export abstract class PullRequest {
         if (this.participants.some(p => !p.participant.isBotUser && p.firstCommentDate && p.firstCommentDate.getTime() < this.sharedForReviewDate.getTime())) {
             errors.push("`participant.firstCommentDate` is less than `pullRequest.sharedForReviewDate`. Recheck the import logic and timezones handling on this sample.");
         }
-        if (this.participants.some(p => this.initialCommitDate && p.firstCommentDate && p.firstCommentDate.getTime() < this.initialCommitDate.getTime())) {
-            errors.push("`participant.firstCommentDate` is less than `pullRequest.initialCommitDate`. Recheck the import logic and timezones handling on this sample.");
-        }
         if (this.participants.some(p => p.firstCommentDate && p.lastCommentDate && p.firstCommentDate.getTime() > p.lastCommentDate.getTime())) {
             errors.push("`participant.firstCommentDate` is bigger than `participant.lastCommentDate`. Recheck the import logic and timezones handling on this sample.");
         }
@@ -171,9 +170,6 @@ export abstract class PullRequest {
         }
         if (this.participants.some(p => p.firstApprovalDate && p.firstApprovalDate.getTime() < this.sharedForReviewDate.getTime())) {
             errors.push("`participant.firstApprovalDate` is less than `pullRequest.sharedForReviewDate`. Recheck the import logic and timezones handling on this sample.");
-        }
-        if (this.participants.some(p => this.initialCommitDate && p.firstApprovalDate && p.firstApprovalDate.getTime() < this.initialCommitDate.getTime())) {
-            errors.push("`participant.firstApprovalDate` is less than `pullRequest.initialCommitDate`. Recheck the import logic and timezones handling on this sample.");
         }
         if (this.participants.some(p => p.firstApprovalDate && p.firstApprovalDate.getTime() > this.mergedDate.getTime())) {
             errors.push("`participant.firstApprovalDate` is bigger than `pullRequest.mergedDate`. Recheck the import logic and timezones handling on this sample.");
@@ -190,9 +186,6 @@ export abstract class PullRequest {
         if (this.participants.some(p => !p.participant.isBotUser && p.lastCommentDate && p.lastCommentDate.getTime() < this.sharedForReviewDate.getTime())) {
             errors.push("`participant.lastCommentDate` is less than `pullRequest.sharedForReviewDate`. Recheck the import logic and timezones handling on this sample.");
         }
-        if (this.participants.some(p => this.initialCommitDate && p.lastCommentDate && p.lastCommentDate.getTime() < this.initialCommitDate.getTime())) {
-            errors.push("`participant.lastCommentDate` is less than `pullRequest.initialCommitDate`. Recheck the import logic and timezones handling on this sample.");
-        }
 
         // participant.lastApprovalDate
         if (this.participants.some(p => p.lastApprovalDate && p.lastApprovalDate.getTime() < this.createdDate.getTime())) {
@@ -201,17 +194,9 @@ export abstract class PullRequest {
         if (this.participants.some(p => p.lastApprovalDate && p.lastApprovalDate.getTime() < this.sharedForReviewDate.getTime())) {
             errors.push("`participant.lastApprovalDate` is less than `pullRequest.sharedForReviewDate`. Recheck the import logic and timezones handling on this sample.");
         }
-        if (this.participants.some(p => this.initialCommitDate && p.lastApprovalDate && p.lastApprovalDate.getTime() < this.initialCommitDate.getTime())) {
-            errors.push("`participant.lastApprovalDate` is less than `pullRequest.initialCommitDate`. Recheck the import logic and timezones handling on this sample.");
-        }
         if (this.participants.some(p => p.lastApprovalDate && p.lastApprovalDate.getTime() > this.mergedDate.getTime())) {
             errors.push("`participant.lastApprovalDate` is bigger than `mergedDate`. Recheck the import logic and timezones handling on this sample.");
         }
-
-        if (this.diffSize === 0) {
-            errors.push("`diffSize` is 0. Maybe there is binary files in the pull request?");
-        }
-
 
         if (errors.length > 0) {
             this.integrityErrors = JSON.stringify(errors);
