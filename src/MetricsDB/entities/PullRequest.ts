@@ -158,7 +158,7 @@ export abstract class PullRequest {
             errors.push("`participant.firstCommentDate` is less than `pullRequest.createdDate`. Recheck the import logic and timezones handling on this sample.");
         }
         if (this.participants.some(p => !p.participant.isBotUser && p.firstCommentDate && p.firstCommentDate.getTime() < this.sharedForReviewDate.getTime())) {
-            errors.push("`participant.firstCommentDate` is less than `pullRequest.sharedForReviewDate`. Recheck the import logic and timezones handling on this sample.");
+            errors.push("`participant.firstCommentDate` is less than `pullRequest.sharedForReviewDate`. Possible reasons: should be marked as a bot, error in import logic and timezones handling.");
         }
         if (this.participants.some(p => p.firstCommentDate && p.lastCommentDate && p.firstCommentDate.getTime() > p.lastCommentDate.getTime())) {
             errors.push("`participant.firstCommentDate` is bigger than `participant.lastCommentDate`. Recheck the import logic and timezones handling on this sample.");
@@ -184,7 +184,7 @@ export abstract class PullRequest {
             errors.push("`participant.lastCommentDate` is less than `pullRequest.createdDate`. Recheck the import logic and timezones handling on this sample.");
         }
         if (this.participants.some(p => !p.participant.isBotUser && p.lastCommentDate && p.lastCommentDate.getTime() < this.sharedForReviewDate.getTime())) {
-            errors.push("`participant.lastCommentDate` is less than `pullRequest.sharedForReviewDate`. Recheck the import logic and timezones handling on this sample.");
+            errors.push("`participant.lastCommentDate` is less than `pullRequest.sharedForReviewDate`. Possible reasons: should be marked as a bot, error in import logic and timezones handling.");
         }
 
         // participant.lastApprovalDate
