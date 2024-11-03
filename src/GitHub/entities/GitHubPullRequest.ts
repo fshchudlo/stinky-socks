@@ -3,7 +3,7 @@ import { GitHubPullRequestParticipant } from "./GitHubPullRequestParticipant";
 import { UserFactory } from "../../MetricsDB/UserFactory";
 import { ActivityTraits } from "./helpers/ActivityTraits";
 import { ImportParams } from "./ImportParams";
-import getCommentsTimestamps from "./helpers/getCommentsTimestamps";
+import getNonBotCommentsTimestamps from "./helpers/getNonBotCommentsTimestamps";
 import getActivitiesOf from "./helpers/getActivitiesOf";
 import calculatePrSharedForReviewDate from "./helpers/calculatePrSharedForReviewDate";
 
@@ -55,7 +55,7 @@ export class GitHubPullRequest extends PullRequest {
     }
 
     private calculateCommitStats(model: ImportParams) {
-        this.totalCommentsCount = getCommentsTimestamps(model.pullRequestActivities, model.botUserNames).length;
+        this.totalCommentsCount = getNonBotCommentsTimestamps(model.pullRequestActivities, model.botUserNames).length;
 
         this.diffRowsAdded = model.files.reduce((acc, file) => acc + file.additions, 0);
         this.diffRowsDeleted = model.files.reduce((acc, file) => acc + file.deletions, 0);

@@ -1,9 +1,9 @@
 import { ImportParams } from "../ImportParams";
-import getCommentsTimestamps from "./getCommentsTimestamps";
+import getNonBotCommentsTimestamps from "./getNonBotCommentsTimestamps";
 import { ActivityTraits } from "./ActivityTraits";
 
 export default function calculatePrSharedForReviewDate(model: ImportParams): Date {
-    const firstCommentDate = getEarliestCommentTimestamp(model);
+    const firstCommentDate = getEarliestNonBotCommentTimestamp(model);
 
     const readyForReviewEvents = model.pullRequestActivities.filter(ActivityTraits.isReadyForReviewEvent);
     if (readyForReviewEvents.length > 0) {
@@ -45,7 +45,7 @@ function getReviewersAddedAfterPRCreation(activities: any[], prCreationDate: str
     return activities.filter(addition => new Date(addition.created_at).getTime() > new Date(prCreationDate).getTime());
 }
 
-function getEarliestCommentTimestamp(model: ImportParams): number | null {
-    const commentTimeStamps = getCommentsTimestamps(model.pullRequestActivities, model.botUserNames);
+function getEarliestNonBotCommentTimestamp(model: ImportParams): number | null {
+    const commentTimeStamps = getNonBotCommentsTimestamps(model.pullRequestActivities, model.botUserNames);
     return commentTimeStamps.length ? Math.min(...commentTimeStamps) : null;
 }
