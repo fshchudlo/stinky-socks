@@ -203,6 +203,10 @@ export abstract class PullRequest {
 
             console.warn(`☣️ PullRequest ${this.viewURL} has the following integrity errors:\n\t• ${errors.join("\n\t• ")}`);
         }
+        else
+        {
+            this.integrityErrors = null;
+        }
         return this;
     }
 }
