@@ -3,7 +3,8 @@ import { Repository } from "typeorm";
 import { PullRequest } from "../MetricsDB/entities/PullRequest";
 import { MetricsDB } from "../MetricsDB/MetricsDB";
 import { GitHubPullRequest } from "./entities/GitHubPullRequest";
-import { GitHubPullRequestModel } from "./api/GitHubAPI.contracts";
+import { GitHubPullRequestModel, GitHubUserModel } from "./api/GitHubAPI.contracts";
+import { ImportParams } from "./entities/ImportParams";
 
 export type GitHubProjectSettings = {
     owner: string;
@@ -54,7 +55,6 @@ export class GitHubPullRequestsImporter {
 
             const pullRequestsChunk = await this.gitHubAPI.getClosedPullRequests(this.project.owner, repositoryName, pageNumber, pageSize);
             for (const pullRequest of pullRequestsChunk) {
-
                 if (lastUpdateDateOfStoredPRs != null && new Date(pullRequest.updated_at) <= lastUpdateDateOfStoredPRs) {
                     continue;
                 }
@@ -85,14 +85,14 @@ export class GitHubPullRequestsImporter {
                 this.gitHubAPI.getPullRequestActivities(project.owner, repositoryName, pullRequest.number),
                 this.gitHubAPI.getPullRequestFiles(project.owner, repositoryName, pullRequest.number)
             ]);
-            const pullRequestEntity = await new GitHubPullRequest().init({
+            const pullRequestEntity = await new GitHubPullRequest().init(this.sanitize({
                     teamName: this.teamName,
                     botUserNames: project.botUserNames,
                     formerEmployeeNames: project.formerEmployeeNames,
                     pullRequest,
                     pullRequestActivities: activities,
                     files
-                }
+                })
             );
             await this.repository.save(pullRequestEntity);
         } catch (error) {
@@ -100,4 +100,38 @@ export class GitHubPullRequestsImporter {
             throw error;
         }
     }
+
+    private sanitize(model: ImportParams) {
+        model.pullRequest.user.login = sanitizeUserLogin(model.pullRequest.user);
+
+        for (const reviewer of model.pullRequest.requested_reviewers) {
+            reviewer.login = sanitizeUserLogin(reviewer);
+        }
+        for (const assignee of model.pullRequest.assignees) {
+            assignee.login = sanitizeUserLogin(assignee);
+        }
+        for (const activity of model.pullRequestActivities) {
+            const anyActivity = activity as any;
+
+            if (anyActivity.comments?.user) {
+                anyActivity.comments.user.login = sanitizeUserLogin(anyActivity.comments.user);
+            }
+            if (anyActivity.user) {
+                anyActivity.user.login = sanitizeUserLogin(anyActivity.user);
+            }
+            if (anyActivity.actor) {
+                anyActivity.actor.login = sanitizeUserLogin(anyActivity.actor);
+            }
+            if (anyActivity.requested_reviewer) {
+                anyActivity.requested_reviewer.login = sanitizeUserLogin(anyActivity.requested_reviewer);
+            }
+        }
+        return model;
+    }
+}
+
+function sanitizeUserLogin(user: GitHubUserModel): string;
+function sanitizeUserLogin(user: GitHubUserModel | undefined): string | null {
+    // If the user is mannequin (e.g. data was imported from other SCM), the login will contain GUID and the only way to extract real login is to parse it from the html_url
+    return user?.type == "Mannequin" ? user.html_url.replace("https://github.com/", "") : user?.login || null;
 }
