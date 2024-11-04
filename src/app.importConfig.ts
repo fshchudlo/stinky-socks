@@ -40,3 +40,53 @@ export const appImportConfig = {
     } as TeamImportSettings]
 };
 
+
+const testKaTeam: TeamImportSettings = {
+    teamName: "Test KA Team",
+    gitHubProjects: [{
+        owner: "webpros-licensing",
+        auth: {
+            apiToken: process.env.GITHUB_API_ENTERPRISE_TOKEN as string
+        },
+        botUserNames: ["bot-automerge", "gitbot", "codeowners", "lps-integration", "devsensei-auto-merge-service-user"],
+        formerEmployeeNames: [
+            "victor.kupriyanov",
+            "denis.gorbatykh",
+            "aleksandr.sapelkin",
+            "nrylov",
+            "asitkov",
+            "kagamian",
+            "ddobrotvorskiy",
+            "anechaev",
+            "andrey.melnikov",
+            "vsamsonova",
+            "dchagin",
+            "ddolovov",
+            "alexander.tarankov",
+            "nmanuilova",
+            "dpyshkin",
+            "dinshakov",
+            "asviridov",
+            "ykolbin",
+            "amorozyuk",
+            "dogurtsov",
+            "oovcharenko",
+            "pkalinnikov",
+            "anechaev",
+            "ikrasner",
+            "nsimonov",
+            "amakeev"
+        ],
+        repositoriesSelector: () => Promise.resolve(["service.consent-keeper", "service.eres-service",
+            "service.hubspot-synchronizer", "service.key-state-cache",
+            "service.on-boarding-trials", "service.payg-telemetry",
+            "service.pkp-dispatcher", "service.plesk-sso",
+            "service.price", "service.sip-processor",
+            "service.support-service", "service.technical-reports",
+            "core.key-administrator", "core.partner-central",
+            "core.production-environment",
+            "qa.auto-tests", "qa.tests-e2e", "devops.lps-infrastructure",
+            "devops.lps-jenkins-library"
+        ])
+    }]
+};

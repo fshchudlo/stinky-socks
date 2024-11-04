@@ -5,7 +5,7 @@ import { PullRequestAuthorRole } from "./PullRequestAuthorRole";
 
 @Entity()
 export abstract class PullRequest {
-    @Column()
+    @PrimaryColumn()
     protected teamName: string;
 
     @PrimaryColumn()

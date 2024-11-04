@@ -1985,8 +1985,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               }
             ]
           },
@@ -2162,7 +2161,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT \n  grouping_field AS \"$group_by_field\",\n  AVG(GREATEST(EXTRACT(EPOCH FROM (shared_for_review_date-initial_commit_date)), 0)) AS \"Development time\",\n  AVG(EXTRACT(EPOCH FROM (first_reaction_date-shared_for_review_date))) AS \"First reaction got in\",\n  AVG(EXTRACT(EPOCH FROM (rework_completed_date-first_reaction_date))) AS \"Rework time\",\n  AVG(EXTRACT(EPOCH FROM (merged_date-last_action_date))) AS \"Idle after approve\"\nFROM (SELECT\n        CASE WHEN '$group_by_field'='author' \n          THEN\n            CASE \n              WHEN author.is_former_employee THEN CONCAT(author.login, ' (former employee)') \n              WHEN author.is_bot_user THEN CONCAT(author.login, ' (bot)')\n              ELSE CASE WHEN $show_real_names THEN author.login ELSE author.nickname END\n            END\n          ELSE pr.repository_name \n        END as grouping_field,\n        pr.merged_date,\n        pr.shared_for_review_date,\n        CASE WHEN commits_history_was_rewritten THEN NULL ELSE pr.initial_commit_date END AS initial_commit_date,\n        pr.first_reaction_date,\n        pr.rework_completed_date,\n        GREATEST(pr.last_approval_date, pr.rework_completed_date, pr.last_commit_date) as last_action_date\n    FROM pull_request AS pr\n        INNER JOIN pull_request_participant AS prtcpnt ON pr.project_name = prtcpnt.project_name AND pr.repository_name = prtcpnt.repository_name AND pr.pull_request_number = prtcpnt.pull_request_number\n        INNER JOIN actor as author ON author.id = pr.author_id\n    WHERE pr.integrity_errors IS NULL\n      AND $__timeFilter(shared_for_review_date) \n      AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n      AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n      AND (COALESCE($pr_author_role) IS NULL OR pr.author_role IN ($pr_author_role))\n      AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n      AND ($include_bots_activities OR NOT author.is_bot_user)\n    GROUP BY 1, pr.project_name, pr.repository_name, pr.pull_request_number\n) AS activity_stats\nGROUP BY 1\nORDER BY AVG((GREATEST(EXTRACT(EPOCH FROM (shared_for_review_date-initial_commit_date)), 0)))\n        +AVG(EXTRACT(EPOCH FROM (first_reaction_date-shared_for_review_date)))\n        +AVG(EXTRACT(EPOCH FROM (rework_completed_date-first_reaction_date)))\n        +AVG(EXTRACT(EPOCH FROM (merged_date-last_action_date)))\n",
+          "rawSql": "SELECT \n  grouping_field AS \"$group_by_field\",\n  AVG(GREATEST(EXTRACT(EPOCH FROM (shared_for_review_date-initial_commit_date)), 0)) AS \"Development time\",\n  AVG(EXTRACT(EPOCH FROM (first_reaction_date-shared_for_review_date))) AS \"First reaction got in\",\n  AVG(EXTRACT(EPOCH FROM (rework_completed_date-first_reaction_date))) AS \"Rework time\",\n  AVG(EXTRACT(EPOCH FROM (merged_date-last_action_date))) AS \"Idle after approve\"\nFROM (SELECT\n        CASE WHEN '$group_by_field'='author' \n          THEN\n            CASE \n              WHEN author.is_former_employee THEN CONCAT(author.login, ' (former employee)') \n              WHEN author.is_bot_user THEN CONCAT(author.login, ' (bot)')\n              ELSE CASE WHEN $show_real_names THEN author.login ELSE author.nickname END\n            END\n          ELSE pr.repository_name \n        END as grouping_field,\n        pr.merged_date,\n        pr.shared_for_review_date,\n        CASE WHEN commits_history_was_rewritten THEN NULL ELSE pr.initial_commit_date END AS initial_commit_date,\n        pr.first_reaction_date,\n        pr.rework_completed_date,\n        GREATEST(pr.last_approval_date, pr.rework_completed_date, pr.last_commit_date) as last_action_date\n    FROM pull_request AS pr\n        INNER JOIN pull_request_participant AS prtcpnt ON pr.project_name = prtcpnt.project_name AND pr.repository_name = prtcpnt.repository_name AND pr.pull_request_number = prtcpnt.pull_request_number\n        INNER JOIN actor as author ON author.id = pr.author_id\n    WHERE pr.integrity_errors IS NULL\n      AND $__timeFilter(shared_for_review_date) \n      AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n      AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n      AND (COALESCE($pr_author_role) IS NULL OR pr.author_role IN ($pr_author_role))\n      AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n      AND ($include_bots_activities OR NOT author.is_bot_user)\n    GROUP BY 1, pr.project_name, pr.repository_name, pr.pull_request_number, pr.merged_date, pr.shared_for_review_date, pr.commits_history_was_rewritten, pr.initial_commit_date, pr.first_reaction_date, pr.rework_completed_date, pr.last_approval_date, pr.last_commit_date\n) AS activity_stats\nGROUP BY 1\nORDER BY AVG((GREATEST(EXTRACT(EPOCH FROM (shared_for_review_date-initial_commit_date)), 0)))\n        +AVG(EXTRACT(EPOCH FROM (first_reaction_date-shared_for_review_date)))\n        +AVG(EXTRACT(EPOCH FROM (rework_completed_date-first_reaction_date)))\n        +AVG(EXTRACT(EPOCH FROM (merged_date-last_action_date)))\n",
           "refId": "A",
           "sql": {
             "columns": [
@@ -3932,8 +3931,8 @@
       },
       {
         "current": {
-          "text": "True",
-          "value": "True"
+          "text": "False",
+          "value": "False"
         },
         "description": "",
         "hide": 2,
@@ -3941,12 +3940,12 @@
         "name": "show_real_names",
         "options": [
           {
-            "selected": false,
+            "selected": true,
             "text": "False",
             "value": "False"
           },
           {
-            "selected": true,
+            "selected": false,
             "text": "True",
             "value": "True"
           }
