@@ -85,11 +85,14 @@ export abstract class PullRequest {
 
 
     public calculateAggregations() {
+        this.participants.forEach(p => p.calculateAggregations());
+
         this.commitsHistoryWasRewritten = this.initialCommitDate ? this.initialCommitDate.getTime() > this.createdDate.getTime() : false;
+
 
         this.firstReactionDate = this.participants
             .filter(p => !p.participant.isBotUser)
-            .flatMap(p => [p.firstCommentDate, p.firstReviewDate, p.firstApprovalDate])
+            .map(p => p.firstReactionDate)
             .filter(d => d)
             .map(d => <Date>d)
             .filter(d => d.getTime() < this.mergedDate.getTime() && d.getTime() > this.sharedForReviewDate.getTime())
@@ -107,7 +110,6 @@ export abstract class PullRequest {
             .filter(d => d)
             .filter(d => d!.getTime() > this.sharedForReviewDate.getTime())
             .reduce((maxDate: Date | null, date) => !maxDate || date!.getTime() > (<Date>maxDate).getTime() ? date : maxDate, null);
-
         return this;
     }
 
@@ -202,9 +204,7 @@ export abstract class PullRequest {
             this.integrityErrors = JSON.stringify(errors);
 
             console.warn(`☣️ PullRequest ${this.viewURL} has the following integrity errors:\n\t• ${errors.join("\n\t• ")}`);
-        }
-        else
-        {
+        } else {
             this.integrityErrors = null;
         }
         return this;

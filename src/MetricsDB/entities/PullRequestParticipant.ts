@@ -17,8 +17,11 @@ export abstract class PullRequestParticipant {
     pullRequestNumber: number;
 
     @PrimaryColumn()
-    //Without this typeorm makes really strange things when doing upsert logic
+        //Without this typeorm makes really strange things when doing upsert logic
     participantIdForPrimaryKeyHack: number;
+
+    @Column({ nullable: true })
+    firstReactionDate?: Date;
 
     @Column({ nullable: true })
     firstCommentDate?: Date;
@@ -53,5 +56,12 @@ export abstract class PullRequestParticipant {
     @ManyToOne(() => Actor, (participant) => participant.participations, { onDelete: "CASCADE" })
     @JoinColumn()
     participant: Actor;
+
+    public calculateAggregations() {
+        this.firstReactionDate = [this.firstCommentDate, this.firstReviewDate, this.firstApprovalDate].filter(d => d)
+            .map(d => <Date>d)
+            .reduce((minDate: Date | null, date) => !minDate || date!.getTime() < (<Date>minDate).getTime() ? date : minDate, null) || undefined;
+        return this;
+    }
 }
   
