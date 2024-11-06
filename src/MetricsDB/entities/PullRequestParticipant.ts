@@ -16,10 +16,6 @@ export abstract class PullRequestParticipant {
     @PrimaryColumn()
     pullRequestNumber: number;
 
-    @PrimaryColumn()
-        //Without this typeorm makes really strange things when doing upsert logic
-    participantIdForPrimaryKeyHack: number;
-
     @Column({ nullable: true })
     firstReactionDate?: Date;
 
@@ -56,6 +52,7 @@ export abstract class PullRequestParticipant {
 
     @ManyToOne(() => Actor, (participant) => participant.participations, { onDelete: "CASCADE" })
     @JoinColumn()
+    @PrimaryColumn({ type: "integer", name: "participant_id" })
     participant: Actor;
 
     public calculateAggregations() {

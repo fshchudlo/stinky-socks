@@ -45,9 +45,11 @@ export class GitHubPullRequestsImporter {
 
     private async importRepositoryPullRequests(repositoryName: string) {
         const pageSize = 100;
-        const lastUpdateDateOfStoredPRs: Date | null = await MetricsDB.getPRsMaxDate("updatedDate", this.teamName, this.project.owner, repositoryName);
-        const importedPRsCount = await MetricsDB.getPRsCount(this.teamName, this.project.owner, repositoryName);
-        let pageNumber = importedPRsCount > pageSize ? Math.floor(importedPRsCount / pageSize) : 1;
+        //const lastUpdateDateOfStoredPRs: Date | null = await MetricsDB.getPRsMaxDate("updatedDate", this.teamName, this.project.owner, repositoryName);
+        //const importedPRsCount = await MetricsDB.getPRsCount(this.teamName, this.project.owner, repositoryName);
+        //let pageNumber = importedPRsCount > pageSize ? Math.floor(importedPRsCount / pageSize) : 1;
+        const lastUpdateDateOfStoredPRs = (1 == 1 + 1) ? new Date() : null;
+        let pageNumber = 1;
 
         while (true) {
             const timelogLabel = `💾 ${this.teamName}/${repositoryName}: successfully processed pull requests #${(pageSize * (pageNumber - 1)).toLocaleString()}-${(pageSize * pageNumber).toLocaleString()}.`;
