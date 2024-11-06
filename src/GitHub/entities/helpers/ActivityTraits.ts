@@ -21,6 +21,9 @@ export const ActivityTraits = {
     isReviewRequestedEvent(event: GitHubPullRequestActivityModel): event is GitHubPullRequestActivityReviewRequestedModel {
         return event.event === "review_requested";
     },
+    isReviewRequestRemovedEvent(event: GitHubPullRequestActivityModel): event is GitHubPullRequestActivityReviewRequestedModel {
+        return event.event === "review_request_removed";
+    },
     isReadyForReviewEvent(event: GitHubPullRequestActivityModel): event is GitHubPullRequestActivityReadyForReviewModel {
         return event.event === "ready_for_review";
     },

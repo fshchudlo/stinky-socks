@@ -52,14 +52,14 @@ export type GitHubPullRequestActivityCommentedModel = {
     actor: GitHubUserModel;
 };
 export type GitHubPullRequestActivityReviewRequestedModel = {
-    event: "review_requested";
+    event: "review_requested" | "review_request_removed";
     actor: GitHubUserModel;
     requested_reviewer: GitHubUserModel;
     requested_team: { name: string };
     created_at: string;
 };
 export type GitHubPullRequestActivityReviewedModel = {
-    body: string;
+    body?: string;
     event: "reviewed";
     state: "approved" | "changes_requested" | "commented" | "dismissed" | "pending";
     submitted_at: string;

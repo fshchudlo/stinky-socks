@@ -14,7 +14,7 @@ export default function getNonBotCommentsTimestamps(activities: GitHubPullReques
 
     const reviewComments = activities.filter(ActivityTraits.isReviewedEvent)
         .filter(a => !(a.user && botUsers.includes(a.user.login)))
-        .filter(a => !!a.body)
+        .filter(a => a.state == "commented" || !!a.body)
         .map(c => new Date(c.submitted_at).getTime());
 
     return comments

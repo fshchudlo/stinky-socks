@@ -25,7 +25,7 @@ export class GitHubPullRequest extends PullRequest {
         this.pullRequestNumber = model.pullRequest.number;
         this.viewURL = model.pullRequest.html_url;
         this.targetBranch = model.pullRequest.base.ref;
-        this.requestedReviewersCount = model.pullRequest.requested_reviewers.length;
+        this.requestedReviewersCount = model.pullRequestActivities.filter(ActivityTraits.isReviewRequestedEvent).length - model.pullRequestActivities.filter(ActivityTraits.isReviewRequestRemovedEvent).length;
         this.authorRole = model.pullRequest.author_association;
         this.createdDate = new Date(model.pullRequest.created_at);
         this.updatedDate = new Date(model.pullRequest.updated_at);
