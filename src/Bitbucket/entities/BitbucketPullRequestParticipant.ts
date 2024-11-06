@@ -17,6 +17,7 @@ export class BitbucketPullRequestParticipant extends PullRequestParticipant {
         this.repositoryName = pullRequestData.toRef.repository.slug;
         this.pullRequestNumber = pullRequestData.id;
         this.participant = participantUser;
+        this.participantIdForPrimaryKeyHack = this.participant.id;
         return this;
     }
 

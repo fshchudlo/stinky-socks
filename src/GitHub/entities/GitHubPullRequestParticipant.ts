@@ -19,6 +19,7 @@ export class GitHubPullRequestParticipant extends PullRequestParticipant {
         this.repositoryName = pullRequestData.base.repo.name;
         this.pullRequestNumber = pullRequestData.number;
         this.participant = participantUser;
+        this.participantIdForPrimaryKeyHack = this.participant.id;
         return this;
     }
 
