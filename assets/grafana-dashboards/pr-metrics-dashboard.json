@@ -1859,25 +1859,21 @@
               {
                 "id": "unit",
                 "value": "s"
-              },
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "PR Count"
+            },
+            "properties": [
               {
-                "id": "thresholds",
+                "id": "custom.hideFrom",
                 "value": {
-                  "mode": "absolute",
-                  "steps": [
-                    {
-                      "color": "green",
-                      "value": null
-                    },
-                    {
-                      "color": "yellow",
-                      "value": 1800
-                    },
-                    {
-                      "color": "red",
-                      "value": 3600
-                    }
-                  ]
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": true
                 }
               }
             ]
@@ -1922,7 +1918,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "WITH reviewer_activity AS (\n    SELECT \n        CASE \n            WHEN participant.is_former_employee THEN CONCAT(participant.login, ' (former employee)') \n            WHEN participant.is_bot_user THEN CONCAT(participant.login, ' (bot)')\n            ELSE CASE WHEN $show_real_names THEN participant.login ELSE participant.nickname END\n        END AS reviewer_name,\n      AVG(prtcpnt.comments_count) AS average_comments_count,\n      AVG(EXTRACT(EPOCH FROM (prtcpnt.first_reaction_date-CASE WHEN prtcpnt.first_reaction_date<shared_for_review_date THEN created_date ELSE shared_for_review_date END))) AS first_reaction_in\n    FROM pull_request AS pr\n        INNER JOIN pull_request_participant AS prtcpnt \n            ON pr.project_name = prtcpnt.project_name \n            AND pr.repository_name = prtcpnt.repository_name \n            AND pr.pull_request_number = prtcpnt.pull_request_number\n        INNER JOIN actor AS author ON author.id = pr.author_id\n        INNER JOIN actor AS participant ON participant.id = prtcpnt.participant_id\n    WHERE pr.integrity_errors IS NULL\n        AND $__timeFilter(shared_for_review_date) \n        AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n        AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n        AND (COALESCE($pr_author_role) IS NULL OR pr.author_role IN ($pr_author_role))\n        AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n        AND ($include_bots_activities OR NOT author.is_bot_user)\n        AND ($include_bots_activities OR NOT participant.is_bot_user)\n    GROUP BY participant.nickname, participant.is_bot_user, participant.is_former_employee, participant.login\n),\nranked_reviewers AS (\n    SELECT \n        reviewer_name,\n        average_comments_count,\n        first_reaction_in,\n        ROW_NUMBER() OVER (ORDER BY first_reaction_in DESC, average_comments_count DESC) AS rank_desc,\n        ROW_NUMBER() OVER (ORDER BY first_reaction_in ASC, average_comments_count ASC) AS rank_asc\n    FROM reviewer_activity\n)\nSELECT \n    reviewer_name,\n    average_comments_count AS \"Average comments count\",\n    first_reaction_in AS \"First reaction in\"\nFROM ranked_reviewers\nWHERE rank_desc <= 10 OR rank_asc <= 10\nORDER BY \"First reaction in\" ASC;",
+          "rawSql": "WITH reviewer_activity AS (\n    SELECT \n        CASE \n            WHEN participant.is_former_employee THEN CONCAT(participant.login, ' (former employee)') \n            WHEN participant.is_bot_user THEN CONCAT(participant.login, ' (bot)')\n            ELSE CASE WHEN $show_real_names THEN participant.login ELSE participant.nickname END\n        END AS reviewer_name,\n        COUNT(DISTINCT prtcpnt.pull_request_number) AS pr_count,\n        AVG(prtcpnt.comments_count) AS average_comments_count,\n        PERCENTILE_CONT($percentile) WITHIN GROUP (ORDER BY EXTRACT(EPOCH FROM (prtcpnt.first_reaction_date - \n        CASE WHEN prtcpnt.first_reaction_date < shared_for_review_date THEN created_date ELSE shared_for_review_date END))) AS time_to_first_reaction\n    FROM pull_request AS pr\n    INNER JOIN pull_request_participant AS prtcpnt \n        ON pr.project_name = prtcpnt.project_name \n        AND pr.repository_name = prtcpnt.repository_name \n        AND pr.pull_request_number = prtcpnt.pull_request_number\n    INNER JOIN actor AS author ON author.id = pr.author_id\n    INNER JOIN actor AS participant ON participant.id = prtcpnt.participant_id\n    WHERE pr.integrity_errors IS NULL\n        AND $__timeFilter(shared_for_review_date) \n        AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n        AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n        AND (COALESCE($pr_author_role) IS NULL OR pr.author_role IN ($pr_author_role))\n        AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n        AND ($include_bots_activities OR NOT author.is_bot_user)\n        AND ($include_bots_activities OR NOT participant.is_bot_user)\n    GROUP BY participant.nickname, participant.is_bot_user, participant.is_former_employee, participant.login\n    HAVING COUNT(DISTINCT prtcpnt.pull_request_number) >= 10  -- Threshold for minimum PR participation\n),\nranked_reviewers AS (\n    SELECT \n        reviewer_name,\n        pr_count,\n        average_comments_count,\n        time_to_first_reaction,\n        ROW_NUMBER() OVER (ORDER BY time_to_first_reaction DESC, average_comments_count DESC) AS rank_desc,\n        ROW_NUMBER() OVER (ORDER BY time_to_first_reaction ASC, average_comments_count ASC) AS rank_asc\n    FROM reviewer_activity\n)\nSELECT \n    reviewer_name,\n    pr_count AS \"PR Count\",\n    average_comments_count AS \"Average comments count\",\n    time_to_first_reaction AS \"First reaction in\"\nFROM ranked_reviewers\nWHERE rank_desc <= 10 OR rank_asc <= 10\nORDER BY \"First reaction in\" ASC;\n",
           "refId": "A",
           "sql": {
             "columns": [
@@ -1985,7 +1981,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               }
             ]
           },
