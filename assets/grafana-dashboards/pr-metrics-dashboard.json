@@ -3856,6 +3856,11 @@
         "name": "percentile",
         "options": [
           {
+            "selected": false,
+            "text": "50th percentile (mean)",
+            "value": "0.50"
+          },
+          {
             "selected": true,
             "text": "75th percentile",
             "value": "0.75"
@@ -3881,7 +3886,7 @@
             "value": "1"
           }
         ],
-        "query": "75th percentile : 0.75, 90th percentile : 0.90, 95th percentile : 0.95, 99th percentile : 0.99, 100% values : 1",
+        "query": "50th percentile (mean) : 0.50, 75th percentile : 0.75, 90th percentile : 0.90, 95th percentile : 0.95, 99th percentile : 0.99, 100% values : 1",
         "type": "custom"
       },
       {
