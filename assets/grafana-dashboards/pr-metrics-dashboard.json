@@ -555,7 +555,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "95th percentile"
+              "options": "90th percentile"
             },
             "properties": [
               {
@@ -655,7 +655,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT \n    $__timeGroupAlias(start_date, $group_by_period), \n    PERCENTILE_CONT(0.95) WITHIN GROUP (ORDER BY pr_lead_time) AS \"95th percentile\",\n    AVG(AVG(pr_lead_time)) OVER (ORDER BY $__timeGroup(start_date, $group_by_period, 0) \n                                ROWS BETWEEN 3 PRECEDING AND CURRENT ROW) AS \"Rolling Average\",\n    PERCENTILE_CONT($percentile) WITHIN GROUP (ORDER BY pr_lead_time) AS \"Percentile of your choice\",\n    PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY pr_lead_time) AS \"25th Percentile\"\nFROM \n   (\n      SELECT \n          LEAST(COALESCE(initial_commit_date, shared_for_review_date), shared_for_review_date) AS start_date,\n          EXTRACT(EPOCH FROM (merged_date - initial_commit_date)) AS pr_lead_time\n      FROM \n          pull_request AS pr\n      INNER JOIN \n          actor AS author ON author.id = pr.author_id\n      WHERE \n        pr.integrity_errors IS NULL\n        AND pr.commits_history_was_rewritten=FALSE\n        AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n        AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n        AND (COALESCE($pr_author_role) IS NULL OR pr.author_role IN ($pr_author_role))\n        AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n        AND ($include_bots_activities OR NOT author.is_bot_user)\n   ) AS lead_times\nGROUP BY \n    1\nORDER BY \n    $__timeGroup(start_date, $group_by_period, 0)",
+          "rawSql": "SELECT \n    $__timeGroupAlias(start_date, $group_by_period), \n    PERCENTILE_CONT(0.90) WITHIN GROUP (ORDER BY pr_lead_time) AS \"90th percentile\",\n    AVG(AVG(pr_lead_time)) OVER (ORDER BY $__timeGroup(start_date, $group_by_period, 0) \n                                ROWS BETWEEN 3 PRECEDING AND CURRENT ROW) AS \"Rolling Average\",\n    PERCENTILE_CONT($percentile) WITHIN GROUP (ORDER BY pr_lead_time) AS \"Percentile of your choice\",\n    PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY pr_lead_time) AS \"25th Percentile\"\nFROM \n   (\n      SELECT \n          LEAST(COALESCE(initial_commit_date, shared_for_review_date), shared_for_review_date) AS start_date,\n          EXTRACT(EPOCH FROM (merged_date - initial_commit_date)) AS pr_lead_time\n      FROM \n          pull_request AS pr\n      INNER JOIN \n          actor AS author ON author.id = pr.author_id\n      WHERE \n        pr.integrity_errors IS NULL\n        AND pr.commits_history_was_rewritten=FALSE\n        AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n        AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n        AND (COALESCE($pr_author_role) IS NULL OR pr.author_role IN ($pr_author_role))\n        AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n        AND ($include_bots_activities OR NOT author.is_bot_user)\n   ) AS lead_times\nGROUP BY \n    1\nORDER BY \n    $__timeGroup(start_date, $group_by_period, 0)",
           "refId": "Lead time",
           "sql": {
             "columns": [
