@@ -2,7 +2,6 @@ import { Actor } from "./entities/Actor";
 import { MetricsDB } from "./MetricsDB";
 import { Repository } from "typeorm";
 import { createCache } from "cache-manager";
-import { AppConfig } from "../app.config";
 
 const colors = [
     "Red", "Orange", "Yellowish", "Greenish", "Bluish", "Purplish", "Pinkish", "Brownish", "Blackish", "Whitish",
@@ -43,7 +42,6 @@ export class UserFactory {
         isFormerParticipant: boolean
     }): Promise<Actor> {
         const cacheKey = `${teamName}-${login}`;
-        login = AppConfig.userNameNormalizerFn(login);
 
         return await usersCache.wrap(cacheKey, async () => {
             let user = await userRepository.findOne({ where: { teamName, login } });

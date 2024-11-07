@@ -8,11 +8,5 @@ export const AppConfig = {
         DB_PASSWORD: process.env.DB_PASSWORD,
         DB_USERNAME: process.env.DB_USERNAME,
         DB_NAME: process.env.DB_NAME
-    },
-    userNameNormalizerFn: (userName: string) => {
-        let normalizedName = userName.replaceAll("-", ".");
-        normalizedName = process.env.USER_NAME_SUFFIX_TO_REPLACE ? normalizedName.replace(process.env.USER_NAME_SUFFIX_TO_REPLACE as string, "") : normalizedName;
-        normalizedName = process.env.USER_NAME_PREFIX_TO_REPLACE ? normalizedName.replace(process.env.USER_NAME_PREFIX_TO_REPLACE as string, "") : normalizedName;
-        return normalizedName;
     }
 };
