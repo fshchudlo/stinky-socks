@@ -6,6 +6,7 @@ import { ImportParams } from "./ImportParams";
 import getNonBotCommentsTimestamps from "./helpers/getNonBotCommentsTimestamps";
 import getActivitiesOf from "./helpers/getActivitiesOf";
 import calculatePrSharedForReviewDate from "./helpers/calculatePrSharedForReviewDate";
+import { GitHubUserModel } from "../api/GitHubAPI.contracts";
 
 export class GitHubPullRequest extends PullRequest {
     public async init(model: ImportParams) {
@@ -35,8 +36,8 @@ export class GitHubPullRequest extends PullRequest {
         this.author = await UserFactory.fetch({
             teamName: model.teamName,
             login: authorLogin,
-            isBotUser: model.botUserNames.includes(authorLogin),
-            isFormerEmployee: model.formerEmployeeNames.includes(authorLogin)
+            isBotUser: model.botUserNames.includes(authorLogin) || model.pullRequest.user.type === "Bot",
+            isFormerParticipant: model.formerParticipantNames.includes(authorLogin)
         });
 
         return this;
@@ -65,32 +66,36 @@ export class GitHubPullRequest extends PullRequest {
     }
 
     private async initializeParticipants(model: ImportParams) {
-        const allParticipants = new Set<string | null>([
-            ...model.pullRequest.requested_reviewers.map(r => r.login),
-            ...model.pullRequest.assignees.map(p => p.login),
-            ...model.pullRequestActivities.filter(ActivityTraits.isMergedEvent).map(c => c.actor?.login),
-            ...model.pullRequestActivities.filter(ActivityTraits.isCommentedEvent).map(c => c.actor?.login),
-            ...model.pullRequestActivities.filter(ActivityTraits.isLineCommentedEvent).flatMap(c => c.comments).map(c => c.user?.login),
-            ...model.pullRequestActivities.filter(ActivityTraits.isReviewedEvent).map(c => c.user?.login || null)
-        ]);
+        const allParticipants = model.pullRequest.requested_reviewers.map(r => r)
+            .concat(model.pullRequest.assignees.map(p => p))
+            .concat(model.pullRequestActivities.filter(ActivityTraits.isMergedEvent).map(c => c.actor))
+            .concat(model.pullRequestActivities.filter(ActivityTraits.isCommentedEvent).map(c => c.actor))
+            .concat(model.pullRequestActivities.filter(ActivityTraits.isLineCommentedEvent).flatMap(c => c.comments).map(c => c.user))
+            .concat(model.pullRequestActivities.filter(ActivityTraits.isReviewedEvent).map(u => u.user).filter(u => !!u))
+            .filter(p => !!p.login)
+            .filter(p => p.login !== model.pullRequest.user.login);
+
+        const uniqueParticipants = Object.values(
+            allParticipants.reduce((acc: Record<string, GitHubUserModel>, user) => {
+                acc[user.login] = user;
+                return acc;
+            }, {})
+        );
 
         this.participants = await Promise.all(
-            Array.from(allParticipants)
-                .filter((participantLogin): participantLogin is string => !!participantLogin)
-                .filter(participantLogin => participantLogin !== model.pullRequest.user.login)
-                .map(async participantLogin => {
-
+            Array.from(uniqueParticipants)
+                .map(async participant => {
                     const participantUser = await UserFactory.fetch({
                         teamName: model.teamName,
-                        login: participantLogin,
-                        isBotUser: model.botUserNames.includes(participantLogin),
-                        isFormerEmployee: model.formerEmployeeNames.includes(participantLogin)
+                        login: participant.login,
+                        isBotUser: model.botUserNames.includes(participant.login) || participant.type === "Bot",
+                        isFormerParticipant: model.formerParticipantNames.includes(participant.login)
                     });
 
                     return new GitHubPullRequestParticipant(
                         model.teamName,
                         model.pullRequest,
-                        getActivitiesOf(model.pullRequestActivities, participantLogin),
+                        getActivitiesOf(model.pullRequestActivities, participant.login),
                         participantUser
                     );
                 }));

@@ -36,11 +36,11 @@ export class UserFactory {
         }
     }
 
-    public static async fetch({ teamName, login, isBotUser, isFormerEmployee }: {
+    public static async fetch({ teamName, login, isBotUser, isFormerParticipant }: {
         teamName: string,
         login: string,
         isBotUser: boolean,
-        isFormerEmployee: boolean
+        isFormerParticipant: boolean
     }): Promise<Actor> {
         const cacheKey = `${teamName}-${login}`;
         login = AppConfig.userNameNormalizerFn(login);
@@ -57,7 +57,7 @@ export class UserFactory {
                 teamName,
                 login,
                 isBotUser,
-                isFormerEmployee,
+                isFormerParticipant,
                 nickname
             });
 

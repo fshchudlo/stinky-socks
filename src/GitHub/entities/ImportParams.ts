@@ -3,7 +3,7 @@ import { GitHubFileDiffModel, GitHubPullRequestActivityModel, GitHubPullRequestM
 export type ImportParams = {
     teamName: string;
     botUserNames: string[],
-    formerEmployeeNames: string[],
+    formerParticipantNames: string[],
     pullRequest: GitHubPullRequestModel,
     pullRequestActivities: GitHubPullRequestActivityModel[],
     files: GitHubFileDiffModel[]

@@ -84,6 +84,6 @@ export type GitHubFileDiffModel = {
 };
 export type GitHubUserModel = {
     login: string;
-    type: "User" | "Organization" | "Mannequin";
+    type: "User" | "Organization" | "Mannequin" | "Bot";
     html_url: string;
 };

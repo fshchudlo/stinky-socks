@@ -8,7 +8,7 @@ import { BitbucketPullRequestModel } from "./api/BitbucketAPI.contracts";
 export type BitbucketProjectSettings = {
     projectKey: string;
     botUserSlugs: string[];
-    formerEmployeeSlugs: string[];
+    formerParticipantSlugs: string[];
     repositoriesSelector: (api: BitbucketAPI) => Promise<string[]>;
     pullRequestsFilterFn?: (pr: BitbucketPullRequestModel) => boolean,
     auth: {
@@ -91,7 +91,7 @@ export class BitbucketPullRequestsImporter {
         const pullRequestEntity = await new BitbucketPullRequest().init({
                 teamName: this.teamName,
                 botUserSlugs: project.botUserSlugs,
-                formerEmployeeSlugs: project.formerEmployeeSlugs,
+                formerParticipantSlugs: project.formerParticipantSlugs,
                 pullRequest,
                 pullRequestActivities: activities,
                 commits,

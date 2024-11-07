@@ -9,7 +9,7 @@ import { ImportParams } from "./entities/ImportParams";
 export type GitHubProjectSettings = {
     owner: string;
     botUserNames: string[];
-    formerEmployeeNames: string[];
+    formerParticipantNames: string[];
     repositoriesSelector: (api: GitHubAPI) => Promise<string[]>;
     pullRequestsFilterFn?: (pr: GitHubPullRequestModel) => boolean,
     auth: {
@@ -88,7 +88,7 @@ export class GitHubPullRequestsImporter {
             const pullRequestEntity = await new GitHubPullRequest().init(this.sanitize({
                     teamName: this.teamName,
                     botUserNames: project.botUserNames,
-                    formerEmployeeNames: project.formerEmployeeNames,
+                    formerParticipantNames: project.formerParticipantNames,
                     pullRequest,
                     pullRequestActivities: activities,
                     files
@@ -132,6 +132,6 @@ export class GitHubPullRequestsImporter {
 
 function sanitizeUserLogin(user: GitHubUserModel): string;
 function sanitizeUserLogin(user: GitHubUserModel | undefined): string | null {
-    // If the user is mannequin (e.g. data was imported from other SCM), the login will contain GUID and the only way to extract real login is to parse it from the html_url
+    // If the user is mannequin (e.g. data was imported from another SCM), the login will contain GUID and the only way to extract real login is to parse it from the html_url
     return user?.type == "Mannequin" ? user.html_url.replace("https://github.com/", "") : user?.login || null;
 }

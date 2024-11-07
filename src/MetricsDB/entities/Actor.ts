@@ -20,7 +20,7 @@ export class Actor {
     isBotUser: boolean;
 
     @Column({ default: false })
-    isFormerEmployee: boolean;
+    isFormerParticipant: boolean;
 
     @Column()
     nickname: string;

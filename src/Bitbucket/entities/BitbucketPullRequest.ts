@@ -31,7 +31,7 @@ export class BitbucketPullRequest extends PullRequest {
             teamName: model.teamName,
             login: authorLogin,
             isBotUser: model.botUserSlugs.includes(authorLogin),
-            isFormerEmployee: model.formerEmployeeSlugs.includes(authorLogin)
+            isFormerParticipant: model.formerParticipantSlugs.includes(authorLogin)
         });
         return this;
     }
@@ -75,7 +75,7 @@ export class BitbucketPullRequest extends PullRequest {
                         teamName: model.teamName,
                         login: participantName,
                         isBotUser: model.botUserSlugs.includes(participantName),
-                        isFormerEmployee: model.formerEmployeeSlugs.includes(participantName)
+                        isFormerParticipant: model.formerParticipantSlugs.includes(participantName)
                     });
                     return new BitbucketPullRequestParticipant(
                         model.teamName,
