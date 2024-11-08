@@ -1794,7 +1794,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "WITH reviewer_demand AS (\n    SELECT \n        CASE \n            WHEN participant.is_former_participant THEN CONCAT(participant.login, ' (former participant)') \n            WHEN participant.is_bot_user THEN CONCAT(participant.login, ' (bot)')\n            ELSE CASE WHEN $show_real_names THEN participant.login ELSE participant.nickname END\n        END AS reviewer_name,\n        COUNT(prtcpnt.pull_request_number) AS added_as_reviewer,\n        SUM(CASE WHEN prtcpnt.first_comment_date IS NULL AND prtcpnt.first_approval_date IS NOT NULL THEN 1 ELSE 0 END) AS did_not_comment,\n        SUM(CASE WHEN prtcpnt.first_approval_date IS NULL THEN 1 ELSE 0 END) AS did_not_approve\n    FROM pull_request AS pr\n        INNER JOIN pull_request_participant AS prtcpnt \n            ON pr.team_name = prtcpnt.team_name AND pr.project_name = prtcpnt.project_name \n            AND pr.repository_name = prtcpnt.repository_name \n            AND pr.pull_request_number = prtcpnt.pull_request_number\n        INNER JOIN actor AS author ON author.id = pr.author_id\n        INNER JOIN actor AS participant ON participant.id = prtcpnt.participant_id\n    WHERE pr.integrity_errors IS NULL\n        AND $__timeFilter(shared_for_review_date) \n        AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n        AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n        AND (COALESCE($pr_author_role) IS NULL OR pr.author_role IN ($pr_author_role))\n        AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n        AND ($include_bots_activities OR NOT author.is_bot_user)\n        AND ($include_bots_activities OR NOT participant.is_bot_user)\n    GROUP BY participant.nickname, participant.is_bot_user, participant.is_former_participant, participant.login\n),\nranked_reviewers AS (\n    SELECT \n        reviewer_name,\n        added_as_reviewer,\n        did_not_comment,\n        did_not_approve,\n        ROW_NUMBER() OVER (ORDER BY added_as_reviewer DESC) AS rank_desc,\n        ROW_NUMBER() OVER (ORDER BY added_as_reviewer ASC) AS rank_asc\n    FROM reviewer_demand\n)\nSELECT \n    reviewer_name,\n    added_as_reviewer AS \"Added as reviewer\",\n    did_not_comment AS \"Did not comment\",\n    did_not_approve AS \"Did not approve\"\nFROM ranked_reviewers\nWHERE rank_desc <= 10 OR rank_asc <= 10\nORDER BY \"Added as reviewer\" DESC;",
+          "rawSql": "WITH reviewer_demand AS (\n    SELECT \n        CASE \n            WHEN participant.is_former_participant THEN CONCAT(participant.login, ' (former participant)') \n            WHEN participant.is_bot_user THEN CONCAT(participant.login, ' (bot)')\n            ELSE CASE WHEN $show_real_names THEN participant.login ELSE participant.nickname END\n        END AS reviewer_name,\n        COUNT(prtcpnt.pull_request_number) AS added_as_reviewer,\n        SUM(CASE WHEN prtcpnt.first_comment_date IS NULL AND prtcpnt.first_approval_date IS NOT NULL THEN 1 ELSE 0 END) AS did_not_comment,\n        SUM(CASE WHEN prtcpnt.first_approval_date IS NULL THEN 1 ELSE 0 END) AS did_not_approve\n    FROM pull_request AS pr\n        INNER JOIN pull_request_participant AS prtcpnt \n            ON pr.team_name = prtcpnt.team_name AND pr.project_name = prtcpnt.project_name \n            AND pr.repository_name = prtcpnt.repository_name \n            AND pr.pull_request_number = prtcpnt.pull_request_number\n        INNER JOIN actor AS author ON author.id = pr.author_id\n        INNER JOIN actor AS participant ON participant.id = prtcpnt.participant_id\n    WHERE pr.integrity_errors IS NULL\n        AND $__timeFilter(shared_for_review_date) \n        AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n        AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n        AND (COALESCE($pr_author_role) IS NULL OR pr.author_role IN ($pr_author_role))\n        AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n        AND ($include_bots_activities OR NOT author.is_bot_user)\n        AND ($include_bots_activities OR NOT participant.is_bot_user)\n    GROUP BY participant.nickname, participant.is_bot_user, participant.is_former_participant, participant.login\n    HAVING COUNT(DISTINCT prtcpnt.pull_request_number) >= 10  -- Threshold for minimum PR participation\n\n),\nranked_reviewers AS (\n    SELECT \n        reviewer_name,\n        added_as_reviewer,\n        did_not_comment,\n        did_not_approve,\n        ROW_NUMBER() OVER (ORDER BY added_as_reviewer DESC) AS rank_desc,\n        ROW_NUMBER() OVER (ORDER BY added_as_reviewer ASC) AS rank_asc\n    FROM reviewer_demand\n)\nSELECT \n    reviewer_name,\n    added_as_reviewer AS \"Added as reviewer\",\n    did_not_comment AS \"Did not comment\",\n    did_not_approve AS \"Did not approve\"\nFROM ranked_reviewers\nWHERE rank_desc <= 10 OR rank_asc <= 10\nORDER BY \"Added as reviewer\" DESC;",
           "refId": "A",
           "sql": {
             "columns": [
@@ -2111,8 +2111,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               }
             ]
           },
@@ -2246,8 +2245,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               }
             ]
           },
@@ -2364,8 +2362,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               }
             ]
           },
@@ -2473,8 +2470,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               }
             ]
           },
@@ -2589,8 +2585,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               }
             ]
           },
@@ -2705,8 +2700,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               }
             ]
           }
@@ -2820,8 +2814,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               }
             ]
           }
@@ -2935,8 +2928,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "#EAB839",
@@ -3065,8 +3057,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "#EAB839",
@@ -3194,8 +3185,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "#EAB839",
@@ -3324,8 +3314,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "#EAB839",
@@ -3453,8 +3442,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               }
             ]
           }
@@ -3620,8 +3608,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               }
             ]
           }

@@ -92,7 +92,8 @@ export class GitHubAPI {
     private async checkRateLimits(response: AxiosResponse<any>) {
         if (this.pauseOnRateLimitThreshold && parseInt(response.headers["x-ratelimit-remaining"], 10) <= 10) {
             const resetTime = parseInt(response.headers["x-ratelimit-reset"], 10) * 1000;
-            const waitTime = resetTime - Date.now();
+            // Add ten more seconds to ensure we didn't violate the rate limit
+            const waitTime = 10000 + resetTime - Date.now();
 
             // We run requests in parallel, and it's possible that a request was blocked because this check was triggered by another request.
             // By the time it resumes execution, the rate limit may have already reset.
