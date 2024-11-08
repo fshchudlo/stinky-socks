@@ -9,7 +9,6 @@ import { ImportParams } from "./entities/ImportParams";
 export type GitHubProjectSettings = {
     owner: string;
     botUserNames: string[];
-    formerParticipantNames: string[];
     repositoriesSelector: (api: GitHubAPI) => Promise<string[]>;
     pullRequestsFilterFn?: (pr: GitHubPullRequestModel) => boolean,
     auth: {
@@ -88,7 +87,6 @@ export class GitHubPullRequestsImporter {
             const pullRequestEntity = await new GitHubPullRequest().init(this.sanitize({
                     teamName: this.teamName,
                     botUserNames: project.botUserNames,
-                    formerParticipantNames: project.formerParticipantNames,
                     pullRequest,
                     pullRequestActivities: activities,
                     files

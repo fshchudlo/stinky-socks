@@ -16,7 +16,6 @@ const grafanaTeam: TeamImportSettings = {
         },
         owner: "grafana",
         botUserNames: [],
-        formerParticipantNames: [],
         repositoriesSelector: async () => Promise.resolve(["grafana"])
     }]
 };
@@ -29,7 +28,6 @@ const kubernetesTeam: TeamImportSettings = {
         },
         owner: "kubernetes",
         botUserNames: [],
-        formerParticipantNames: [],
         repositoriesSelector: async () => Promise.resolve(["kubernetes"])
     }]
 };

@@ -8,7 +8,6 @@ import {
 export type ImportParams = {
     teamName: string;
     botUserSlugs: string[],
-    formerParticipantSlugs: string[],
     pullRequest: BitbucketPullRequestModel,
     pullRequestActivities: BitbucketPullRequestActivityModel[],
     commits: BitbucketCommitModel[],

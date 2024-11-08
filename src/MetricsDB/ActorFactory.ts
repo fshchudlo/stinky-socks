@@ -23,43 +23,42 @@ const animals = [
     "Sloth", "Otter", "Kangaroo", "Raccoon", "Squirrel", "Turtle", "Llama", "Monkey", "Hippo", "Elephant",
     "Rabbit", "Hedgehog", "Parrot", "Owl", "Moose", "Duck", "Goose", "Ferret", "Octopus", "Platypus"
 ];
-const userRepository: Repository<Actor> = MetricsDB.getRepository(Actor);
-const usersCache = createCache();
+const actorsRepository: Repository<Actor> = MetricsDB.getRepository(Actor);
+const actorsCache = createCache();
 
-export class UserFactory {
+export class ActorFactory {
     public static async preloadCacheByTeam(teamName: string): Promise<void> {
-        const users = await userRepository.find({ where: { teamName: teamName } });
+        const users = await actorsRepository.find({ where: { teamName: teamName } });
         for (const user of users) {
             const cacheKey = `${teamName}-${user.login}`;
-            await usersCache.set(cacheKey, user);
+            await actorsCache.set(cacheKey, user);
         }
     }
 
-    public static async fetch({ teamName, login, isBotUser, isFormerParticipant }: {
+    public static async fetch({ teamName, login, isBotUser }: {
         teamName: string,
         login: string,
-        isBotUser: boolean,
-        isFormerParticipant: boolean
+        isBotUser: boolean
     }): Promise<Actor> {
         const cacheKey = `${teamName}-${login}`;
 
-        return await usersCache.wrap(cacheKey, async () => {
-            let user = await userRepository.findOne({ where: { teamName, login } });
+        return await actorsCache.wrap(cacheKey, async () => {
+            let user = await actorsRepository.findOne({ where: { teamName, login } });
 
             if (user) {
                 return user;
             }
 
-            const nickname = await UserFactory.generateUniqueNickname(teamName);
-            user = userRepository.create({
+            const nickname = await ActorFactory.generateUniqueNickname(teamName);
+            user = actorsRepository.create({
                 teamName,
                 login,
                 isBotUser,
-                isFormerParticipant,
+                isFormerParticipant: false,
                 nickname
             });
 
-            await userRepository.save(user);
+            await actorsRepository.save(user);
             return user;
         });
     }
@@ -69,8 +68,8 @@ export class UserFactory {
         let isUnique = false;
 
         do {
-            nickname = UserFactory.generateNickname();
-            const existingUser = await userRepository.findOne({ where: { teamName, nickname } });
+            nickname = ActorFactory.generateNickname();
+            const existingUser = await actorsRepository.findOne({ where: { teamName, nickname } });
             if (!existingUser) {
                 isUnique = true;
             } else {

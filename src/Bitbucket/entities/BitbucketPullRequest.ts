@@ -1,7 +1,7 @@
 import { PullRequest } from "../../MetricsDB/entities/PullRequest";
 import { BitbucketPullRequestParticipant } from "./BitbucketPullRequestParticipant";
 import { BitbucketDiffModel, BitbucketPullRequestActivityModel } from "../api/BitbucketAPI.contracts";
-import { UserFactory } from "../../MetricsDB/UserFactory";
+import { ActorFactory } from "../../MetricsDB/ActorFactory";
 import { ImportParams } from "./ImportParams";
 import { PullRequestAuthorRole } from "../../MetricsDB/entities/PullRequestAuthorRole";
 
@@ -27,11 +27,10 @@ export class BitbucketPullRequest extends PullRequest {
         this.updatedDate = new Date(model.pullRequest.updatedDate);
 
         const authorLogin = model.pullRequest.author.user.slug;
-        this.author = await UserFactory.fetch({
+        this.author = await ActorFactory.fetch({
             teamName: model.teamName,
             login: authorLogin,
-            isBotUser: model.botUserSlugs.includes(authorLogin),
-            isFormerParticipant: model.formerParticipantSlugs.includes(authorLogin)
+            isBotUser: model.botUserSlugs.includes(authorLogin)
         });
         return this;
     }
@@ -71,11 +70,10 @@ export class BitbucketPullRequest extends PullRequest {
             Array.from(allParticipants)
                 .filter(p => p !== model.pullRequest.author.user.slug)
                 .map(async participantName => {
-                    const participantUser = await UserFactory.fetch({
+                    const participantUser = await ActorFactory.fetch({
                         teamName: model.teamName,
                         login: participantName,
-                        isBotUser: model.botUserSlugs.includes(participantName),
-                        isFormerParticipant: model.formerParticipantSlugs.includes(participantName)
+                        isBotUser: model.botUserSlugs.includes(participantName)
                     });
                     return new BitbucketPullRequestParticipant(
                         model.teamName,

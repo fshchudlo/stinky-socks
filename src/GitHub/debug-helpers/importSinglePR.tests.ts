@@ -1,13 +1,13 @@
 import "dotenv/config";
 import { MetricsDB } from "../../MetricsDB/MetricsDB";
-import { UserFactory } from "../../MetricsDB/UserFactory";
+import { ActorFactory } from "../../MetricsDB/ActorFactory";
 import { GitHubAPI } from "../api/GitHubAPI";
 import { GitHubPullRequest } from "../entities/GitHubPullRequest";
 
 describe("Import single PR debug helper", () => {
     it.skip("Create PR entity", async () => {
         await MetricsDB.initialize();
-        await UserFactory.preloadCacheByTeam("grafana");
+        await ActorFactory.preloadCacheByTeam("grafana");
         const gitHubAPI = new GitHubAPI(process.env.GITHUB_API_TOKEN as string);
 
         const [pullRequest, activities, files] = await Promise.all([
@@ -18,7 +18,6 @@ describe("Import single PR debug helper", () => {
         const pullRequestEntity = await new GitHubPullRequest().init({
                 teamName: "grafana",
                 botUserNames: [],
-                formerParticipantNames: [],
                 pullRequest,
                 pullRequestActivities: activities,
                 files

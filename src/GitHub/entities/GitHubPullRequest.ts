@@ -1,6 +1,6 @@
 import { PullRequest } from "../../MetricsDB/entities/PullRequest";
 import { GitHubPullRequestParticipant } from "./GitHubPullRequestParticipant";
-import { UserFactory } from "../../MetricsDB/UserFactory";
+import { ActorFactory } from "../../MetricsDB/ActorFactory";
 import { ActivityTraits } from "./helpers/ActivityTraits";
 import { ImportParams } from "./ImportParams";
 import getNonBotCommentsTimestamps from "./helpers/getNonBotCommentsTimestamps";
@@ -33,11 +33,10 @@ export class GitHubPullRequest extends PullRequest {
 
 
         const authorLogin = model.pullRequest.user.login;
-        this.author = await UserFactory.fetch({
+        this.author = await ActorFactory.fetch({
             teamName: model.teamName,
             login: authorLogin,
-            isBotUser: model.botUserNames.includes(authorLogin) || model.pullRequest.user.type === "Bot",
-            isFormerParticipant: model.formerParticipantNames.includes(authorLogin)
+            isBotUser: model.botUserNames.includes(authorLogin) || model.pullRequest.user.type === "Bot"
         });
 
         return this;
@@ -85,11 +84,10 @@ export class GitHubPullRequest extends PullRequest {
         this.participants = await Promise.all(
             Array.from(uniqueParticipants)
                 .map(async participant => {
-                    const participantUser = await UserFactory.fetch({
+                    const participantUser = await ActorFactory.fetch({
                         teamName: model.teamName,
                         login: participant.login,
-                        isBotUser: model.botUserNames.includes(participant.login) || participant.type === "Bot",
-                        isFormerParticipant: model.formerParticipantNames.includes(participant.login)
+                        isBotUser: model.botUserNames.includes(participant.login) || participant.type === "Bot"
                     });
 
                     return new GitHubPullRequestParticipant(
