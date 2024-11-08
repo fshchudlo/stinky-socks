@@ -122,6 +122,9 @@ export abstract class PullRequest {
         if (!this.lastCommitDate) {
             errors.push("`lastCommitDate` field is null. Is that possible that pull request has no commits?");
         }
+        if (this.requestedReviewersCount<0) {
+            errors.push("`requestedReviewersCount` is less than 0. Recheck the import logic on this sample.");
+        }
 
         // createdDate
         if (this.createdDate.getTime() > this.updatedDate.getTime()) {
