@@ -1668,12 +1668,161 @@
       "type": "timeseries"
     },
     {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "decimals": 2,
+          "mappings": [],
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "locale"
+        },
+        "overrides": [
+          {
+            "__systemRef": "hideSeriesFrom",
+            "matcher": {
+              "id": "byNames",
+              "options": {
+                "mode": "exclude",
+                "names": [
+                  "count aleksandr.sapelkin (former participant)"
+                ],
+                "prefix": "All except:",
+                "readOnly": true
+              }
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom",
+                "value": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": true
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 41
+      },
+      "id": 52,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.3.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "WITH pr_activity AS (\n    SELECT\n        CASE \n            WHEN author.is_former_participant THEN CONCAT(author.login, ' (former participant)') \n            WHEN author.is_bot_user THEN CONCAT(author.login, ' (bot)')\n            ELSE CASE WHEN $show_real_names THEN author.login ELSE author.nickname END\n        END AS author_name,\n        created_date,\n        merged_date,\n        generate_series(\n            DATE_TRUNC('day', created_date), \n            DATE_TRUNC('day', merged_date), \n            '1 day'::interval\n        ) AS activity_date\n    FROM pull_request AS pr\n        INNER JOIN actor as author ON author.id = pr.author_id\n    WHERE pr.integrity_errors IS NULL\n        AND $__timeFilter(shared_for_review_date) \n        AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n        AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n        AND (COALESCE($pr_author_role) IS NULL OR pr.author_role IN ($pr_author_role))\n        AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n        AND ($include_bots_activities OR NOT author.is_bot_user)\n)\n\nSELECT\n    activity_date AS time,\n    author_name AS value,\n    COUNT(*)\nFROM pr_activity\nGROUP BY 1, 2\nORDER BY 1",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "Multitasking factor (amount of PRs author works on in parallel)",
+      "transformations": [
+        {
+          "id": "prepareTimeSeries",
+          "options": {
+            "format": "multi"
+          }
+        }
+      ],
+      "type": "timeseries"
+    },
+    {
       "collapsed": false,
       "gridPos": {
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 41
+        "y": 49
       },
       "id": 24,
       "panels": [],
@@ -1760,7 +1909,7 @@
         "h": 25,
         "w": 12,
         "x": 0,
-        "y": 42
+        "y": 50
       },
       "id": 16,
       "options": {
@@ -1896,7 +2045,7 @@
         "h": 25,
         "w": 12,
         "x": 12,
-        "y": 42
+        "y": 50
       },
       "id": 17,
       "options": {
@@ -1993,8 +2142,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               }
             ]
           },
@@ -2006,7 +2154,7 @@
         "h": 23,
         "w": 24,
         "x": 0,
-        "y": 67
+        "y": 75
       },
       "id": 15,
       "options": {
@@ -2111,8 +2259,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               }
             ]
           },
@@ -2173,7 +2320,7 @@
         "h": 23,
         "w": 24,
         "x": 0,
-        "y": 90
+        "y": 98
       },
       "id": 51,
       "options": {
@@ -2237,7 +2384,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 113
+        "y": 121
       },
       "id": 22,
       "panels": [],
@@ -2282,8 +2429,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               }
             ]
           },
@@ -2295,7 +2441,7 @@
         "h": 19,
         "w": 12,
         "x": 0,
-        "y": 114
+        "y": 122
       },
       "id": 1,
       "options": {
@@ -2400,8 +2546,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               }
             ]
           },
@@ -2430,7 +2575,7 @@
         "h": 19,
         "w": 12,
         "x": 12,
-        "y": 114
+        "y": 122
       },
       "id": 35,
       "options": {
@@ -2526,8 +2671,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               }
             ]
           },
@@ -2556,7 +2700,7 @@
         "h": 18,
         "w": 12,
         "x": 0,
-        "y": 133
+        "y": 141
       },
       "id": 2,
       "options": {
@@ -2659,8 +2803,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               }
             ]
           },
@@ -2693,7 +2836,7 @@
         "h": 18,
         "w": 12,
         "x": 12,
-        "y": 133
+        "y": 141
       },
       "id": 13,
       "options": {
@@ -2797,8 +2940,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               }
             ]
           },
@@ -2827,7 +2969,7 @@
         "h": 18,
         "w": 12,
         "x": 0,
-        "y": 151
+        "y": 159
       },
       "id": 14,
       "options": {
@@ -2931,8 +3073,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               }
             ]
           },
@@ -2961,7 +3102,7 @@
         "h": 18,
         "w": 12,
         "x": 12,
-        "y": 151
+        "y": 159
       },
       "id": 20,
       "options": {
@@ -3064,8 +3205,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "#EAB839",
@@ -3114,7 +3254,7 @@
         "h": 10,
         "w": 12,
         "x": 0,
-        "y": 169
+        "y": 177
       },
       "id": 18,
       "options": {
@@ -3211,8 +3351,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "#EAB839",
@@ -3261,7 +3400,7 @@
         "h": 10,
         "w": 12,
         "x": 12,
-        "y": 169
+        "y": 177
       },
       "id": 19,
       "options": {
@@ -3357,8 +3496,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "#EAB839",
@@ -3391,7 +3529,7 @@
         "h": 10,
         "w": 12,
         "x": 0,
-        "y": 179
+        "y": 187
       },
       "id": 30,
       "options": {
@@ -3488,8 +3626,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "#EAB839",
@@ -3538,7 +3675,7 @@
         "h": 10,
         "w": 12,
         "x": 12,
-        "y": 179
+        "y": 187
       },
       "id": 44,
       "options": {
@@ -3603,7 +3740,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 189
+        "y": 197
       },
       "id": 39,
       "panels": [],
@@ -3634,8 +3771,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               }
             ]
           }
@@ -3717,7 +3853,7 @@
         "h": 14,
         "w": 24,
         "x": 0,
-        "y": 190
+        "y": 198
       },
       "id": 49,
       "options": {
@@ -3801,8 +3937,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               }
             ]
           }
@@ -3844,7 +3979,7 @@
         "h": 14,
         "w": 24,
         "x": 0,
-        "y": 204
+        "y": 212
       },
       "id": 31,
       "options": {
