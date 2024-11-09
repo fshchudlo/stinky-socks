@@ -71,7 +71,7 @@ export class GitHubPullRequest extends PullRequest {
             .concat(model.pullRequestActivities.filter(ActivityTraits.isCommentedEvent).map(c => c.actor))
             .concat(model.pullRequestActivities.filter(ActivityTraits.isLineCommentedEvent).flatMap(c => c.comments).map(c => c.user))
             .concat(model.pullRequestActivities.filter(ActivityTraits.isReviewedEvent).map(u => u.user).filter(u => !!u))
-            .filter(p => !!p.login)
+            .filter(p => !!p?.login)
             .filter(p => p.login !== model.pullRequest.user.login);
 
         const uniqueParticipants = Object.values(
