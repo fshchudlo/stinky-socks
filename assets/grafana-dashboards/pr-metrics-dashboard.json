@@ -268,7 +268,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT PERCENTILE_CONT($percentile) WITHIN GROUP (ORDER BY time_to_first_reaction)\nFROM (\n    SELECT\n        GREATEST(EXTRACT(EPOCH FROM (first_reaction_date-shared_for_review_date)), 0) AS time_to_first_reaction\n   FROM pull_request AS pr\n      INNER JOIN actor as author ON author.id = pr.author_id\n   WHERE pr.integrity_errors IS NULL\n      AND $__timeFilter(shared_for_review_date) \n      AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n      AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n      AND (COALESCE($pr_author_role) IS NULL OR pr.author_role IN ($pr_author_role))\n      AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n      AND ($include_bots_activities OR NOT author.is_bot_user)\n      AND first_reaction_date IS NOT NULL\n    ) AS \"First responses\"",
+          "rawSql": "SELECT PERCENTILE_CONT($percentile) WITHIN GROUP (ORDER BY time_to_first_reaction)\nFROM (\n    SELECT\n        GREATEST(EXTRACT(EPOCH FROM (first_reaction_date-shared_for_review_date)), 0) AS time_to_first_reaction\n   FROM pull_request AS pr\n      INNER JOIN actor as author ON author.id = pr.author_id\n   WHERE pr.integrity_errors IS NULL\n      AND $__timeFilter(shared_for_review_date) \n      AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n      AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n      AND (COALESCE($pr_author_role) IS NULL OR pr.author_role IN ($pr_author_role))\n      AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n      AND ($include_bots_activities OR NOT author.is_bot_user)\n      AND first_reaction_date IS NOT NULL\n    ) AS \"First responses\"\nWHERE COALESCE(time_to_first_reaction, 0)>0",
           "refId": "A",
           "sql": {
             "columns": [
@@ -352,7 +352,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT PERCENTILE_CONT($percentile) WITHIN GROUP (ORDER BY rework_time)\nFROM (\n    SELECT\n        GREATEST(EXTRACT(EPOCH FROM (rework_completed_date-first_reaction_date)), 0) AS rework_time\n    FROM pull_request AS pr\n        INNER JOIN actor as author ON author.id = pr.author_id\n    WHERE pr.integrity_errors IS NULL\n      AND $__timeFilter(shared_for_review_date) \n      AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n      AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n      AND (COALESCE($pr_author_role) IS NULL OR pr.author_role IN ($pr_author_role))\n      AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n      AND ($include_bots_activities OR NOT author.is_bot_user)\n      AND first_reaction_date IS NOT NULL\n      AND rework_completed_date IS NOT NULL\n) AS rework_times",
+          "rawSql": "SELECT PERCENTILE_CONT($percentile) WITHIN GROUP (ORDER BY rework_time)\nFROM (\n    SELECT\n        GREATEST(EXTRACT(EPOCH FROM (rework_completed_date-first_reaction_date)), 0) AS rework_time\n    FROM pull_request AS pr\n        INNER JOIN actor as author ON author.id = pr.author_id\n    WHERE pr.integrity_errors IS NULL\n      AND $__timeFilter(shared_for_review_date) \n      AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n      AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n      AND (COALESCE($pr_author_role) IS NULL OR pr.author_role IN ($pr_author_role))\n      AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n      AND ($include_bots_activities OR NOT author.is_bot_user)\n      AND first_reaction_date IS NOT NULL\n      AND rework_completed_date IS NOT NULL\n) AS rework_times\nWHERE COALESCE(rework_time, 0)>0",
           "refId": "A",
           "sql": {
             "columns": [
@@ -436,7 +436,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT PERCENTILE_CONT($percentile) WITHIN GROUP (ORDER BY from_last_approval_to_merge)\nFROM (\n    SELECT\n        EXTRACT(EPOCH FROM (merged_date-last_action_date)) AS from_last_approval_to_merge\n    FROM (\n            SELECT\n                merged_date,\n                GREATEST(pr.last_approval_date, pr.rework_completed_date, pr.last_commit_date) as last_action_date\n            FROM pull_request AS pr\n                INNER JOIN pull_request_participant AS prtcpnt ON pr.team_name = prtcpnt.team_name AND pr.project_name = prtcpnt.project_name AND pr.repository_name = prtcpnt.repository_name AND pr.pull_request_number = prtcpnt.pull_request_number\n                INNER JOIN actor as author ON author.id = pr.author_id\n            WHERE pr.integrity_errors IS NULL\n                AND $__timeFilter(shared_for_review_date) \n                AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n                AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n                AND (COALESCE($pr_author_role) IS NULL OR pr.author_role IN ($pr_author_role))\n                AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n                AND ($include_bots_activities OR NOT author.is_bot_user)\n        ) AS approvals\n) AS timings",
+          "rawSql": "SELECT PERCENTILE_CONT($percentile) WITHIN GROUP (ORDER BY from_last_approval_to_merge)\nFROM (\n    SELECT\n        EXTRACT(EPOCH FROM (merged_date-last_action_date)) AS from_last_approval_to_merge\n    FROM (\n            SELECT\n                merged_date,\n                GREATEST(pr.last_approval_date, pr.rework_completed_date, pr.last_commit_date) as last_action_date\n            FROM pull_request AS pr\n                INNER JOIN pull_request_participant AS prtcpnt ON pr.team_name = prtcpnt.team_name AND pr.project_name = prtcpnt.project_name AND pr.repository_name = prtcpnt.repository_name AND pr.pull_request_number = prtcpnt.pull_request_number\n                INNER JOIN actor as author ON author.id = pr.author_id\n            WHERE pr.integrity_errors IS NULL\n                AND $__timeFilter(shared_for_review_date) \n                AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n                AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n                AND (COALESCE($pr_author_role) IS NULL OR pr.author_role IN ($pr_author_role))\n                AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n                AND ($include_bots_activities OR NOT author.is_bot_user)\n        ) AS approvals\n) AS timings\nWHERE COALESCE(from_last_approval_to_merge, 0)>0",
           "refId": "A",
           "sql": {
             "columns": [
@@ -1865,8 +1865,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               }
             ]
           },
@@ -1983,8 +1982,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               }
             ]
           },
@@ -2154,8 +2152,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               }
             ]
           },
@@ -2272,8 +2269,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               }
             ]
           },
@@ -2398,8 +2394,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               }
             ]
           },
@@ -2531,8 +2526,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               }
             ]
           },
