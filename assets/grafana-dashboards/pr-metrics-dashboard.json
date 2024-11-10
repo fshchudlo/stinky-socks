@@ -3997,6 +3997,48 @@
       },
       {
         "current": {
+          "text": [
+            "pr_lead_time"
+          ],
+          "value": [
+            "pr_lead_time"
+          ]
+        },
+        "label": "Display flow stats for",
+        "multi": true,
+        "name": "display_flow_stats_for",
+        "options": [
+          {
+            "selected": true,
+            "text": "PR Lead time",
+            "value": "pr_lead_time"
+          },
+          {
+            "selected": false,
+            "text": "Development time",
+            "value": "development_time"
+          },
+          {
+            "selected": false,
+            "text": "Time to first reaction",
+            "value": "time_to_first_reaction"
+          },
+          {
+            "selected": false,
+            "text": "Rework time",
+            "value": "rework_time"
+          },
+          {
+            "selected": false,
+            "text": "Idle after approve",
+            "value": "idle_after_approve"
+          }
+        ],
+        "query": "PR Lead time : pr_lead_time, Development time : development_time, Time to first reaction : time_to_first_reaction, Rework time : rework_time, Idle after approve : idle_after_approve",
+        "type": "custom"
+      },
+      {
+        "current": {
           "text": "False",
           "value": "False"
         },
@@ -4040,48 +4082,6 @@
         "query": "10",
         "skipUrlSync": true,
         "type": "constant"
-      },
-      {
-        "current": {
-          "text": [
-            "pr_lead_time"
-          ],
-          "value": [
-            "pr_lead_time"
-          ]
-        },
-        "label": "Display flow stats for",
-        "multi": true,
-        "name": "display_flow_stats_for",
-        "options": [
-          {
-            "selected": true,
-            "text": "PR Lead time",
-            "value": "pr_lead_time"
-          },
-          {
-            "selected": false,
-            "text": "Development time",
-            "value": "development_time"
-          },
-          {
-            "selected": false,
-            "text": "Time to first reaction",
-            "value": "time_to_first_reaction"
-          },
-          {
-            "selected": false,
-            "text": "Rework time",
-            "value": "rework_time"
-          },
-          {
-            "selected": false,
-            "text": "Idle after approve",
-            "value": "idle_after_approve"
-          }
-        ],
-        "query": "PR Lead time : pr_lead_time, Development time : development_time, Time to first reaction : time_to_first_reaction, Rework time : rework_time, Idle after approve : idle_after_approve",
-        "type": "custom"
       }
     ]
   },
