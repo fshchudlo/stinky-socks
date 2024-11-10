@@ -100,7 +100,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT PERCENTILE_CONT($percentile) WITHIN GROUP (ORDER BY pr_lead_time)\nFROM \n   (SELECT \n      EXTRACT(EPOCH FROM (merged_date-LEAST(initial_commit_date, shared_for_review_date))) AS pr_lead_time\n   FROM pull_request AS pr\n      INNER JOIN actor as author ON author.id = pr.author_id\n   WHERE pr.integrity_errors IS NULL\n      AND $__timeFilter(shared_for_review_date) \n      AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n      AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n      AND (COALESCE($pr_author_role) IS NULL OR pr.author_role IN ($pr_author_role))\n      AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n      AND ($include_bots_activities OR NOT author.is_bot_user)\n   ) AS lead_times\nWHERE COALESCE(pr_lead_time, 0)>0",
+          "rawSql": "SELECT PERCENTILE_CONT($percentile) WITHIN GROUP (ORDER BY pr_lead_time)\nFROM \n   (SELECT \n      EXTRACT(EPOCH FROM (merged_date-LEAST(initial_commit_date, shared_for_review_date))) AS pr_lead_time\n   FROM pull_request AS pr\n      INNER JOIN actor AS shadowed_author ON shadowed_author.id = pr.author_id\n      INNER JOIN actor AS author ON COALESCE(shadowed_author.merged_with_id, shadowed_author.id)=author.id\n   WHERE pr.integrity_errors IS NULL\n      AND $__timeFilter(LEAST(initial_commit_date, shared_for_review_date)) \n      AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n      AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n      AND (COALESCE($pr_author_role) IS NULL OR COALESCE(author.team_role, pr.author_role) IN ($pr_author_role))\n      AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n      AND ($include_bots_activities OR NOT author.is_bot_user)\n   ) AS lead_times\nWHERE COALESCE(pr_lead_time, 0)>0",
           "refId": "A",
           "sql": {
             "columns": [
@@ -184,7 +184,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT PERCENTILE_CONT($percentile) WITHIN GROUP (ORDER BY development_time)\nFROM \n   (SELECT \n      GREATEST(EXTRACT(EPOCH FROM (shared_for_review_date-initial_commit_date)),0) AS development_time\n   FROM pull_request AS pr\n      INNER JOIN actor as author ON author.id = pr.author_id\n   WHERE pr.integrity_errors IS NULL\n      AND $__timeFilter(shared_for_review_date) \n      AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n      AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n      AND (COALESCE($pr_author_role) IS NULL OR pr.author_role IN ($pr_author_role))\n      AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n      AND ($include_bots_activities OR NOT author.is_bot_user)\n   ) AS timings\nWHERE COALESCE(development_time,0)>0",
+          "rawSql": "SELECT PERCENTILE_CONT($percentile) WITHIN GROUP (ORDER BY development_time)\nFROM \n   (SELECT \n      GREATEST(EXTRACT(EPOCH FROM (shared_for_review_date-initial_commit_date)),0) AS development_time\n   FROM pull_request AS pr\n      INNER JOIN actor AS shadowed_author ON shadowed_author.id = pr.author_id\n      INNER JOIN actor AS author ON COALESCE(shadowed_author.merged_with_id, shadowed_author.id)=author.id\n   WHERE pr.integrity_errors IS NULL\n      AND $__timeFilter(LEAST(initial_commit_date, shared_for_review_date)) \n      AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n      AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n      AND (COALESCE($pr_author_role) IS NULL OR COALESCE(author.team_role, pr.author_role) IN ($pr_author_role))\n      AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n      AND ($include_bots_activities OR NOT author.is_bot_user)\n   ) AS timings\nWHERE COALESCE(development_time,0)>0",
           "refId": "A",
           "sql": {
             "columns": [
@@ -268,7 +268,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT PERCENTILE_CONT($percentile) WITHIN GROUP (ORDER BY time_to_first_reaction)\nFROM (\n    SELECT\n        GREATEST(EXTRACT(EPOCH FROM (first_reaction_date-shared_for_review_date)), 0) AS time_to_first_reaction\n   FROM pull_request AS pr\n      INNER JOIN actor as author ON author.id = pr.author_id\n   WHERE pr.integrity_errors IS NULL\n      AND $__timeFilter(shared_for_review_date) \n      AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n      AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n      AND (COALESCE($pr_author_role) IS NULL OR pr.author_role IN ($pr_author_role))\n      AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n      AND ($include_bots_activities OR NOT author.is_bot_user)\n      AND first_reaction_date IS NOT NULL\n    ) AS \"First responses\"\nWHERE COALESCE(time_to_first_reaction, 0)>0",
+          "rawSql": "SELECT PERCENTILE_CONT($percentile) WITHIN GROUP (ORDER BY time_to_first_reaction)\nFROM (\n    SELECT\n        GREATEST(EXTRACT(EPOCH FROM (first_reaction_date-shared_for_review_date)), 0) AS time_to_first_reaction\n   FROM pull_request AS pr\n      INNER JOIN actor AS shadowed_author ON shadowed_author.id = pr.author_id\n      INNER JOIN actor AS author ON COALESCE(shadowed_author.merged_with_id, shadowed_author.id)=author.id\n   WHERE pr.integrity_errors IS NULL\n      AND $__timeFilter(LEAST(initial_commit_date, shared_for_review_date)) \n      AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n      AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n      AND (COALESCE($pr_author_role) IS NULL OR COALESCE(author.team_role, pr.author_role) IN ($pr_author_role))\n      AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n      AND ($include_bots_activities OR NOT author.is_bot_user)\n      AND first_reaction_date IS NOT NULL\n    ) AS \"First responses\"\nWHERE COALESCE(time_to_first_reaction, 0)>0",
           "refId": "A",
           "sql": {
             "columns": [
@@ -352,7 +352,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT PERCENTILE_CONT($percentile) WITHIN GROUP (ORDER BY rework_time)\nFROM (\n    SELECT\n        GREATEST(EXTRACT(EPOCH FROM (rework_completed_date-first_reaction_date)), 0) AS rework_time\n    FROM pull_request AS pr\n        INNER JOIN actor as author ON author.id = pr.author_id\n    WHERE pr.integrity_errors IS NULL\n      AND $__timeFilter(shared_for_review_date) \n      AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n      AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n      AND (COALESCE($pr_author_role) IS NULL OR pr.author_role IN ($pr_author_role))\n      AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n      AND ($include_bots_activities OR NOT author.is_bot_user)\n      AND first_reaction_date IS NOT NULL\n      AND rework_completed_date IS NOT NULL\n) AS rework_times\nWHERE COALESCE(rework_time, 0)>0",
+          "rawSql": "SELECT PERCENTILE_CONT($percentile) WITHIN GROUP (ORDER BY rework_time)\nFROM (\n    SELECT\n        GREATEST(EXTRACT(EPOCH FROM (rework_completed_date-first_reaction_date)), 0) AS rework_time\n    FROM pull_request AS pr\n      INNER JOIN actor AS shadowed_author ON shadowed_author.id = pr.author_id\n      INNER JOIN actor AS author ON COALESCE(shadowed_author.merged_with_id, shadowed_author.id)=author.id\n    WHERE pr.integrity_errors IS NULL\n      AND $__timeFilter(LEAST(initial_commit_date, shared_for_review_date)) \n      AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n      AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n      AND (COALESCE($pr_author_role) IS NULL OR COALESCE(author.team_role, pr.author_role) IN ($pr_author_role))\n      AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n      AND ($include_bots_activities OR NOT author.is_bot_user)\n      AND first_reaction_date IS NOT NULL\n      AND rework_completed_date IS NOT NULL\n) AS rework_times\nWHERE COALESCE(rework_time, 0)>0",
           "refId": "A",
           "sql": {
             "columns": [
@@ -436,7 +436,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT PERCENTILE_CONT($percentile) WITHIN GROUP (ORDER BY from_last_approval_to_merge)\nFROM (\n    SELECT\n        EXTRACT(EPOCH FROM (merged_date-last_action_date)) AS from_last_approval_to_merge\n    FROM (\n            SELECT\n                merged_date,\n                GREATEST(pr.last_approval_date, pr.rework_completed_date, pr.last_commit_date) as last_action_date\n            FROM pull_request AS pr\n                INNER JOIN pull_request_participant AS prtcpnt ON pr.team_name = prtcpnt.team_name AND pr.project_name = prtcpnt.project_name AND pr.repository_name = prtcpnt.repository_name AND pr.pull_request_number = prtcpnt.pull_request_number\n                INNER JOIN actor as author ON author.id = pr.author_id\n            WHERE pr.integrity_errors IS NULL\n                AND $__timeFilter(shared_for_review_date) \n                AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n                AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n                AND (COALESCE($pr_author_role) IS NULL OR pr.author_role IN ($pr_author_role))\n                AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n                AND ($include_bots_activities OR NOT author.is_bot_user)\n        ) AS approvals\n) AS timings\nWHERE COALESCE(from_last_approval_to_merge, 0)>0",
+          "rawSql": "SELECT PERCENTILE_CONT($percentile) WITHIN GROUP (ORDER BY from_last_approval_to_merge)\nFROM (\n    SELECT\n        EXTRACT(EPOCH FROM (merged_date-last_action_date)) AS from_last_approval_to_merge\n    FROM (\n        SELECT\n            merged_date,\n            GREATEST(pr.last_approval_date, pr.rework_completed_date, pr.last_commit_date) as last_action_date\n        FROM pull_request AS pr\n            INNER JOIN actor AS shadowed_author ON shadowed_author.id = pr.author_id\n            INNER JOIN actor AS author ON COALESCE(shadowed_author.merged_with_id, shadowed_author.id)=author.id\n        WHERE pr.integrity_errors IS NULL\n            AND $__timeFilter(LEAST(initial_commit_date, shared_for_review_date)) \n            AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n            AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n            AND (COALESCE($pr_author_role) IS NULL OR COALESCE(author.team_role, pr.author_role) IN ($pr_author_role))\n            AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n            AND ($include_bots_activities OR NOT author.is_bot_user)\n    ) AS approvals\n) AS timings\nWHERE COALESCE(from_last_approval_to_merge, 0)>0",
           "refId": "A",
           "sql": {
             "columns": [
@@ -521,7 +521,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT COUNT(*) as \"Average PR size\"\nFROM pull_request AS pr\n   INNER JOIN actor as author ON author.id = pr.author_id\nWHERE pr.integrity_errors IS NULL\n   AND $__timeFilter(shared_for_review_date) \n   AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n   AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n   AND (COALESCE($pr_author_role) IS NULL OR pr.author_role IN ($pr_author_role))\n   AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n   AND ($include_bots_activities OR NOT author.is_bot_user)",
+          "rawSql": "SELECT COUNT(*) as \"Average PR size\"\nFROM pull_request AS pr\n   INNER JOIN actor AS shadowed_author ON shadowed_author.id = pr.author_id\n   INNER JOIN actor AS author ON COALESCE(shadowed_author.merged_with_id, shadowed_author.id)=author.id\nWHERE pr.integrity_errors IS NULL\n   AND $__timeFilter(LEAST(initial_commit_date, shared_for_review_date)) \n   AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n   AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n   AND (COALESCE($pr_author_role) IS NULL OR COALESCE(author.team_role, pr.author_role) IN ($pr_author_role))\n   AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n   AND ($include_bots_activities OR NOT author.is_bot_user)",
           "refId": "A",
           "sql": {
             "columns": [
@@ -613,7 +613,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT AVG(requested_reviewers_count) AS \"Reviewers count\" \nFROM pull_request AS pr\n   INNER JOIN actor as author ON author.id = pr.author_id\nWHERE pr.integrity_errors IS NULL\n   AND $__timeFilter(shared_for_review_date) \n   AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n   AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n   AND (COALESCE($pr_author_role) IS NULL OR pr.author_role IN ($pr_author_role))\n   AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n   AND ($include_bots_activities OR NOT author.is_bot_user)",
+          "rawSql": "SELECT AVG(requested_reviewers_count) AS \"Reviewers count\" \nFROM pull_request AS pr\n   INNER JOIN actor AS shadowed_author ON shadowed_author.id = pr.author_id\n   INNER JOIN actor AS author ON COALESCE(shadowed_author.merged_with_id, shadowed_author.id)=author.id\nWHERE pr.integrity_errors IS NULL\n   AND $__timeFilter(LEAST(initial_commit_date, shared_for_review_date)) \n   AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n   AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n   AND (COALESCE($pr_author_role) IS NULL OR COALESCE(author.team_role, pr.author_role) IN ($pr_author_role))\n   AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n   AND ($include_bots_activities OR NOT author.is_bot_user)",
           "refId": "A",
           "sql": {
             "columns": [
@@ -705,7 +705,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT AVG(total_comments_count) AS \"Comments count\" \nFROM pull_request AS pr\n   INNER JOIN actor as author ON author.id = pr.author_id\nWHERE pr.integrity_errors IS NULL\n   AND $__timeFilter(shared_for_review_date) \n   AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n   AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n   AND (COALESCE($pr_author_role) IS NULL OR pr.author_role IN ($pr_author_role))\n   AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n   AND ($include_bots_activities OR NOT author.is_bot_user)",
+          "rawSql": "SELECT AVG(total_comments_count) AS \"Comments count\" \nFROM pull_request AS pr\n   INNER JOIN actor AS shadowed_author ON shadowed_author.id = pr.author_id\n   INNER JOIN actor AS author ON COALESCE(shadowed_author.merged_with_id, shadowed_author.id)=author.id\nWHERE pr.integrity_errors IS NULL\n   AND $__timeFilter(LEAST(initial_commit_date, shared_for_review_date)) \n   AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n   AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n   AND (COALESCE($pr_author_role) IS NULL OR COALESCE(author.team_role, pr.author_role) IN ($pr_author_role))\n   AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n   AND ($include_bots_activities OR NOT author.is_bot_user)",
           "refId": "A",
           "sql": {
             "columns": [
@@ -797,7 +797,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT AVG(diff_rows_added+diff_rows_deleted) as \"Average PR size\"\nFROM pull_request AS pr\n   INNER JOIN actor as author ON author.id = pr.author_id\nWHERE pr.integrity_errors IS NULL\n   AND diff_rows_added+diff_rows_deleted!=0\n   AND $__timeFilter(shared_for_review_date) \n   AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n   AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n   AND (COALESCE($pr_author_role) IS NULL OR pr.author_role IN ($pr_author_role))\n   AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n   AND ($include_bots_activities OR NOT author.is_bot_user)",
+          "rawSql": "SELECT AVG(diff_rows_added+diff_rows_deleted) as \"Average PR size\"\nFROM pull_request AS pr\n   INNER JOIN actor as author ON author.id = pr.author_id\nWHERE pr.integrity_errors IS NULL\n   AND diff_rows_added+diff_rows_deleted!=0\n   AND $__timeFilter(LEAST(initial_commit_date, shared_for_review_date)) \n   AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n   AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n   AND (COALESCE($pr_author_role) IS NULL OR COALESCE(author.team_role, pr.author_role) IN ($pr_author_role))\n   AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n   AND ($include_bots_activities OR NOT author.is_bot_user)",
           "refId": "A",
           "sql": {
             "columns": [
@@ -896,7 +896,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT SUM(CASE WHEN tests_were_touched THEN 0 ELSE 1 END)::decimal/COUNT(*)*100 AS \"PRs without tests touch\" \nFROM pull_request AS pr\n   INNER JOIN actor as author ON author.id = pr.author_id\nWHERE pr.integrity_errors IS NULL\n   AND $__timeFilter(shared_for_review_date) \n   AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n   AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n   AND (COALESCE($pr_author_role) IS NULL OR pr.author_role IN ($pr_author_role))\n   AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n   AND ($include_bots_activities OR NOT author.is_bot_user)",
+          "rawSql": "SELECT SUM(CASE WHEN tests_were_touched THEN 0 ELSE 1 END)::decimal/COUNT(*)*100 AS \"PRs without tests touch\" \nFROM pull_request AS pr\n   INNER JOIN actor as author ON author.id = pr.author_id\nWHERE pr.integrity_errors IS NULL\n   AND $__timeFilter(LEAST(initial_commit_date, shared_for_review_date)) \n   AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n   AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n   AND (COALESCE($pr_author_role) IS NULL OR COALESCE(author.team_role, pr.author_role) IN ($pr_author_role))\n   AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n   AND ($include_bots_activities OR NOT author.is_bot_user)",
           "refId": "A",
           "sql": {
             "columns": [
@@ -988,7 +988,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT SUM(diff_rows_added+diff_rows_deleted) as \"Total diff\"\nFROM pull_request AS pr\n   INNER JOIN actor as author ON author.id = pr.author_id\nWHERE pr.integrity_errors IS NULL\n   AND $__timeFilter(shared_for_review_date) \n   AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n   AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n   AND (COALESCE($pr_author_role) IS NULL OR pr.author_role IN ($pr_author_role))\n   AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n   AND ($include_bots_activities OR NOT author.is_bot_user)",
+          "rawSql": "SELECT SUM(diff_rows_added+diff_rows_deleted) as \"Total diff\"\nFROM pull_request AS pr\n   INNER JOIN actor as author ON author.id = pr.author_id\nWHERE pr.integrity_errors IS NULL\n   AND $__timeFilter(LEAST(initial_commit_date, shared_for_review_date)) \n   AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n   AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n   AND (COALESCE($pr_author_role) IS NULL OR COALESCE(author.team_role, pr.author_role) IN ($pr_author_role))\n   AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n   AND ($include_bots_activities OR NOT author.is_bot_user)",
           "refId": "A",
           "sql": {
             "columns": [
@@ -1210,7 +1210,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT \n    $__timeGroupAlias(start_date, $group_by_period), \n    PERCENTILE_CONT(0.90) WITHIN GROUP (ORDER BY $display_flow_stats_for) AS \"90th percentile\",\n    AVG(AVG($display_flow_stats_for)) OVER (ORDER BY $__timeGroup(start_date, $group_by_period, 0) \n                                ROWS BETWEEN 3 PRECEDING AND CURRENT ROW) AS \"Rolling Average\",\n    PERCENTILE_CONT($percentile) WITHIN GROUP (ORDER BY $display_flow_stats_for) AS \"Percentile of your choice\",\n    PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY $display_flow_stats_for) AS \"25th Percentile\"\n\nFROM \n   (SELECT \n      LEAST(initial_commit_date, shared_for_review_date) AS start_date,\n      EXTRACT(EPOCH FROM (merged_date-LEAST(initial_commit_date, shared_for_review_date))) AS pr_lead_time,\n      EXTRACT(EPOCH FROM (shared_for_review_date-initial_commit_date)) AS development_time,\n      GREATEST(EXTRACT(EPOCH FROM (first_reaction_date-shared_for_review_date)), 0) AS time_to_first_reaction,\n      EXTRACT(EPOCH FROM (rework_completed_date-first_reaction_date)) AS rework_time,\n      EXTRACT(EPOCH FROM (merged_date-GREATEST(pr.last_approval_date, pr.rework_completed_date, pr.last_commit_date))) AS idle_after_approve\n   FROM pull_request AS pr\n      INNER JOIN actor as author ON author.id = pr.author_id\n   WHERE pr.integrity_errors IS NULL\n      AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n      AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n      AND (COALESCE($pr_author_role) IS NULL OR pr.author_role IN ($pr_author_role))\n      AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n      AND ($include_bots_activities OR NOT author.is_bot_user)\n   ) AS timings\nWHERE COALESCE($display_flow_stats_for, 0)>0\nGROUP BY 1\nORDER BY $__timeGroup(start_date, $group_by_period, 0)",
+          "rawSql": "SELECT \n    $__timeGroupAlias(start_date, $group_by_period), \n    PERCENTILE_CONT(0.90) WITHIN GROUP (ORDER BY $display_flow_stats_for) AS \"90th percentile\",\n    AVG(AVG($display_flow_stats_for)) OVER (ORDER BY $__timeGroup(start_date, $group_by_period, 0) \n                                ROWS BETWEEN 3 PRECEDING AND CURRENT ROW) AS \"Rolling Average\",\n    PERCENTILE_CONT($percentile) WITHIN GROUP (ORDER BY $display_flow_stats_for) AS \"Percentile of your choice\",\n    PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY $display_flow_stats_for) AS \"25th Percentile\"\n\nFROM \n   (SELECT \n      LEAST(initial_commit_date, shared_for_review_date) AS start_date,\n      EXTRACT(EPOCH FROM (merged_date-LEAST(initial_commit_date, shared_for_review_date))) AS pr_lead_time,\n      EXTRACT(EPOCH FROM (shared_for_review_date-initial_commit_date)) AS development_time,\n      GREATEST(EXTRACT(EPOCH FROM (first_reaction_date-shared_for_review_date)), 0) AS time_to_first_reaction,\n      EXTRACT(EPOCH FROM (rework_completed_date-first_reaction_date)) AS rework_time,\n      EXTRACT(EPOCH FROM (merged_date-GREATEST(pr.last_approval_date, pr.rework_completed_date, pr.last_commit_date))) AS idle_after_approve\n   FROM pull_request AS pr\n      INNER JOIN actor AS shadowed_author ON shadowed_author.id = pr.author_id\n      INNER JOIN actor AS author ON COALESCE(shadowed_author.merged_with_id, shadowed_author.id)=author.id\n   WHERE pr.integrity_errors IS NULL\n      AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n      AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n      AND (COALESCE($pr_author_role) IS NULL OR COALESCE(author.team_role, pr.author_role) IN ($pr_author_role))\n      AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n      AND ($include_bots_activities OR NOT author.is_bot_user)\n   ) AS timings\nWHERE COALESCE($display_flow_stats_for, 0)>0\nGROUP BY 1\nORDER BY $__timeGroup(start_date, $group_by_period, 0)",
           "refId": "Flow stats",
           "sql": {
             "columns": [
@@ -1366,7 +1366,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT \n   $__timeGroupAlias(shared_for_review_date, $group_by_period),\n   COUNT(*) AS \"PRs count\",\n   COUNT(DISTINCT CASE WHEN pr.author_role IN ('OWNER', 'MEMBER', 'COLLABORATOR') THEN pr.author_id END) AS \"Maintainers contirbuted\",\n   COUNT(DISTINCT CASE WHEN pr.author_role IN ('CONTRIBUTOR', 'FIRST_TIMER', 'FIRST_TIME_CONTRIBUTOR') THEN pr.author_id END) AS \"Contributors contirbuted\",\n   COUNT(DISTINCT pr.author_id) AS \"Total authors contributed\",\n   AVG(requested_reviewers_count) AS \"Average reviewers count\",\n   AVG(total_comments_count) AS \"Average comments count\",\n   SUM(CASE WHEN tests_were_touched THEN 0 ELSE 1 END)::decimal/COUNT(*)*100 AS \"PRs without tests changes\",\n   AVG(CASE WHEN diff_rows_added+diff_rows_deleted=0 THEN NULL ELSE diff_rows_added+diff_rows_deleted END) AS \"Average diff size\",\n   SUM(diff_rows_added+diff_rows_deleted) as \"Lines changed in period\"\nFROM pull_request AS pr\n   INNER JOIN actor as author ON author.id = pr.author_id\nWHERE pr.integrity_errors IS NULL\n   AND $__timeFilter(shared_for_review_date) \n   AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n   AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n   AND (COALESCE($pr_author_role) IS NULL OR pr.author_role IN ($pr_author_role))\n   AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n   AND ($include_bots_activities OR NOT author.is_bot_user)\nGROUP BY 1\nORDER BY $__timeGroup(shared_for_review_date, $group_by_period)",
+          "rawSql": "SELECT \n   $__timeGroupAlias(start_date, $group_by_period),\n   COUNT(*) AS \"PRs count\",\n   COUNT(DISTINCT CASE WHEN author_role IN ('OWNER', 'MEMBER', 'COLLABORATOR') THEN author_id END) AS \"Maintainers contirbuted\",\n   COUNT(DISTINCT CASE WHEN author_role IN ('CONTRIBUTOR', 'FIRST_TIMER', 'FIRST_TIME_CONTRIBUTOR') THEN author_id END) AS \"Contributors contirbuted\",\n   COUNT(DISTINCT author_id) AS \"Total authors contributed\",\n   AVG(requested_reviewers_count) AS \"Average reviewers count\",\n   AVG(total_comments_count) AS \"Average comments count\",\n   SUM(CASE WHEN tests_were_touched THEN 0 ELSE 1 END)::decimal/COUNT(*)*100 AS \"PRs without tests changes\",\n   AVG(CASE WHEN diff_rows_added+diff_rows_deleted=0 THEN NULL ELSE diff_rows_added+diff_rows_deleted END) AS \"Average diff size\",\n   SUM(diff_rows_added+diff_rows_deleted) as \"Lines changed in period\"\nFROM \n   (SELECT \n      LEAST(initial_commit_date, shared_for_review_date) AS start_date,\n      author.id AS author_id,\n      COALESCE(author.team_role, pr.author_role) AS author_role,\n      requested_reviewers_count,\n      total_comments_count,\n      tests_were_touched,\n      diff_rows_added,\n      diff_rows_deleted\n   FROM pull_request AS pr\n      INNER JOIN actor AS shadowed_author ON shadowed_author.id = pr.author_id\n      INNER JOIN actor AS author ON COALESCE(shadowed_author.merged_with_id, shadowed_author.id)=author.id\n   WHERE pr.integrity_errors IS NULL\n      AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n      AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n      AND (COALESCE($pr_author_role) IS NULL OR COALESCE(author.team_role, pr.author_role) IN ($pr_author_role))\n      AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n      AND ($include_bots_activities OR NOT author.is_bot_user)\n   ) AS timings\nGROUP BY 1\nORDER BY $__timeGroup(start_date, $group_by_period, 0)",
           "refId": "A",
           "sql": {
             "columns": [
@@ -1405,155 +1405,6 @@
     },
     {
       "datasource": {
-        "type": "grafana-postgresql-datasource",
-        "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "barWidthFactor": 0.6,
-            "drawStyle": "line",
-            "fillOpacity": 0,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "insertNulls": false,
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "decimals": 2,
-          "mappings": [],
-          "min": 0,
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          },
-          "unit": "locale"
-        },
-        "overrides": [
-          {
-            "__systemRef": "hideSeriesFrom",
-            "matcher": {
-              "id": "byNames",
-              "options": {
-                "mode": "exclude",
-                "names": [
-                  "count aleksandr.sapelkin (former participant)"
-                ],
-                "prefix": "All except:",
-                "readOnly": true
-              }
-            },
-            "properties": [
-              {
-                "id": "custom.hideFrom",
-                "value": {
-                  "legend": false,
-                  "tooltip": false,
-                  "viz": true
-                }
-              }
-            ]
-          }
-        ]
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 24,
-        "x": 0,
-        "y": 39
-      },
-      "id": 52,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": {
-          "mode": "multi",
-          "sort": "none"
-        }
-      },
-      "pluginVersion": "11.3.0",
-      "targets": [
-        {
-          "datasource": {
-            "type": "postgres",
-            "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
-          },
-          "editorMode": "code",
-          "format": "table",
-          "rawQuery": true,
-          "rawSql": "WITH pr_activity AS (\n    SELECT\n        CASE \n            WHEN author.is_former_participant THEN CONCAT(author.login, ' (former participant)') \n            WHEN author.is_bot_user THEN CONCAT(author.login, ' (bot)')\n            ELSE CASE WHEN $show_real_names THEN author.login ELSE author.nickname END\n        END AS author_name,\n        created_date,\n        merged_date,\n        generate_series(\n            DATE_TRUNC('day', created_date), \n            DATE_TRUNC('day', merged_date), \n            '1 day'::interval\n        ) AS activity_date\n    FROM pull_request AS pr\n        INNER JOIN actor as author ON author.id = pr.author_id\n    WHERE pr.integrity_errors IS NULL\n        AND $__timeFilter(shared_for_review_date) \n        AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n        AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n        AND (COALESCE($pr_author_role) IS NULL OR pr.author_role IN ($pr_author_role))\n        AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n        AND ($include_bots_activities OR NOT author.is_bot_user)\n)\n\nSELECT\n    activity_date AS time,\n    author_name AS value,\n    COUNT(*)\nFROM pr_activity\nGROUP BY 1, 2\nORDER BY 1",
-          "refId": "A",
-          "sql": {
-            "columns": [
-              {
-                "parameters": [],
-                "type": "function"
-              }
-            ],
-            "groupBy": [
-              {
-                "property": {
-                  "type": "string"
-                },
-                "type": "groupBy"
-              }
-            ],
-            "limit": 50
-          }
-        }
-      ],
-      "title": "Multitasking factor (amount of PRs author works on in parallel)",
-      "transformations": [
-        {
-          "id": "prepareTimeSeries",
-          "options": {
-            "format": "multi"
-          }
-        }
-      ],
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
         "type": "postgres",
         "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
       },
@@ -1589,8 +1440,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               }
             ]
           }
@@ -1632,7 +1482,7 @@
         "h": 25,
         "w": 12,
         "x": 0,
-        "y": 47
+        "y": 39
       },
       "id": 16,
       "options": {
@@ -1666,7 +1516,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "WITH reviewer_demand AS (\n    SELECT \n        CASE \n            WHEN participant.is_former_participant THEN CONCAT(participant.login, ' (former participant)') \n            WHEN participant.is_bot_user THEN CONCAT(participant.login, ' (bot)')\n            ELSE CASE WHEN $show_real_names THEN participant.login ELSE participant.nickname END\n        END AS reviewer_name,\n        COUNT(prtcpnt.pull_request_number) AS added_as_reviewer,\n        SUM(CASE WHEN prtcpnt.first_comment_date IS NULL AND prtcpnt.first_approval_date IS NOT NULL THEN 1 ELSE 0 END) AS did_not_comment,\n        SUM(CASE WHEN prtcpnt.first_approval_date IS NULL THEN 1 ELSE 0 END) AS did_not_approve\n    FROM pull_request AS pr\n        INNER JOIN pull_request_participant AS prtcpnt \n            ON pr.team_name = prtcpnt.team_name AND pr.project_name = prtcpnt.project_name \n            AND pr.repository_name = prtcpnt.repository_name \n            AND pr.pull_request_number = prtcpnt.pull_request_number\n        INNER JOIN actor AS author ON author.id = pr.author_id\n        INNER JOIN actor AS participant ON participant.id = prtcpnt.participant_id\n    WHERE pr.integrity_errors IS NULL\n        AND $__timeFilter(shared_for_review_date) \n        AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n        AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n        AND (COALESCE($pr_author_role) IS NULL OR pr.author_role IN ($pr_author_role))\n        AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n        AND ($include_bots_activities OR NOT author.is_bot_user)\n        AND ($include_bots_activities OR NOT participant.is_bot_user)\n    GROUP BY participant.nickname, participant.is_bot_user, participant.is_former_participant, participant.login\n    HAVING COUNT(*) >= $min_prs_count_sample_size  -- Threshold for minimum PR participation\n\n),\nranked_reviewers AS (\n    SELECT \n        reviewer_name,\n        added_as_reviewer,\n        did_not_comment,\n        did_not_approve,\n        ROW_NUMBER() OVER (ORDER BY added_as_reviewer DESC) AS rank_desc,\n        ROW_NUMBER() OVER (ORDER BY added_as_reviewer ASC) AS rank_asc\n    FROM reviewer_demand\n)\nSELECT \n    reviewer_name,\n    added_as_reviewer AS \"Added as reviewer\",\n    did_not_comment AS \"Did not comment\",\n    did_not_approve AS \"Did not approve\"\nFROM ranked_reviewers\nWHERE rank_desc <= $ranked_samples_size OR rank_asc <= $ranked_samples_size\nORDER BY \"Added as reviewer\" DESC;",
+          "rawSql": "WITH reviewer_demand AS (\n    SELECT \n        CASE \n            WHEN participant.is_former_participant THEN CONCAT(participant.login, ' (former participant)') \n            WHEN participant.is_bot_user THEN CONCAT(participant.login, ' (bot)')\n            ELSE CASE WHEN $show_real_names THEN participant.login ELSE participant.nickname END\n        END AS reviewer_name,\n        COUNT(prtcpnt.pull_request_number) AS added_as_reviewer,\n        SUM(CASE WHEN prtcpnt.first_comment_date IS NULL AND prtcpnt.first_approval_date IS NOT NULL THEN 1 ELSE 0 END) AS did_not_comment,\n        SUM(CASE WHEN prtcpnt.first_approval_date IS NULL THEN 1 ELSE 0 END) AS did_not_approve\n    FROM pull_request AS pr\n        INNER JOIN pull_request_participant AS prtcpnt \n            ON pr.team_name = prtcpnt.team_name AND pr.project_name = prtcpnt.project_name \n            AND pr.repository_name = prtcpnt.repository_name \n            AND pr.pull_request_number = prtcpnt.pull_request_number\n        INNER JOIN actor AS shadowed_author ON shadowed_author.id = pr.author_id\n        INNER JOIN actor AS author ON COALESCE(shadowed_author.merged_with_id, shadowed_author.id)=author.id\n        INNER JOIN actor AS shadowed_participant ON shadowed_participant.id = prtcpnt.participant_id\n        INNER JOIN actor AS participant ON COALESCE(shadowed_participant.merged_with_id, shadowed_participant.id)=participant.id\n    WHERE pr.integrity_errors IS NULL\n        AND $__timeFilter(LEAST(initial_commit_date, shared_for_review_date)) \n        AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n        AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n        AND (COALESCE($pr_author_role) IS NULL OR COALESCE(author.team_role, pr.author_role) IN ($pr_author_role))\n        AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n        AND ($include_bots_activities OR NOT author.is_bot_user)\n        AND ($include_bots_activities OR NOT participant.is_bot_user)\n    GROUP BY participant.nickname, participant.is_bot_user, participant.is_former_participant, participant.login\n    HAVING COUNT(*) >= $min_prs_count_sample_size  -- Threshold for minimum PR participation\n\n),\nranked_reviewers AS (\n    SELECT \n        reviewer_name,\n        added_as_reviewer,\n        did_not_comment,\n        did_not_approve,\n        ROW_NUMBER() OVER (ORDER BY added_as_reviewer DESC) AS rank_desc,\n        ROW_NUMBER() OVER (ORDER BY added_as_reviewer ASC) AS rank_asc\n    FROM reviewer_demand\n)\nSELECT \n    reviewer_name,\n    added_as_reviewer AS \"Added as reviewer\",\n    did_not_comment AS \"Did not comment\",\n    did_not_approve AS \"Did not approve\"\nFROM ranked_reviewers\nWHERE rank_desc <= $ranked_samples_size OR rank_asc <= $ranked_samples_size\nORDER BY \"Added as reviewer\" DESC;",
           "refId": "A",
           "sql": {
             "columns": [
@@ -1727,8 +1577,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               }
             ]
           }
@@ -1768,7 +1617,7 @@
         "h": 25,
         "w": 12,
         "x": 12,
-        "y": 47
+        "y": 39
       },
       "id": 17,
       "options": {
@@ -1802,7 +1651,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "WITH reviewer_activity AS (\n    SELECT \n        CASE \n            WHEN participant.is_former_participant THEN CONCAT(participant.login, ' (former participant)') \n            WHEN participant.is_bot_user THEN CONCAT(participant.login, ' (bot)')\n            ELSE CASE WHEN $show_real_names THEN participant.login ELSE participant.nickname END\n        END AS reviewer_name,\n        COUNT(*) AS pr_count,\n        PERCENTILE_CONT($percentile) WITHIN GROUP (ORDER BY prtcpnt.comments_count) AS comments_count,\n        PERCENTILE_CONT($percentile) WITHIN GROUP (ORDER BY EXTRACT(EPOCH FROM (prtcpnt.first_reaction_date - \n        CASE WHEN prtcpnt.first_reaction_date < shared_for_review_date THEN created_date ELSE shared_for_review_date END))) AS time_to_first_reaction\n    FROM pull_request AS pr\n    INNER JOIN pull_request_participant AS prtcpnt \n        ON pr.team_name = prtcpnt.team_name AND pr.project_name = prtcpnt.project_name \n        AND pr.repository_name = prtcpnt.repository_name \n        AND pr.pull_request_number = prtcpnt.pull_request_number\n    INNER JOIN actor AS author ON author.id = pr.author_id\n    INNER JOIN actor AS participant ON participant.id = prtcpnt.participant_id\n    WHERE pr.integrity_errors IS NULL\n        AND $__timeFilter(shared_for_review_date) \n        AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n        AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n        AND (COALESCE($pr_author_role) IS NULL OR pr.author_role IN ($pr_author_role))\n        AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n        AND ($include_bots_activities OR NOT author.is_bot_user)\n        AND ($include_bots_activities OR NOT participant.is_bot_user)\n    GROUP BY participant.nickname, participant.is_bot_user, participant.is_former_participant, participant.login\n    HAVING COUNT(*) >= $min_prs_count_sample_size  -- Threshold for minimum PR participation\n),\nranked_reviewers AS (\n    SELECT \n        reviewer_name,\n        pr_count,\n        comments_count,\n        time_to_first_reaction,\n        ROW_NUMBER() OVER (ORDER BY time_to_first_reaction DESC, comments_count DESC) AS rank_desc,\n        ROW_NUMBER() OVER (ORDER BY time_to_first_reaction ASC, comments_count ASC) AS rank_asc\n    FROM reviewer_activity\n)\nSELECT \n    reviewer_name,\n    pr_count AS \"PR Count\",\n    comments_count AS \"Comments count\",\n    time_to_first_reaction AS \"First reaction in\"\nFROM ranked_reviewers\nWHERE rank_desc <= $ranked_samples_size OR rank_asc <= $ranked_samples_size\nORDER BY \"First reaction in\" ASC;\n",
+          "rawSql": "WITH reviewer_activity AS (\n    SELECT \n        CASE \n            WHEN participant.is_former_participant THEN CONCAT(participant.login, ' (former participant)') \n            WHEN participant.is_bot_user THEN CONCAT(participant.login, ' (bot)')\n            ELSE CASE WHEN $show_real_names THEN participant.login ELSE participant.nickname END\n        END AS reviewer_name,\n        COUNT(*) AS pr_count,\n        PERCENTILE_CONT($percentile) WITHIN GROUP (ORDER BY prtcpnt.comments_count) AS comments_count,\n        PERCENTILE_CONT($percentile) WITHIN GROUP (ORDER BY EXTRACT(EPOCH FROM (prtcpnt.first_reaction_date - \n        CASE WHEN prtcpnt.first_reaction_date < shared_for_review_date THEN created_date ELSE shared_for_review_date END))) AS time_to_first_reaction\n    FROM pull_request AS pr\n    INNER JOIN pull_request_participant AS prtcpnt \n        ON pr.team_name = prtcpnt.team_name AND pr.project_name = prtcpnt.project_name \n        AND pr.repository_name = prtcpnt.repository_name \n        AND pr.pull_request_number = prtcpnt.pull_request_number\n    INNER JOIN actor AS shadowed_author ON shadowed_author.id = pr.author_id\n    INNER JOIN actor AS author ON COALESCE(shadowed_author.merged_with_id, shadowed_author.id)=author.id\n    INNER JOIN actor AS shadowed_participant ON shadowed_participant.id = prtcpnt.participant_id\n    INNER JOIN actor AS participant ON COALESCE(shadowed_participant.merged_with_id, shadowed_participant.id)=participant.id\n    WHERE pr.integrity_errors IS NULL\n        AND $__timeFilter(LEAST(initial_commit_date, shared_for_review_date)) \n        AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n        AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n        AND (COALESCE($pr_author_role) IS NULL OR COALESCE(author.team_role, pr.author_role) IN ($pr_author_role))\n        AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n        AND ($include_bots_activities OR NOT author.is_bot_user)\n        AND ($include_bots_activities OR NOT participant.is_bot_user)\n    GROUP BY participant.nickname, participant.is_bot_user, participant.is_former_participant, participant.login\n    HAVING COUNT(*) >= $min_prs_count_sample_size  -- Threshold for minimum PR participation\n),\nranked_reviewers AS (\n    SELECT \n        reviewer_name,\n        pr_count,\n        comments_count,\n        time_to_first_reaction,\n        ROW_NUMBER() OVER (ORDER BY time_to_first_reaction DESC, comments_count DESC) AS rank_desc,\n        ROW_NUMBER() OVER (ORDER BY time_to_first_reaction ASC, comments_count ASC) AS rank_asc\n    FROM reviewer_activity\n)\nSELECT \n    reviewer_name,\n    pr_count AS \"PR Count\",\n    comments_count AS \"Comments count\",\n    time_to_first_reaction AS \"First reaction in\"\nFROM ranked_reviewers\nWHERE rank_desc <= $ranked_samples_size OR rank_asc <= $ranked_samples_size\nORDER BY \"First reaction in\" ASC;\n",
           "refId": "A",
           "sql": {
             "columns": [
@@ -1865,8 +1714,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               }
             ]
           },
@@ -1878,7 +1726,7 @@
         "h": 23,
         "w": 24,
         "x": 0,
-        "y": 72
+        "y": 64
       },
       "id": 15,
       "options": {
@@ -1912,7 +1760,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT personal.repository_name, contributor_name, personal_contribution::numeric/total_contribution*100 as \"contribution_percent\"\nFROM\n    (SELECT \n        repository_name, \n        CASE \n            WHEN author.is_former_participant THEN CONCAT(author.login, ' (former participant)') \n            WHEN author.is_bot_user THEN CONCAT(author.login, ' (bot)')\n            ELSE CASE WHEN $show_real_names THEN author.login ELSE author.nickname END\n        END AS contributor_name,\n        SUM(diff_rows_added+diff_rows_deleted) as personal_contribution\n    FROM pull_request AS pr\n        INNER JOIN actor as author ON author.id = pr.author_id\n    WHERE pr.integrity_errors IS NULL\n      AND diff_rows_added+diff_rows_deleted!=0\n      AND $__timeFilter(shared_for_review_date) \n      AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n      AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n      AND (COALESCE($pr_author_role) IS NULL OR pr.author_role IN ($pr_author_role))\n      AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n      AND ($include_bots_activities OR NOT author.is_bot_user)\n    GROUP BY repository_name, author.nickname, author.is_former_participant, author.is_bot_user, author.login) AS personal\n\nRIGHT JOIN \n    (SELECT repository_name, SUM(diff_rows_added+diff_rows_deleted) as total_contribution\n    FROM pull_request AS pr\n        INNER JOIN actor as author ON author.id = pr.author_id\n    WHERE pr.integrity_errors IS NULL\n      AND diff_rows_added+diff_rows_deleted!=0\n      AND $__timeFilter(shared_for_review_date) \n      AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n      AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n      AND (COALESCE($pr_author_role) IS NULL OR pr.author_role IN ($pr_author_role))\n      AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n      AND ($include_bots_activities OR NOT author.is_bot_user)\n    GROUP BY repository_name) AS total\nON total.repository_name=personal.repository_name\nORDER BY personal.repository_name",
+          "rawSql": "SELECT personal.repository_name, contributor_name, personal_contribution::numeric/total_contribution*100 as \"contribution_percent\"\nFROM\n    (SELECT \n        repository_name, \n        CASE \n            WHEN author.is_former_participant THEN CONCAT(author.login, ' (former participant)') \n            WHEN author.is_bot_user THEN CONCAT(author.login, ' (bot)')\n            ELSE CASE WHEN $show_real_names THEN author.login ELSE author.nickname END\n        END AS contributor_name,\n        SUM(diff_rows_added+diff_rows_deleted) as personal_contribution\n    FROM pull_request AS pr\n        INNER JOIN actor AS shadowed_author ON shadowed_author.id = pr.author_id\n        INNER JOIN actor AS author ON COALESCE(shadowed_author.merged_with_id, shadowed_author.id)=author.id\n    WHERE pr.integrity_errors IS NULL\n      AND diff_rows_added+diff_rows_deleted!=0\n      AND $__timeFilter(LEAST(initial_commit_date, shared_for_review_date)) \n      AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n      AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n      AND (COALESCE($pr_author_role) IS NULL OR COALESCE(author.team_role, pr.author_role) IN ($pr_author_role))\n      AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n      AND ($include_bots_activities OR NOT author.is_bot_user)\n    GROUP BY repository_name, author.nickname, author.is_former_participant, author.is_bot_user, author.login) AS personal\n\nRIGHT JOIN \n    (SELECT repository_name, SUM(diff_rows_added+diff_rows_deleted) as total_contribution\n    FROM pull_request AS pr\n        INNER JOIN actor AS shadowed_author ON shadowed_author.id = pr.author_id\n        INNER JOIN actor AS author ON COALESCE(shadowed_author.merged_with_id, shadowed_author.id)=author.id\n    WHERE pr.integrity_errors IS NULL\n      AND diff_rows_added+diff_rows_deleted!=0\n      AND $__timeFilter(LEAST(initial_commit_date, shared_for_review_date)) \n      AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n      AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n      AND (COALESCE($pr_author_role) IS NULL OR COALESCE(author.team_role, pr.author_role) IN ($pr_author_role))\n      AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n      AND ($include_bots_activities OR NOT author.is_bot_user)\n    GROUP BY repository_name) AS total\nON total.repository_name=personal.repository_name\nORDER BY personal.repository_name",
           "refId": "A",
           "sql": {
             "columns": [
@@ -1983,8 +1831,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               }
             ]
           },
@@ -2045,7 +1892,7 @@
         "h": 23,
         "w": 24,
         "x": 0,
-        "y": 95
+        "y": 87
       },
       "id": 51,
       "options": {
@@ -2079,7 +1926,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "WITH review_timings AS (\nSELECT \n  grouping_field AS \"$group_by_field\",\n  PERCENTILE_CONT($percentile) WITHIN GROUP (ORDER BY EXTRACT(EPOCH FROM (merged_date-LEAST(COALESCE(initial_commit_date, shared_for_review_date), shared_for_review_date)))) AS total_lead_time,\n  COUNT(*) AS prs_count,\n  PERCENTILE_CONT($percentile) WITHIN GROUP (ORDER BY GREATEST(EXTRACT(EPOCH FROM (shared_for_review_date-initial_commit_date)), 0)) AS development_time,\n  PERCENTILE_CONT($percentile) WITHIN GROUP (ORDER BY EXTRACT(EPOCH FROM (first_reaction_date-shared_for_review_date))) AS first_reaction_got_in,\n  PERCENTILE_CONT($percentile) WITHIN GROUP (ORDER BY EXTRACT(EPOCH FROM (rework_completed_date-first_reaction_date))) AS rework_time,\n  PERCENTILE_CONT($percentile) WITHIN GROUP (ORDER BY EXTRACT(EPOCH FROM (merged_date-last_action_date))) AS idle_after_approve,\n\n\n  PERCENTILE_CONT($percentile) WITHIN GROUP (ORDER BY GREATEST(EXTRACT(EPOCH FROM (shared_for_review_date-initial_commit_date)), 0))\n        +PERCENTILE_CONT($percentile) WITHIN GROUP (ORDER BY EXTRACT(EPOCH FROM (first_reaction_date-shared_for_review_date)))\n        +PERCENTILE_CONT($percentile) WITHIN GROUP (ORDER BY EXTRACT(EPOCH FROM (rework_completed_date-first_reaction_date)))\n        +PERCENTILE_CONT($percentile) WITHIN GROUP (ORDER BY EXTRACT(EPOCH FROM (merged_date-last_action_date))) AS \"ordering_rank\"\nFROM (SELECT\n        CASE WHEN '$group_by_field'='author' \n          THEN\n            CASE \n              WHEN author.is_former_participant THEN CONCAT(author.login, ' (former participant)') \n              WHEN author.is_bot_user THEN CONCAT(author.login, ' (bot)')\n              ELSE CASE WHEN $show_real_names THEN author.login ELSE author.nickname END\n            END\n          ELSE pr.repository_name \n        END as grouping_field,\n        pr.merged_date,\n        pr.shared_for_review_date,\n        CASE WHEN commits_history_was_rewritten THEN NULL ELSE pr.initial_commit_date END AS initial_commit_date,\n        pr.first_reaction_date,\n        pr.rework_completed_date,\n        GREATEST(pr.last_approval_date, pr.rework_completed_date, pr.last_commit_date) as last_action_date\n    FROM pull_request AS pr\n        INNER JOIN pull_request_participant AS prtcpnt ON pr.team_name = prtcpnt.team_name AND pr.project_name = prtcpnt.project_name AND pr.repository_name = prtcpnt.repository_name AND pr.pull_request_number = prtcpnt.pull_request_number\n        INNER JOIN actor as author ON author.id = pr.author_id\n    WHERE pr.integrity_errors IS NULL\n      AND $__timeFilter(shared_for_review_date) \n      AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n      AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n      AND (COALESCE($pr_author_role) IS NULL OR pr.author_role IN ($pr_author_role))\n      AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n      AND ($include_bots_activities OR NOT author.is_bot_user)\n    GROUP BY 1, pr.project_name, pr.repository_name, pr.pull_request_number, pr.merged_date, pr.shared_for_review_date, pr.commits_history_was_rewritten, pr.initial_commit_date, pr.first_reaction_date, pr.rework_completed_date, pr.last_approval_date, pr.last_commit_date\n) AS activity_stats\nGROUP BY 1\nORDER BY PERCENTILE_CONT($percentile) WITHIN GROUP (ORDER BY GREATEST(EXTRACT(EPOCH FROM (shared_for_review_date-initial_commit_date)), 0))\n        +PERCENTILE_CONT($percentile) WITHIN GROUP (ORDER BY EXTRACT(EPOCH FROM (first_reaction_date-shared_for_review_date)))\n        +PERCENTILE_CONT($percentile) WITHIN GROUP (ORDER BY EXTRACT(EPOCH FROM (rework_completed_date-first_reaction_date)))\n        +PERCENTILE_CONT($percentile) WITHIN GROUP (ORDER BY EXTRACT(EPOCH FROM (merged_date-last_action_date)))\n),\nranked_review_timings AS (\n    SELECT \n        $group_by_field,\n        total_lead_time,\n        prs_count,\n        development_time,\n        first_reaction_got_in,\n        rework_time,\n        idle_after_approve,\n        ordering_rank,\n        ROW_NUMBER() OVER (ORDER BY ordering_rank DESC) AS rank_desc,\n        ROW_NUMBER() OVER (ORDER BY ordering_rank ASC) AS rank_asc\n    FROM review_timings\n    WHERE prs_count>$min_prs_count_sample_size\n)\nSELECT \n  $group_by_field,\n  total_lead_time AS \"Total lead time\",\n  prs_count AS \"PRs count\",\n  development_time AS \"Development time\",\n  first_reaction_got_in AS \"First reaction got in\",\n  rework_time AS \"Rework time\",\n  idle_after_approve AS \"Idle after approve\"\nFROM ranked_review_timings\nWHERE rank_desc <= $ranked_samples_size OR rank_asc <= $ranked_samples_size\nORDER BY ordering_rank DESC;",
+          "rawSql": "WITH review_timings AS (\nSELECT \n  grouping_field AS \"$group_by_field\",\n  PERCENTILE_CONT($percentile) WITHIN GROUP (ORDER BY EXTRACT(EPOCH FROM (merged_date-LEAST(COALESCE(initial_commit_date, shared_for_review_date), shared_for_review_date)))) AS total_lead_time,\n  COUNT(*) AS prs_count,\n  PERCENTILE_CONT($percentile) WITHIN GROUP (ORDER BY GREATEST(EXTRACT(EPOCH FROM (shared_for_review_date-initial_commit_date)), 0)) AS development_time,\n  PERCENTILE_CONT($percentile) WITHIN GROUP (ORDER BY EXTRACT(EPOCH FROM (first_reaction_date-shared_for_review_date))) AS first_reaction_got_in,\n  PERCENTILE_CONT($percentile) WITHIN GROUP (ORDER BY EXTRACT(EPOCH FROM (rework_completed_date-first_reaction_date))) AS rework_time,\n  PERCENTILE_CONT($percentile) WITHIN GROUP (ORDER BY EXTRACT(EPOCH FROM (merged_date-last_action_date))) AS idle_after_approve,\n\n\n  PERCENTILE_CONT($percentile) WITHIN GROUP (ORDER BY GREATEST(EXTRACT(EPOCH FROM (shared_for_review_date-initial_commit_date)), 0))\n        +PERCENTILE_CONT($percentile) WITHIN GROUP (ORDER BY EXTRACT(EPOCH FROM (first_reaction_date-shared_for_review_date)))\n        +PERCENTILE_CONT($percentile) WITHIN GROUP (ORDER BY EXTRACT(EPOCH FROM (rework_completed_date-first_reaction_date)))\n        +PERCENTILE_CONT($percentile) WITHIN GROUP (ORDER BY EXTRACT(EPOCH FROM (merged_date-last_action_date))) AS \"ordering_rank\"\nFROM (SELECT\n        CASE WHEN '$group_by_field'='author' \n          THEN\n            CASE \n              WHEN author.is_former_participant THEN CONCAT(author.login, ' (former participant)') \n              WHEN author.is_bot_user THEN CONCAT(author.login, ' (bot)')\n              ELSE CASE WHEN $show_real_names THEN author.login ELSE author.nickname END\n            END\n          ELSE pr.repository_name \n        END as grouping_field,\n        pr.merged_date,\n        pr.shared_for_review_date,\n        CASE WHEN commits_history_was_rewritten THEN NULL ELSE pr.initial_commit_date END AS initial_commit_date,\n        pr.first_reaction_date,\n        pr.rework_completed_date,\n        GREATEST(pr.last_approval_date, pr.rework_completed_date, pr.last_commit_date) as last_action_date\n    FROM pull_request AS pr\n      INNER JOIN actor AS shadowed_author ON shadowed_author.id = pr.author_id\n      INNER JOIN actor AS author ON COALESCE(shadowed_author.merged_with_id, shadowed_author.id)=author.id\n    WHERE pr.integrity_errors IS NULL\n      AND $__timeFilter(LEAST(initial_commit_date, shared_for_review_date)) \n      AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n      AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n      AND (COALESCE($pr_author_role) IS NULL OR COALESCE(author.team_role, pr.author_role) IN ($pr_author_role))\n      AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n      AND ($include_bots_activities OR NOT author.is_bot_user)\n    GROUP BY 1, pr.project_name, pr.repository_name, pr.pull_request_number, pr.merged_date, pr.shared_for_review_date, pr.commits_history_was_rewritten, pr.initial_commit_date, pr.first_reaction_date, pr.rework_completed_date, pr.last_approval_date, pr.last_commit_date\n) AS activity_stats\nGROUP BY 1\nORDER BY PERCENTILE_CONT($percentile) WITHIN GROUP (ORDER BY GREATEST(EXTRACT(EPOCH FROM (shared_for_review_date-initial_commit_date)), 0))\n        +PERCENTILE_CONT($percentile) WITHIN GROUP (ORDER BY EXTRACT(EPOCH FROM (first_reaction_date-shared_for_review_date)))\n        +PERCENTILE_CONT($percentile) WITHIN GROUP (ORDER BY EXTRACT(EPOCH FROM (rework_completed_date-first_reaction_date)))\n        +PERCENTILE_CONT($percentile) WITHIN GROUP (ORDER BY EXTRACT(EPOCH FROM (merged_date-last_action_date)))\n),\nranked_review_timings AS (\n    SELECT \n        $group_by_field,\n        total_lead_time,\n        prs_count,\n        development_time,\n        first_reaction_got_in,\n        rework_time,\n        idle_after_approve,\n        ordering_rank,\n        ROW_NUMBER() OVER (ORDER BY ordering_rank DESC) AS rank_desc,\n        ROW_NUMBER() OVER (ORDER BY ordering_rank ASC) AS rank_asc\n    FROM review_timings\n    WHERE prs_count>$min_prs_count_sample_size\n)\nSELECT \n  $group_by_field,\n  total_lead_time AS \"Total lead time\",\n  prs_count AS \"PRs count\",\n  development_time AS \"Development time\",\n  first_reaction_got_in AS \"First reaction got in\",\n  rework_time AS \"Rework time\",\n  idle_after_approve AS \"Idle after approve\"\nFROM ranked_review_timings\nWHERE rank_desc <= $ranked_samples_size OR rank_asc <= $ranked_samples_size\nORDER BY ordering_rank DESC;",
           "refId": "A",
           "sql": {
             "columns": [
@@ -2109,7 +1956,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 118
+        "y": 110
       },
       "id": 22,
       "panels": [],
@@ -2154,8 +2001,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               }
             ]
           },
@@ -2167,7 +2013,7 @@
         "h": 19,
         "w": 12,
         "x": 0,
-        "y": 119
+        "y": 111
       },
       "id": 1,
       "options": {
@@ -2202,7 +2048,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "WITH data AS (\n   SELECT \n      CASE WHEN '$group_by_field'='author' \n         THEN\n            CASE \n            WHEN author.is_former_participant THEN CONCAT(author.login, ' (former participant)') \n            WHEN author.is_bot_user THEN CONCAT(author.login, ' (bot)')\n            ELSE CASE WHEN $show_real_names THEN author.login ELSE author.nickname END\n            END\n         ELSE pr.repository_name \n      END as grouping_field,\n      COUNT(*) as prs_count\n   FROM pull_request AS pr\n      INNER JOIN actor as author ON author.id = pr.author_id\n   WHERE pr.integrity_errors IS NULL\n      AND $__timeFilter(shared_for_review_date) \n      AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n      AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n      AND (COALESCE($pr_author_role) IS NULL OR pr.author_role IN ($pr_author_role))\n      AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n      AND ($include_bots_activities OR NOT author.is_bot_user)\n   GROUP BY 1\n),\nranked_data AS (\n    SELECT \n        grouping_field,\n        prs_count,\n        ROW_NUMBER() OVER (ORDER BY prs_count DESC) AS rank_desc,\n        ROW_NUMBER() OVER (ORDER BY prs_count ASC) AS rank_asc\n    FROM data\n    WHERE prs_count>$min_prs_count_sample_size\n)\nSELECT \n grouping_field AS \"${group_by_field}\",\n prs_count AS \"PRs count\"\nFROM ranked_data\nWHERE rank_desc <= $ranked_samples_size OR rank_asc <= $ranked_samples_size\nORDER BY prs_count;",
+          "rawSql": "WITH data AS (\n   SELECT \n      CASE WHEN '$group_by_field'='author' \n         THEN\n            CASE \n            WHEN author.is_former_participant THEN CONCAT(author.login, ' (former participant)') \n            WHEN author.is_bot_user THEN CONCAT(author.login, ' (bot)')\n            ELSE CASE WHEN $show_real_names THEN author.login ELSE author.nickname END\n            END\n         ELSE pr.repository_name \n      END as grouping_field,\n      COUNT(*) as prs_count\n   FROM pull_request AS pr\n      INNER JOIN actor AS shadowed_author ON shadowed_author.id = pr.author_id\n      INNER JOIN actor AS author ON COALESCE(shadowed_author.merged_with_id, shadowed_author.id)=author.id\n   WHERE pr.integrity_errors IS NULL\n      AND $__timeFilter(LEAST(initial_commit_date, shared_for_review_date)) \n      AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n      AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n      AND (COALESCE($pr_author_role) IS NULL OR COALESCE(author.team_role, pr.author_role) IN ($pr_author_role))\n      AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n      AND ($include_bots_activities OR NOT author.is_bot_user)\n   GROUP BY 1\n),\nranked_data AS (\n    SELECT \n        grouping_field,\n        prs_count,\n        ROW_NUMBER() OVER (ORDER BY prs_count DESC) AS rank_desc,\n        ROW_NUMBER() OVER (ORDER BY prs_count ASC) AS rank_asc\n    FROM data\n    WHERE prs_count>$min_prs_count_sample_size\n)\nSELECT \n grouping_field AS \"${group_by_field}\",\n prs_count AS \"PRs count\"\nFROM ranked_data\nWHERE rank_desc <= $ranked_samples_size OR rank_asc <= $ranked_samples_size\nORDER BY prs_count;",
           "refId": "A",
           "sql": {
             "columns": [
@@ -2272,8 +2118,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               }
             ]
           },
@@ -2302,7 +2147,7 @@
         "h": 19,
         "w": 12,
         "x": 12,
-        "y": 119
+        "y": 111
       },
       "id": 35,
       "options": {
@@ -2336,7 +2181,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "WITH data AS (\n   SELECT \n      CASE WHEN '$group_by_field'='author' \n         THEN\n            CASE \n            WHEN author.is_former_participant THEN CONCAT(author.login, ' (former participant)') \n            WHEN author.is_bot_user THEN CONCAT(author.login, ' (bot)')\n            ELSE CASE WHEN $show_real_names THEN author.login ELSE author.nickname END\n            END\n         ELSE pr.repository_name \n      END as grouping_field,\n      SUM(diff_rows_added+diff_rows_deleted) as total_diff,\n   COUNT(*) AS prs_count\n   FROM pull_request AS pr\n      INNER JOIN actor as author ON author.id = pr.author_id\n   WHERE pr.integrity_errors IS NULL\n      AND $__timeFilter(shared_for_review_date) \n      AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n      AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n      AND (COALESCE($pr_author_role) IS NULL OR pr.author_role IN ($pr_author_role))\n      AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n      AND ($include_bots_activities OR NOT author.is_bot_user)\n   GROUP BY 1\n),\nranked_data AS (\n    SELECT \n        grouping_field,\n        prs_count,\n        total_diff,\n        ROW_NUMBER() OVER (ORDER BY total_diff DESC) AS rank_desc,\n        ROW_NUMBER() OVER (ORDER BY total_diff ASC) AS rank_asc\n    FROM data\n    WHERE prs_count>$min_prs_count_sample_size\n)\nSELECT \n grouping_field AS \"${group_by_field}\",\n total_diff AS \"Total diff\",\n prs_count AS \"PRs count\"\nFROM ranked_data\nWHERE rank_desc <= $ranked_samples_size OR rank_asc <= $ranked_samples_size\nORDER BY \"Total diff\";",
+          "rawSql": "WITH data AS (\n   SELECT \n      CASE WHEN '$group_by_field'='author' \n         THEN\n            CASE \n            WHEN author.is_former_participant THEN CONCAT(author.login, ' (former participant)') \n            WHEN author.is_bot_user THEN CONCAT(author.login, ' (bot)')\n            ELSE CASE WHEN $show_real_names THEN author.login ELSE author.nickname END\n            END\n         ELSE pr.repository_name \n      END as grouping_field,\n      SUM(diff_rows_added+diff_rows_deleted) as total_diff,\n   COUNT(*) AS prs_count\n   FROM pull_request AS pr\n      INNER JOIN actor AS shadowed_author ON shadowed_author.id = pr.author_id\n      INNER JOIN actor AS author ON COALESCE(shadowed_author.merged_with_id, shadowed_author.id)=author.id\n   WHERE pr.integrity_errors IS NULL\n      AND $__timeFilter(LEAST(initial_commit_date, shared_for_review_date)) \n      AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n      AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n      AND (COALESCE($pr_author_role) IS NULL OR COALESCE(author.team_role, pr.author_role) IN ($pr_author_role))\n      AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n      AND ($include_bots_activities OR NOT author.is_bot_user)\n   GROUP BY 1\n),\nranked_data AS (\n    SELECT \n        grouping_field,\n        prs_count,\n        total_diff,\n        ROW_NUMBER() OVER (ORDER BY total_diff DESC) AS rank_desc,\n        ROW_NUMBER() OVER (ORDER BY total_diff ASC) AS rank_asc\n    FROM data\n    WHERE prs_count>$min_prs_count_sample_size\n)\nSELECT \n grouping_field AS \"${group_by_field}\",\n total_diff AS \"Total diff\",\n prs_count AS \"PRs count\"\nFROM ranked_data\nWHERE rank_desc <= $ranked_samples_size OR rank_asc <= $ranked_samples_size\nORDER BY \"Total diff\";",
           "refId": "A",
           "sql": {
             "columns": [
@@ -2398,8 +2243,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               }
             ]
           },
@@ -2428,7 +2272,7 @@
         "h": 18,
         "w": 12,
         "x": 0,
-        "y": 138
+        "y": 130
       },
       "id": 2,
       "options": {
@@ -2463,7 +2307,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "WITH data AS (\n   SELECT \n      CASE WHEN '$group_by_field'='author' \n         THEN\n            CASE \n            WHEN author.is_former_participant THEN CONCAT(author.login, ' (former participant)') \n            WHEN author.is_bot_user THEN CONCAT(author.login, ' (bot)')\n            ELSE CASE WHEN $show_real_names THEN author.login ELSE author.nickname END\n            END\n         ELSE pr.repository_name \n      END as grouping_field,\n      PERCENTILE_CONT($percentile) WITHIN GROUP (ORDER BY diff_rows_added+diff_rows_deleted) as diff_size,\n      COUNT(*) AS prs_count\n   FROM pull_request AS pr\n      INNER JOIN actor as author ON author.id = pr.author_id\n   WHERE pr.integrity_errors IS NULL\n      AND diff_rows_added+diff_rows_deleted!=0\n      AND $__timeFilter(shared_for_review_date) \n      AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n      AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n      AND (COALESCE($pr_author_role) IS NULL OR pr.author_role IN ($pr_author_role))\n      AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n      AND ($include_bots_activities OR NOT author.is_bot_user)\n   GROUP BY 1\n),\nranked_data AS (\n    SELECT \n        grouping_field,\n        prs_count,\n        diff_size,\n        ROW_NUMBER() OVER (ORDER BY diff_size DESC) AS rank_desc,\n        ROW_NUMBER() OVER (ORDER BY diff_size ASC) AS rank_asc\n    FROM data\n    WHERE prs_count>$min_prs_count_sample_size\n)\nSELECT \n grouping_field AS \"${group_by_field}\",\n diff_size AS \"Diff size\",\n prs_count AS \"PRs count\"\nFROM ranked_data\nWHERE rank_desc <= $ranked_samples_size OR rank_asc <= $ranked_samples_size\nORDER BY \"Diff size\";",
+          "rawSql": "WITH data AS (\n   SELECT \n      CASE WHEN '$group_by_field'='author' \n         THEN\n            CASE \n            WHEN author.is_former_participant THEN CONCAT(author.login, ' (former participant)') \n            WHEN author.is_bot_user THEN CONCAT(author.login, ' (bot)')\n            ELSE CASE WHEN $show_real_names THEN author.login ELSE author.nickname END\n            END\n         ELSE pr.repository_name \n      END as grouping_field,\n      PERCENTILE_CONT($percentile) WITHIN GROUP (ORDER BY diff_rows_added+diff_rows_deleted) as diff_size,\n      COUNT(*) AS prs_count\n   FROM pull_request AS pr\n      INNER JOIN actor AS shadowed_author ON shadowed_author.id = pr.author_id\n      INNER JOIN actor AS author ON COALESCE(shadowed_author.merged_with_id, shadowed_author.id)=author.id\n   WHERE pr.integrity_errors IS NULL\n      AND diff_rows_added+diff_rows_deleted!=0\n      AND $__timeFilter(LEAST(initial_commit_date, shared_for_review_date)) \n      AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n      AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n      AND (COALESCE($pr_author_role) IS NULL OR COALESCE(author.team_role, pr.author_role) IN ($pr_author_role))\n      AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n      AND ($include_bots_activities OR NOT author.is_bot_user)\n   GROUP BY 1\n),\nranked_data AS (\n    SELECT \n        grouping_field,\n        prs_count,\n        diff_size,\n        ROW_NUMBER() OVER (ORDER BY diff_size DESC) AS rank_desc,\n        ROW_NUMBER() OVER (ORDER BY diff_size ASC) AS rank_asc\n    FROM data\n    WHERE prs_count>$min_prs_count_sample_size\n)\nSELECT \n grouping_field AS \"${group_by_field}\",\n diff_size AS \"Diff size\",\n prs_count AS \"PRs count\"\nFROM ranked_data\nWHERE rank_desc <= $ranked_samples_size OR rank_asc <= $ranked_samples_size\nORDER BY \"Diff size\";",
           "refId": "A",
           "sql": {
             "columns": [
@@ -2531,8 +2375,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               }
             ]
           },
@@ -2565,7 +2408,7 @@
         "h": 18,
         "w": 12,
         "x": 12,
-        "y": 138
+        "y": 130
       },
       "id": 13,
       "options": {
@@ -2600,7 +2443,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "WITH data AS (\n   SELECT \n      CASE WHEN '$group_by_field'='author' \n         THEN\n            CASE \n            WHEN author.is_former_participant THEN CONCAT(author.login, ' (former participant)') \n            WHEN author.is_bot_user THEN CONCAT(author.login, ' (bot)')\n            ELSE CASE WHEN $show_real_names THEN author.login ELSE author.nickname END\n            END\n         ELSE pr.repository_name \n      END as grouping_field,\n      AVG(EXTRACT(EPOCH FROM (merged_date-shared_for_review_date))) AS approval_speed,\n      COUNT(*) AS prs_count\n   FROM pull_request AS pr\n      INNER JOIN actor as author ON author.id = pr.author_id\n   WHERE pr.integrity_errors IS NULL\n      AND diff_rows_added+diff_rows_deleted!=0\n      AND $__timeFilter(shared_for_review_date) \n      AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n      AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n      AND (COALESCE($pr_author_role) IS NULL OR pr.author_role IN ($pr_author_role))\n      AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n      AND ($include_bots_activities OR NOT author.is_bot_user)\n   GROUP BY 1\n),\nranked_data AS (\n    SELECT \n        grouping_field,\n        prs_count,\n        approval_speed,\n        ROW_NUMBER() OVER (ORDER BY approval_speed DESC) AS rank_desc,\n        ROW_NUMBER() OVER (ORDER BY approval_speed ASC) AS rank_asc\n    FROM data\n    WHERE prs_count>$min_prs_count_sample_size\n)\nSELECT \n grouping_field AS \"${group_by_field}\",\n approval_speed AS \"Approval speed\",\n prs_count AS \"PRs count\"\nFROM ranked_data\nWHERE rank_desc <= $ranked_samples_size OR rank_asc <= $ranked_samples_size\nORDER BY \"Approval speed\";",
+          "rawSql": "WITH data AS (\n   SELECT \n      CASE WHEN '$group_by_field'='author' \n         THEN\n            CASE \n            WHEN author.is_former_participant THEN CONCAT(author.login, ' (former participant)') \n            WHEN author.is_bot_user THEN CONCAT(author.login, ' (bot)')\n            ELSE CASE WHEN $show_real_names THEN author.login ELSE author.nickname END\n            END\n         ELSE pr.repository_name \n      END as grouping_field,\n      AVG(EXTRACT(EPOCH FROM (merged_date-shared_for_review_date))) AS approval_speed,\n      COUNT(*) AS prs_count\n   FROM pull_request AS pr\n      INNER JOIN actor AS shadowed_author ON shadowed_author.id = pr.author_id\n      INNER JOIN actor AS author ON COALESCE(shadowed_author.merged_with_id, shadowed_author.id)=author.id\n   WHERE pr.integrity_errors IS NULL\n      AND diff_rows_added+diff_rows_deleted!=0\n      AND $__timeFilter(LEAST(initial_commit_date, shared_for_review_date)) \n      AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n      AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n      AND (COALESCE($pr_author_role) IS NULL OR COALESCE(author.team_role, pr.author_role) IN ($pr_author_role))\n      AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n      AND ($include_bots_activities OR NOT author.is_bot_user)\n   GROUP BY 1\n),\nranked_data AS (\n    SELECT \n        grouping_field,\n        prs_count,\n        approval_speed,\n        ROW_NUMBER() OVER (ORDER BY approval_speed DESC) AS rank_desc,\n        ROW_NUMBER() OVER (ORDER BY approval_speed ASC) AS rank_asc\n    FROM data\n    WHERE prs_count>$min_prs_count_sample_size\n)\nSELECT \n grouping_field AS \"${group_by_field}\",\n approval_speed AS \"Approval speed\",\n prs_count AS \"PRs count\"\nFROM ranked_data\nWHERE rank_desc <= $ranked_samples_size OR rank_asc <= $ranked_samples_size\nORDER BY \"Approval speed\";",
           "refId": "A",
           "sql": {
             "columns": [
@@ -2669,8 +2512,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               }
             ]
           },
@@ -2699,7 +2541,7 @@
         "h": 18,
         "w": 12,
         "x": 0,
-        "y": 156
+        "y": 148
       },
       "id": 14,
       "options": {
@@ -2734,7 +2576,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "WITH data AS (\n   SELECT \n      CASE WHEN '$group_by_field'='author' \n         THEN\n            CASE \n            WHEN author.is_former_participant THEN CONCAT(author.login, ' (former participant)') \n            WHEN author.is_bot_user THEN CONCAT(author.login, ' (bot)')\n            ELSE CASE WHEN $show_real_names THEN author.login ELSE author.nickname END\n            END\n         ELSE pr.repository_name \n      END as grouping_field,\n      AVG(requested_reviewers_count) AS reviewers_count,\n      COUNT(*) AS prs_count\n   FROM pull_request AS pr\n      INNER JOIN actor as author ON author.id = pr.author_id\n   WHERE pr.integrity_errors IS NULL\n      AND diff_rows_added+diff_rows_deleted!=0\n      AND $__timeFilter(shared_for_review_date) \n      AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n      AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n      AND (COALESCE($pr_author_role) IS NULL OR pr.author_role IN ($pr_author_role))\n      AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n      AND ($include_bots_activities OR NOT author.is_bot_user)\n   GROUP BY 1\n),\nranked_data AS (\n    SELECT \n        grouping_field,\n        prs_count,\n        reviewers_count,\n        ROW_NUMBER() OVER (ORDER BY reviewers_count DESC) AS rank_desc,\n        ROW_NUMBER() OVER (ORDER BY reviewers_count ASC) AS rank_asc\n    FROM data\n    WHERE prs_count>$min_prs_count_sample_size\n)\nSELECT \n grouping_field AS \"${group_by_field}\",\n reviewers_count AS \"Reviewers count\",\n prs_count AS \"PRs count\"\nFROM ranked_data\nWHERE rank_desc <= $ranked_samples_size OR rank_asc <= $ranked_samples_size\nORDER BY \"Reviewers count\";",
+          "rawSql": "WITH data AS (\n   SELECT \n      CASE WHEN '$group_by_field'='author' \n         THEN\n            CASE \n            WHEN author.is_former_participant THEN CONCAT(author.login, ' (former participant)') \n            WHEN author.is_bot_user THEN CONCAT(author.login, ' (bot)')\n            ELSE CASE WHEN $show_real_names THEN author.login ELSE author.nickname END\n            END\n         ELSE pr.repository_name \n      END as grouping_field,\n      AVG(requested_reviewers_count) AS reviewers_count,\n      COUNT(*) AS prs_count\n   FROM pull_request AS pr\n      INNER JOIN actor AS shadowed_author ON shadowed_author.id = pr.author_id\n      INNER JOIN actor AS author ON COALESCE(shadowed_author.merged_with_id, shadowed_author.id)=author.id\n   WHERE pr.integrity_errors IS NULL\n      AND diff_rows_added+diff_rows_deleted!=0\n      AND $__timeFilter(LEAST(initial_commit_date, shared_for_review_date)) \n      AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n      AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n      AND (COALESCE($pr_author_role) IS NULL OR COALESCE(author.team_role, pr.author_role) IN ($pr_author_role))\n      AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n      AND ($include_bots_activities OR NOT author.is_bot_user)\n   GROUP BY 1\n),\nranked_data AS (\n    SELECT \n        grouping_field,\n        prs_count,\n        reviewers_count,\n        ROW_NUMBER() OVER (ORDER BY reviewers_count DESC) AS rank_desc,\n        ROW_NUMBER() OVER (ORDER BY reviewers_count ASC) AS rank_asc\n    FROM data\n    WHERE prs_count>$min_prs_count_sample_size\n)\nSELECT \n grouping_field AS \"${group_by_field}\",\n reviewers_count AS \"Reviewers count\",\n prs_count AS \"PRs count\"\nFROM ranked_data\nWHERE rank_desc <= $ranked_samples_size OR rank_asc <= $ranked_samples_size\nORDER BY \"Reviewers count\";",
           "refId": "A",
           "sql": {
             "columns": [
@@ -2803,8 +2645,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               }
             ]
           },
@@ -2833,7 +2674,7 @@
         "h": 18,
         "w": 12,
         "x": 12,
-        "y": 156
+        "y": 148
       },
       "id": 20,
       "options": {
@@ -2868,7 +2709,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "WITH data AS (\n   SELECT \n      CASE WHEN '$group_by_field'='author' \n         THEN\n            CASE \n            WHEN author.is_former_participant THEN CONCAT(author.login, ' (former participant)') \n            WHEN author.is_bot_user THEN CONCAT(author.login, ' (bot)')\n            ELSE CASE WHEN $show_real_names THEN author.login ELSE author.nickname END\n            END\n         ELSE pr.repository_name \n      END as grouping_field,\n      AVG(total_comments_count) AS comments_count,\n      COUNT(*) AS prs_count\n   FROM pull_request AS pr\n      INNER JOIN actor as author ON author.id = pr.author_id\n   WHERE pr.integrity_errors IS NULL\n      AND diff_rows_added+diff_rows_deleted!=0\n      AND $__timeFilter(shared_for_review_date) \n      AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n      AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n      AND (COALESCE($pr_author_role) IS NULL OR pr.author_role IN ($pr_author_role))\n      AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n      AND ($include_bots_activities OR NOT author.is_bot_user)\n   GROUP BY 1\n),\nranked_data AS (\n    SELECT \n        grouping_field,\n        prs_count,\n        comments_count,\n        ROW_NUMBER() OVER (ORDER BY comments_count DESC) AS rank_desc,\n        ROW_NUMBER() OVER (ORDER BY comments_count ASC) AS rank_asc\n    FROM data\n    WHERE prs_count>$min_prs_count_sample_size\n)\nSELECT \n grouping_field AS \"${group_by_field}\",\n comments_count AS \"Comments count\",\n prs_count AS \"PRs count\"\nFROM ranked_data\nWHERE rank_desc <= $ranked_samples_size OR rank_asc <= $ranked_samples_size\nORDER BY \"Comments count\";",
+          "rawSql": "WITH data AS (\n   SELECT \n      CASE WHEN '$group_by_field'='author' \n         THEN\n            CASE \n            WHEN author.is_former_participant THEN CONCAT(author.login, ' (former participant)') \n            WHEN author.is_bot_user THEN CONCAT(author.login, ' (bot)')\n            ELSE CASE WHEN $show_real_names THEN author.login ELSE author.nickname END\n            END\n         ELSE pr.repository_name \n      END as grouping_field,\n      AVG(total_comments_count) AS comments_count,\n      COUNT(*) AS prs_count\n   FROM pull_request AS pr\n      INNER JOIN actor AS shadowed_author ON shadowed_author.id = pr.author_id\n      INNER JOIN actor AS author ON COALESCE(shadowed_author.merged_with_id, shadowed_author.id)=author.id\n   WHERE pr.integrity_errors IS NULL\n      AND diff_rows_added+diff_rows_deleted!=0\n      AND $__timeFilter(LEAST(initial_commit_date, shared_for_review_date)) \n      AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n      AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n      AND (COALESCE($pr_author_role) IS NULL OR COALESCE(author.team_role, pr.author_role) IN ($pr_author_role))\n      AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n      AND ($include_bots_activities OR NOT author.is_bot_user)\n   GROUP BY 1\n),\nranked_data AS (\n    SELECT \n        grouping_field,\n        prs_count,\n        comments_count,\n        ROW_NUMBER() OVER (ORDER BY comments_count DESC) AS rank_desc,\n        ROW_NUMBER() OVER (ORDER BY comments_count ASC) AS rank_asc\n    FROM data\n    WHERE prs_count>$min_prs_count_sample_size\n)\nSELECT \n grouping_field AS \"${group_by_field}\",\n comments_count AS \"Comments count\",\n prs_count AS \"PRs count\"\nFROM ranked_data\nWHERE rank_desc <= $ranked_samples_size OR rank_asc <= $ranked_samples_size\nORDER BY \"Comments count\";",
           "refId": "A",
           "sql": {
             "columns": [
@@ -2936,8 +2777,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "#EAB839",
@@ -2986,7 +2826,7 @@
         "h": 10,
         "w": 12,
         "x": 0,
-        "y": 174
+        "y": 166
       },
       "id": 18,
       "options": {
@@ -3021,7 +2861,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT\n   CASE\n      WHEN diff_rows_added+diff_rows_deleted<500 THEN 100 * round((diff_rows_added+diff_rows_deleted) / 100)\n      WHEN diff_rows_added+diff_rows_deleted<5000 THEN 1000 * round((diff_rows_added+diff_rows_deleted) / 1000)\n      WHEN diff_rows_added+diff_rows_deleted<50000 THEN 10000 * round((diff_rows_added+diff_rows_deleted) / 10000)\n      ELSE 50000 * round((diff_rows_added+diff_rows_deleted) / 50000)\n   END as \"Diff size\",\n   PERCENTILE_CONT($percentile) WITHIN GROUP (ORDER BY EXTRACT(EPOCH FROM (merged_date-shared_for_review_date))) AS \"Approval speed\",\n   COUNT(*) AS \"PRs count\"\nFROM pull_request AS pr\n   INNER JOIN actor as author ON author.id = pr.author_id\nWHERE pr.integrity_errors IS NULL\n   AND diff_rows_added+diff_rows_deleted!=0\n   AND $__timeFilter(shared_for_review_date) \n   AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n   AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n   AND (COALESCE($pr_author_role) IS NULL OR pr.author_role IN ($pr_author_role))\n   AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n   AND ($include_bots_activities OR NOT author.is_bot_user)\nGROUP BY 1\nORDER BY \"Diff size\"",
+          "rawSql": "SELECT\n   CASE\n      WHEN diff_rows_added+diff_rows_deleted<500 THEN 100 * round((diff_rows_added+diff_rows_deleted) / 100)\n      WHEN diff_rows_added+diff_rows_deleted<5000 THEN 1000 * round((diff_rows_added+diff_rows_deleted) / 1000)\n      WHEN diff_rows_added+diff_rows_deleted<50000 THEN 10000 * round((diff_rows_added+diff_rows_deleted) / 10000)\n      ELSE 50000 * round((diff_rows_added+diff_rows_deleted) / 50000)\n   END as \"Diff size\",\n   PERCENTILE_CONT($percentile) WITHIN GROUP (ORDER BY EXTRACT(EPOCH FROM (merged_date-shared_for_review_date))) AS \"Approval speed\",\n   COUNT(*) AS \"PRs count\"\nFROM pull_request AS pr\n   INNER JOIN actor AS shadowed_author ON shadowed_author.id = pr.author_id\n   INNER JOIN actor AS author ON COALESCE(shadowed_author.merged_with_id, shadowed_author.id)=author.id\nWHERE pr.integrity_errors IS NULL\n   AND diff_rows_added+diff_rows_deleted!=0\n   AND $__timeFilter(LEAST(initial_commit_date, shared_for_review_date)) \n   AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n   AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n   AND (COALESCE($pr_author_role) IS NULL OR COALESCE(author.team_role, pr.author_role) IN ($pr_author_role))\n   AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n   AND ($include_bots_activities OR NOT author.is_bot_user)\nGROUP BY 1\nORDER BY \"Diff size\"",
           "refId": "A",
           "sql": {
             "columns": [
@@ -3083,8 +2923,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "#EAB839",
@@ -3133,7 +2972,7 @@
         "h": 10,
         "w": 12,
         "x": 12,
-        "y": 174
+        "y": 166
       },
       "id": 19,
       "options": {
@@ -3168,7 +3007,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT\n   requested_reviewers_count  AS \"Reviewers count\",\n   PERCENTILE_CONT($percentile) WITHIN GROUP (ORDER BY EXTRACT(EPOCH FROM (merged_date-shared_for_review_date))) AS \"Approval speed\",\n   COUNT(*) AS \"PRs count\"\nFROM pull_request AS pr\n   INNER JOIN actor as author ON author.id = pr.author_id\nWHERE pr.integrity_errors IS NULL\n   AND $__timeFilter(shared_for_review_date) \n   AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n   AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n   AND (COALESCE($pr_author_role) IS NULL OR pr.author_role IN ($pr_author_role))\n   AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n   AND ($include_bots_activities OR NOT author.is_bot_user)\nGROUP BY requested_reviewers_count\nORDER BY requested_reviewers_count",
+          "rawSql": "SELECT\n   requested_reviewers_count  AS \"Reviewers count\",\n   PERCENTILE_CONT($percentile) WITHIN GROUP (ORDER BY EXTRACT(EPOCH FROM (merged_date-shared_for_review_date))) AS \"Approval speed\",\n   COUNT(*) AS \"PRs count\"\nFROM pull_request AS pr\n   INNER JOIN actor AS shadowed_author ON shadowed_author.id = pr.author_id\n   INNER JOIN actor AS author ON COALESCE(shadowed_author.merged_with_id, shadowed_author.id)=author.id\nWHERE pr.integrity_errors IS NULL\n   AND $__timeFilter(LEAST(initial_commit_date, shared_for_review_date)) \n   AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n   AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n   AND (COALESCE($pr_author_role) IS NULL OR COALESCE(author.team_role, pr.author_role) IN ($pr_author_role))\n   AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n   AND ($include_bots_activities OR NOT author.is_bot_user)\nGROUP BY requested_reviewers_count\nORDER BY requested_reviewers_count",
           "refId": "A",
           "sql": {
             "columns": [
@@ -3229,8 +3068,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "#EAB839",
@@ -3263,7 +3101,7 @@
         "h": 10,
         "w": 12,
         "x": 0,
-        "y": 184
+        "y": 176
       },
       "id": 30,
       "options": {
@@ -3298,7 +3136,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT\n   CASE\n      WHEN diff_rows_added+diff_rows_deleted<500 THEN 100 * round((diff_rows_added+diff_rows_deleted) / 100)\n      WHEN diff_rows_added+diff_rows_deleted<5000 THEN 1000 * round((diff_rows_added+diff_rows_deleted) / 1000)\n      WHEN diff_rows_added+diff_rows_deleted<50000 THEN 10000 * round((diff_rows_added+diff_rows_deleted) / 10000)\n      ELSE 50000 * round((diff_rows_added+diff_rows_deleted) / 50000)\n   END as \"Diff size\",\n   PERCENTILE_CONT($percentile) WITHIN GROUP (ORDER BY total_comments_count) AS \"Comments count\"\nFROM pull_request AS pr\n   INNER JOIN actor as author ON author.id = pr.author_id\nWHERE pr.integrity_errors IS NULL\n   AND diff_rows_added+diff_rows_deleted!=0\n   AND $__timeFilter(shared_for_review_date) \n   AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n   AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n   AND (COALESCE($pr_author_role) IS NULL OR pr.author_role IN ($pr_author_role))\n   AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n   AND ($include_bots_activities OR NOT author.is_bot_user)\nGROUP BY 1\nORDER BY \"Diff size\"",
+          "rawSql": "SELECT\n   CASE\n      WHEN diff_rows_added+diff_rows_deleted<500 THEN 100 * round((diff_rows_added+diff_rows_deleted) / 100)\n      WHEN diff_rows_added+diff_rows_deleted<5000 THEN 1000 * round((diff_rows_added+diff_rows_deleted) / 1000)\n      WHEN diff_rows_added+diff_rows_deleted<50000 THEN 10000 * round((diff_rows_added+diff_rows_deleted) / 10000)\n      ELSE 50000 * round((diff_rows_added+diff_rows_deleted) / 50000)\n   END as \"Diff size\",\n   PERCENTILE_CONT($percentile) WITHIN GROUP (ORDER BY total_comments_count) AS \"Comments count\"\nFROM pull_request AS pr\n   INNER JOIN actor AS shadowed_author ON shadowed_author.id = pr.author_id\n   INNER JOIN actor AS author ON COALESCE(shadowed_author.merged_with_id, shadowed_author.id)=author.id\nWHERE pr.integrity_errors IS NULL\n   AND diff_rows_added+diff_rows_deleted!=0\n   AND $__timeFilter(LEAST(initial_commit_date, shared_for_review_date)) \n   AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n   AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n   AND (COALESCE($pr_author_role) IS NULL OR COALESCE(author.team_role, pr.author_role) IN ($pr_author_role))\n   AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n   AND ($include_bots_activities OR NOT author.is_bot_user)\nGROUP BY 1\nORDER BY \"Diff size\"",
           "refId": "A",
           "sql": {
             "columns": [
@@ -3360,8 +3198,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "#EAB839",
@@ -3410,7 +3247,7 @@
         "h": 10,
         "w": 12,
         "x": 12,
-        "y": 184
+        "y": 176
       },
       "id": 44,
       "options": {
@@ -3445,7 +3282,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT\n   requested_reviewers_count  AS \"Reviewers count\",\n   PERCENTILE_CONT($percentile) WITHIN GROUP (ORDER BY total_comments_count) AS \"Comments count\",\n   COUNT(*) AS \"PRs count\"\nFROM pull_request AS pr\n   INNER JOIN actor as author ON author.id = pr.author_id\nWHERE pr.integrity_errors IS NULL\n   AND $__timeFilter(shared_for_review_date) \n   AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n   AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n   AND (COALESCE($pr_author_role) IS NULL OR pr.author_role IN ($pr_author_role))\n   AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n   AND ($include_bots_activities OR NOT author.is_bot_user)\nGROUP BY requested_reviewers_count\nORDER BY requested_reviewers_count",
+          "rawSql": "SELECT\n   requested_reviewers_count  AS \"Reviewers count\",\n   PERCENTILE_CONT($percentile) WITHIN GROUP (ORDER BY total_comments_count) AS \"Comments count\",\n   COUNT(*) AS \"PRs count\"\nFROM pull_request AS pr\n   INNER JOIN actor AS shadowed_author ON shadowed_author.id = pr.author_id\n   INNER JOIN actor AS author ON COALESCE(shadowed_author.merged_with_id, shadowed_author.id)=author.id\nWHERE pr.integrity_errors IS NULL\n   AND $__timeFilter(LEAST(initial_commit_date, shared_for_review_date)) \n   AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n   AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n   AND (COALESCE($pr_author_role) IS NULL OR COALESCE(author.team_role, pr.author_role) IN ($pr_author_role))\n   AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n   AND ($include_bots_activities OR NOT author.is_bot_user)\nGROUP BY requested_reviewers_count\nORDER BY requested_reviewers_count",
           "refId": "A",
           "sql": {
             "columns": [
@@ -3475,7 +3312,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 194
+        "y": 186
       },
       "id": 39,
       "panels": [],
@@ -3506,8 +3343,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               }
             ]
           }
@@ -3589,7 +3425,7 @@
         "h": 14,
         "w": 24,
         "x": 0,
-        "y": 195
+        "y": 187
       },
       "id": 49,
       "options": {
@@ -3616,7 +3452,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT CONCAT(pr.project_name, '/', pr.repository_name, '/', pr.pull_request_number) as pull_request, pr.view_url, pr.integrity_errors\nFROM pull_request AS pr\n   INNER JOIN actor as author ON author.id = pr.author_id\nWHERE pr.integrity_errors IS NOT NULL\n   AND $__timeFilter(shared_for_review_date) \n   AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n   AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n   AND (COALESCE($pr_author_role) IS NULL OR pr.author_role IN ($pr_author_role))\n   AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n   AND ($include_bots_activities OR NOT author.is_bot_user)",
+          "rawSql": "SELECT CONCAT(pr.project_name, '/', pr.repository_name, '/', pr.pull_request_number) as pull_request, pr.view_url, pr.integrity_errors\nFROM pull_request AS pr\n   INNER JOIN actor AS shadowed_author ON shadowed_author.id = pr.author_id\n   INNER JOIN actor AS author ON COALESCE(shadowed_author.merged_with_id, shadowed_author.id)=author.id\nWHERE pr.integrity_errors IS NOT NULL\n   AND $__timeFilter(LEAST(initial_commit_date, shared_for_review_date)) \n   AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n   AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n   AND (COALESCE($pr_author_role) IS NULL OR COALESCE(author.team_role, pr.author_role) IN ($pr_author_role))\n   AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n   AND ($include_bots_activities OR NOT author.is_bot_user)",
           "refId": "A",
           "sql": {
             "columns": [
@@ -3673,8 +3509,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               }
             ]
           }
@@ -3716,7 +3551,7 @@
         "h": 14,
         "w": 24,
         "x": 0,
-        "y": 209
+        "y": 201
       },
       "id": 31,
       "options": {
@@ -3748,7 +3583,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT \n   pr.*, \n   CASE \n      WHEN author.is_former_participant THEN CONCAT(author.login, ' (former participant)') \n      WHEN author.is_bot_user THEN CONCAT(author.login, ' (bot)')\n      ELSE CASE WHEN $show_real_names THEN author.login ELSE author.nickname END\n   END AS author\nFROM pull_request AS pr\n   INNER JOIN actor as author ON author.id = pr.author_id\nWHERE $__timeFilter(shared_for_review_date) \n   AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n   AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n   AND (COALESCE($pr_author_role) IS NULL OR pr.author_role IN ($pr_author_role))\n   AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n   AND ($include_bots_activities OR NOT author.is_bot_user)",
+          "rawSql": "SELECT \n   pr.*, \n   CASE \n      WHEN author.is_former_participant THEN CONCAT(author.login, ' (former participant)') \n      WHEN author.is_bot_user THEN CONCAT(author.login, ' (bot)')\n      ELSE CASE WHEN $show_real_names THEN author.login ELSE author.nickname END\n   END AS author,\n   author.team_role AS author_team_role\nFROM pull_request AS pr\n   INNER JOIN actor AS shadowed_author ON shadowed_author.id = pr.author_id\n   INNER JOIN actor AS author ON COALESCE(shadowed_author.merged_with_id, shadowed_author.id)=author.id\nWHERE $__timeFilter(LEAST(initial_commit_date, shared_for_review_date)) \n   AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n   AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n   AND (COALESCE($pr_author_role) IS NULL OR COALESCE(author.team_role, pr.author_role) IN ($pr_author_role))\n   AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n   AND ($include_bots_activities OR NOT author.is_bot_user)",
           "refId": "A",
           "sql": {
             "columns": [
@@ -3793,13 +3628,13 @@
           "type": "postgres",
           "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
         },
-        "definition": "SELECT DISTINCT team_name \nFROM pull_request\nWHERE pull_request.integrity_errors IS NULL\nORDER BY team_name",
+        "definition": "SELECT DISTINCT team_name \nFROM pull_request\nWHERE pull_request.integrity_errors IS NULL\nAND $__timeFilter(LEAST(initial_commit_date, shared_for_review_date)) \nORDER BY team_name",
         "includeAll": true,
         "label": "Team",
         "multi": true,
         "name": "team_name",
         "options": [],
-        "query": "SELECT DISTINCT team_name \nFROM pull_request\nWHERE pull_request.integrity_errors IS NULL\nORDER BY team_name",
+        "query": "SELECT DISTINCT team_name \nFROM pull_request\nWHERE pull_request.integrity_errors IS NULL\nAND $__timeFilter(LEAST(initial_commit_date, shared_for_review_date)) \nORDER BY team_name",
         "refresh": 1,
         "regex": "",
         "type": "query"
@@ -3818,13 +3653,13 @@
           "type": "postgres",
           "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
         },
-        "definition": "SELECT DISTINCT (repository_name) \nFROM pull_request \nWHERE \n    pull_request.integrity_errors IS NULL\n    AND $__timeFilter(shared_for_review_date) \n    AND (COALESCE($team_name) IS NULL OR team_name IN ($team_name))    \nORDER BY repository_name",
+        "definition": "SELECT DISTINCT (repository_name) \nFROM pull_request \nWHERE \n    pull_request.integrity_errors IS NULL\n    AND $__timeFilter(LEAST(initial_commit_date, shared_for_review_date)) \n    AND (COALESCE($team_name) IS NULL OR team_name IN ($team_name))    \nORDER BY repository_name",
         "includeAll": true,
         "label": "Repository name",
         "multi": true,
         "name": "repository_name",
         "options": [],
-        "query": "SELECT DISTINCT (repository_name) \nFROM pull_request \nWHERE \n    pull_request.integrity_errors IS NULL\n    AND $__timeFilter(shared_for_review_date) \n    AND (COALESCE($team_name) IS NULL OR team_name IN ($team_name))    \nORDER BY repository_name",
+        "query": "SELECT DISTINCT (repository_name) \nFROM pull_request \nWHERE \n    pull_request.integrity_errors IS NULL\n    AND $__timeFilter(LEAST(initial_commit_date, shared_for_review_date)) \n    AND (COALESCE($team_name) IS NULL OR team_name IN ($team_name))    \nORDER BY repository_name",
         "refresh": 2,
         "regex": "",
         "sort": 1,
@@ -3844,14 +3679,14 @@
           "type": "grafana-postgresql-datasource",
           "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
         },
-        "definition": "SELECT \nDISTINCT author_role\nFROM pull_request \n    INNER JOIN actor AS author ON pull_request.author_id = author.id\nWHERE pull_request.integrity_errors IS NULL\n    AND $__timeFilter(shared_for_review_date) \n    AND (COALESCE($team_name) IS NULL OR pull_request.team_name IN ($team_name))    \n    AND (COALESCE($repository_name) IS NULL OR repository_name IN ($repository_name))",
+        "definition": "SELECT \n    DISTINCT author_role\nFROM pull_request \nWHERE pull_request.integrity_errors IS NULL\n    AND $__timeFilter(LEAST(initial_commit_date, shared_for_review_date)) \n    AND (COALESCE($team_name) IS NULL OR pull_request.team_name IN ($team_name))    \n    AND (COALESCE($repository_name) IS NULL OR repository_name IN ($repository_name))\nUNION\nSELECT \n    DISTINCT author.team_role\nFROM pull_request AS pr\n      INNER JOIN actor AS shadowed_author ON shadowed_author.id = pr.author_id\n      INNER JOIN actor AS author ON COALESCE(shadowed_author.merged_with_id, shadowed_author.id)=author.id\nWHERE author.team_role IS NOT NULL \n    AND pr.integrity_errors IS NULL\n    AND $__timeFilter(LEAST(initial_commit_date, shared_for_review_date)) \n    AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))    \n    AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n",
         "description": "• OWNER: the author is the owner of the repository.\n\n• MEMBER: the author is a member of the organization that owns the repository.\n\n• COLLABORATOR: the author has write access to the repository.\n\n• FIRST_TIMER: the author is making their first contribution to any repository in the organization.\n\n• FIRST_TIME_CONTRIBUTOR: the author is contributing to this particular repository for the first time.\n\n• CONTRIBUTOR: the author has previously committed to the repository but is not necessarily a member or collaborator.\n\n• MANNEQUIN: the author is a placeholder for a previously deleted user.\n\n• NONE: the author has no affiliation with the repository.",
         "includeAll": true,
         "label": "Author role",
         "multi": true,
         "name": "pr_author_role",
         "options": [],
-        "query": "SELECT \nDISTINCT author_role\nFROM pull_request \n    INNER JOIN actor AS author ON pull_request.author_id = author.id\nWHERE pull_request.integrity_errors IS NULL\n    AND $__timeFilter(shared_for_review_date) \n    AND (COALESCE($team_name) IS NULL OR pull_request.team_name IN ($team_name))    \n    AND (COALESCE($repository_name) IS NULL OR repository_name IN ($repository_name))",
+        "query": "SELECT \n    DISTINCT author_role\nFROM pull_request \nWHERE pull_request.integrity_errors IS NULL\n    AND $__timeFilter(LEAST(initial_commit_date, shared_for_review_date)) \n    AND (COALESCE($team_name) IS NULL OR pull_request.team_name IN ($team_name))    \n    AND (COALESCE($repository_name) IS NULL OR repository_name IN ($repository_name))\nUNION\nSELECT \n    DISTINCT author.team_role\nFROM pull_request AS pr\n      INNER JOIN actor AS shadowed_author ON shadowed_author.id = pr.author_id\n      INNER JOIN actor AS author ON COALESCE(shadowed_author.merged_with_id, shadowed_author.id)=author.id\nWHERE author.team_role IS NOT NULL \n    AND pr.integrity_errors IS NULL\n    AND $__timeFilter(LEAST(initial_commit_date, shared_for_review_date)) \n    AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))    \n    AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n",
         "refresh": 1,
         "regex": "",
         "sort": 1,
@@ -3871,13 +3706,13 @@
           "type": "postgres",
           "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
         },
-        "definition": "SELECT \nDISTINCT \nauthor.id as __value, \nCASE \n    WHEN author.is_former_participant THEN CONCAT(author.login, ' (former participant)') \n    WHEN author.is_bot_user THEN CONCAT(author.login, ' (bot)')\n    ELSE CASE WHEN $show_real_names THEN author.login ELSE author.nickname END\nEND AS __text \nFROM pull_request \n    INNER JOIN actor AS author ON pull_request.author_id = author.id\nWHERE pull_request.integrity_errors IS NULL\n    AND $__timeFilter(shared_for_review_date) \n    AND (COALESCE($team_name) IS NULL OR pull_request.team_name IN ($team_name))    \n    AND (COALESCE($repository_name) IS NULL OR repository_name IN ($repository_name))\n    AND (COALESCE($pr_author_role) IS NULL OR pull_request.author_role IN ($pr_author_role))\nORDER BY 2",
+        "definition": "SELECT \nDISTINCT \nauthor.id as __value, \nCASE \n    WHEN author.is_former_participant THEN CONCAT(author.login, ' (former participant)') \n    WHEN author.is_bot_user THEN CONCAT(author.login, ' (bot)')\n    ELSE CASE WHEN $show_real_names THEN author.login ELSE author.nickname END\nEND AS __text \nFROM pull_request AS pr\n    INNER JOIN actor AS shadowed_author ON shadowed_author.id = pr.author_id\n    INNER JOIN actor AS author ON COALESCE(shadowed_author.merged_with_id, shadowed_author.id)=author.id\nWHERE pr.integrity_errors IS NULL\n    AND $__timeFilter(LEAST(initial_commit_date, shared_for_review_date)) \n    AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))    \n    AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n    AND (COALESCE($pr_author_role) IS NULL OR COALESCE(author.team_role, pr.author_role) IN ($pr_author_role))\nORDER BY 2",
         "includeAll": true,
         "label": "PR author",
         "multi": true,
         "name": "pr_author",
         "options": [],
-        "query": "SELECT \nDISTINCT \nauthor.id as __value, \nCASE \n    WHEN author.is_former_participant THEN CONCAT(author.login, ' (former participant)') \n    WHEN author.is_bot_user THEN CONCAT(author.login, ' (bot)')\n    ELSE CASE WHEN $show_real_names THEN author.login ELSE author.nickname END\nEND AS __text \nFROM pull_request \n    INNER JOIN actor AS author ON pull_request.author_id = author.id\nWHERE pull_request.integrity_errors IS NULL\n    AND $__timeFilter(shared_for_review_date) \n    AND (COALESCE($team_name) IS NULL OR pull_request.team_name IN ($team_name))    \n    AND (COALESCE($repository_name) IS NULL OR repository_name IN ($repository_name))\n    AND (COALESCE($pr_author_role) IS NULL OR pull_request.author_role IN ($pr_author_role))\nORDER BY 2",
+        "query": "SELECT \nDISTINCT \nauthor.id as __value, \nCASE \n    WHEN author.is_former_participant THEN CONCAT(author.login, ' (former participant)') \n    WHEN author.is_bot_user THEN CONCAT(author.login, ' (bot)')\n    ELSE CASE WHEN $show_real_names THEN author.login ELSE author.nickname END\nEND AS __text \nFROM pull_request AS pr\n    INNER JOIN actor AS shadowed_author ON shadowed_author.id = pr.author_id\n    INNER JOIN actor AS author ON COALESCE(shadowed_author.merged_with_id, shadowed_author.id)=author.id\nWHERE pr.integrity_errors IS NULL\n    AND $__timeFilter(LEAST(initial_commit_date, shared_for_review_date)) \n    AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))    \n    AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n    AND (COALESCE($pr_author_role) IS NULL OR COALESCE(author.team_role, pr.author_role) IN ($pr_author_role))\nORDER BY 2",
         "refresh": 2,
         "regex": "",
         "type": "query"

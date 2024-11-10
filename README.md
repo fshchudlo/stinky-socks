@@ -38,7 +38,7 @@
 >
 > This feature is also could helpful if you’re building your own importer for the SCM system of your need (and we’d love your
 > contributions!).
-
+~~~~
 ### Running unit tests
 
 - Easy as ```npm run test```.
