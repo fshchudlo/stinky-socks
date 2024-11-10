@@ -1366,7 +1366,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT \n   $__timeGroupAlias(shared_for_review_date, $group_by_period),\n   COUNT(*) AS \"PRs count\",\n   COUNT(DISTINCT pr.author_id) AS \"Contributors count\",\n   AVG(requested_reviewers_count) AS \"Average reviewers count\",\n   AVG(total_comments_count) AS \"Average comments count\",\n   SUM(CASE WHEN tests_were_touched THEN 0 ELSE 1 END)::decimal/COUNT(*)*100 AS \"PRs without tests changes\",\n   AVG(CASE WHEN diff_rows_added+diff_rows_deleted=0 THEN NULL ELSE diff_rows_added+diff_rows_deleted END) AS \"Average diff size\",\n   SUM(diff_rows_added+diff_rows_deleted) as \"Lines changed in period\"\nFROM pull_request AS pr\n   INNER JOIN actor as author ON author.id = pr.author_id\nWHERE pr.integrity_errors IS NULL\n   AND $__timeFilter(shared_for_review_date) \n   AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n   AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n   AND (COALESCE($pr_author_role) IS NULL OR pr.author_role IN ($pr_author_role))\n   AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n   AND ($include_bots_activities OR NOT author.is_bot_user)\nGROUP BY 1\nORDER BY $__timeGroup(shared_for_review_date, $group_by_period)",
+          "rawSql": "SELECT \n   $__timeGroupAlias(shared_for_review_date, $group_by_period),\n   COUNT(*) AS \"PRs count\",\n   COUNT(DISTINCT CASE WHEN pr.author_role IN ('OWNER', 'MEMBER', 'COLLABORATOR') THEN pr.author_id END) AS \"Maintainers contirbuted\",\n   COUNT(DISTINCT CASE WHEN pr.author_role IN ('CONTRIBUTOR', 'FIRST_TIMER', 'FIRST_TIME_CONTRIBUTOR') THEN pr.author_id END) AS \"Contributors contirbuted\",\n   COUNT(DISTINCT pr.author_id) AS \"Total authors contributed\",\n   AVG(requested_reviewers_count) AS \"Average reviewers count\",\n   AVG(total_comments_count) AS \"Average comments count\",\n   SUM(CASE WHEN tests_were_touched THEN 0 ELSE 1 END)::decimal/COUNT(*)*100 AS \"PRs without tests changes\",\n   AVG(CASE WHEN diff_rows_added+diff_rows_deleted=0 THEN NULL ELSE diff_rows_added+diff_rows_deleted END) AS \"Average diff size\",\n   SUM(diff_rows_added+diff_rows_deleted) as \"Lines changed in period\"\nFROM pull_request AS pr\n   INNER JOIN actor as author ON author.id = pr.author_id\nWHERE pr.integrity_errors IS NULL\n   AND $__timeFilter(shared_for_review_date) \n   AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n   AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n   AND (COALESCE($pr_author_role) IS NULL OR pr.author_role IN ($pr_author_role))\n   AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n   AND ($include_bots_activities OR NOT author.is_bot_user)\nGROUP BY 1\nORDER BY $__timeGroup(shared_for_review_date, $group_by_period)",
           "refId": "A",
           "sql": {
             "columns": [
@@ -1865,7 +1865,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               }
             ]
           },
@@ -1982,7 +1983,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               }
             ]
           },
@@ -2152,7 +2154,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               }
             ]
           },
@@ -2269,7 +2272,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               }
             ]
           },
@@ -2394,7 +2398,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               }
             ]
           },
@@ -2526,7 +2531,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               }
             ]
           },
@@ -2663,7 +2669,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               }
             ]
           },
@@ -2796,7 +2803,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               }
             ]
           },
@@ -2928,7 +2936,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "#EAB839",
@@ -3074,7 +3083,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "#EAB839",
@@ -3219,7 +3229,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "#EAB839",
@@ -3349,7 +3360,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "#EAB839",
@@ -3494,7 +3506,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               }
             ]
           }
@@ -3660,7 +3673,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               }
             ]
           }
