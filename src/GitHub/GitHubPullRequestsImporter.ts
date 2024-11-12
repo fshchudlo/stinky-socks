@@ -31,7 +31,7 @@ export class GitHubPullRequestsImporter {
 
     async importPullRequests() {
         for (const repositoryName of await this.project.repositoriesSelector(this.gitHubAPI)) {
-            console.group(`🔁 Importing pull requests for '${repositoryName}' repository`);
+            console.group(`🔁 Importing pull requests for the '${repositoryName}' repository`);
 
             const timelogLabel = `✅ '${repositoryName}' pull requests import completed`;
             console.time(timelogLabel);
