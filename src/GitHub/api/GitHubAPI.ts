@@ -36,13 +36,7 @@ export class GitHubAPI {
 
     async getPullRequestActivities(owner: string, repo: string, pullRequestId: number): Promise<GitHubPullRequestActivityModel[]> {
         const url = `${this.baseUrl}/repos/${owner}/${repo}/issues/${pullRequestId}/timeline`;
-        const result = await this.getFullList(url);
-        return result.map(a => {
-            if (!["base_ref_deleted", "disconnected", "auto_rebase_enabled", "base_ref_force_pushed", "connected", "auto_merge_disabled", "auto_squash_enabled", "convert_to_draft", "unsubscribed", "locked", "removed_from_project", "moved_columns_in_project", "added_to_project", "review_dismissed", "comment_deleted", "base_ref_changed", "review_request_removed", "unassigned", "reopened", "demilestoned", "line-commented", "head_ref_restored", "automatic_base_change_succeeded", "ready_for_review", "reviewed", "review_requested", "cross-referenced", "referenced", "commented", "committed", "merged", "closed", "unlabeled", "milestoned", "renamed", "labeled", "head_ref_deleted", "head_ref_force_pushed", "mentioned", "subscribed", "assigned"].includes(a.event)) {
-                console.error(`Unknown event type: ${a.event}`);
-            }
-            return a;
-        });
+        return await this.getFullList(url);
     }
 
     async getPullRequestFiles(owner: string, repo: string, pullRequestId: number): Promise<GitHubFileDiffModel[]> {
