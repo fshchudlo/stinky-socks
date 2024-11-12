@@ -7,6 +7,7 @@ import getNonBotCommentsTimestamps from "./helpers/getNonBotCommentsTimestamps";
 import getActivitiesOf from "./helpers/getActivitiesOf";
 import calculatePrSharedForReviewDate from "./helpers/calculatePrSharedForReviewDate";
 import { GitHubUserModel } from "../api/GitHubAPI.contracts";
+import { calculateReviewersCount } from "./helpers/calculateReviewersCount";
 
 export class GitHubPullRequest extends PullRequest {
     public async init(model: ImportParams) {
@@ -26,7 +27,7 @@ export class GitHubPullRequest extends PullRequest {
         this.pullRequestNumber = model.pullRequest.number;
         this.viewURL = model.pullRequest.html_url;
         this.targetBranch = model.pullRequest.base.ref;
-        this.requestedReviewersCount = model.pullRequestActivities.filter(ActivityTraits.isReviewRequestedEvent).length - model.pullRequestActivities.filter(ActivityTraits.isReviewRequestRemovedEvent).length;
+        this.requestedReviewersCount = calculateReviewersCount(model);
         this.authorRole = model.pullRequest.author_association;
         this.createdDate = new Date(model.pullRequest.created_at);
         this.updatedDate = new Date(model.pullRequest.updated_at);
