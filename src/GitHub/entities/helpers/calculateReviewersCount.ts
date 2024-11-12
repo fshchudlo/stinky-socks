@@ -10,11 +10,13 @@ import { ActivityTraits } from "./ActivityTraits";
 export function calculateReviewersCount(model: ImportParams) {
     const requestedReviewers = model.pullRequestActivities
         .filter(ActivityTraits.isReviewRequestedEvent)
-        .map(r => r.requested_reviewer.login);
+        .filter(r => r.requested_reviewer)
+        .map(r => r.requested_reviewer!.login);
 
     const removedReviewers = model.pullRequestActivities
         .filter(ActivityTraits.isReviewRequestRemovedEvent)
-        .map(r => r.requested_reviewer.login);
+        .filter(r => r.requested_reviewer)
+        .map(r => r.requested_reviewer!.login);
 
     const reactedReviewers = model.pullRequestActivities
         .filter(ActivityTraits.isReviewedEvent)

@@ -54,8 +54,8 @@ export type GitHubPullRequestActivityCommentedModel = {
 export type GitHubPullRequestActivityReviewRequestedModel = {
     event: "review_requested" | "review_request_removed";
     actor: GitHubUserModel;
-    requested_reviewer: GitHubUserModel;
-    requested_team: { name: string };
+    requested_reviewer?: GitHubUserModel;
+    requested_team?: { name: string };
     created_at: string;
 };
 export type GitHubPullRequestActivityReviewedModel = {

@@ -38,7 +38,7 @@ function getEarliestTimestamp(dates: string[]): number {
 function getNonBotReviewerAdditions(model: ImportParams): any[] {
     return model.pullRequestActivities
         .filter(ActivityTraits.isReviewRequestedEvent)
-        .filter(a => !model.botUserNames.includes(a.requested_reviewer?.login || a.requested_team?.name));
+        .filter(a => !model.botUserNames.includes((a.requested_reviewer?.login || a.requested_team?.name)!));
 }
 
 function getReviewersAddedAfterPRCreation(activities: any[], prCreationDate: string): any[] {
