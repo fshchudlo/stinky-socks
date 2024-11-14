@@ -43,9 +43,10 @@ export class GitHubPullRequestsImporter {
     }
 
     private async importRepositoryPullRequests(repositoryName: string) {
-        const pageSize = 100;
-        const lastUpdateDateOfStoredPRs: Date | null = await MetricsDB.getPRsMaxDate("updatedDate", this.teamName, this.project.owner, repositoryName);
         const importedPRsCount = await MetricsDB.getPRsCount(this.teamName, this.project.owner, repositoryName);
+        const lastUpdateDateOfStoredPRs: Date | null = await MetricsDB.getPRsMaxDate("updatedDate", this.teamName, this.project.owner, repositoryName);
+
+        const pageSize = 100;
         let pageNumber = importedPRsCount > pageSize ? Math.floor(importedPRsCount / pageSize) : 1;
 
         while (true) {
@@ -53,6 +54,7 @@ export class GitHubPullRequestsImporter {
             console.time(timelogLabel);
 
             const pullRequestsChunk = await this.gitHubAPI.getClosedPullRequests(this.project.owner, repositoryName, pageNumber, pageSize);
+
             for (const pullRequest of pullRequestsChunk) {
                 if (lastUpdateDateOfStoredPRs != null && new Date(pullRequest.updated_at) <= lastUpdateDateOfStoredPRs) {
                     continue;
@@ -88,7 +90,7 @@ export class GitHubPullRequestsImporter {
                     teamName: this.teamName,
                     botUserNames: project.botUserNames,
                     pullRequest,
-                    pullRequestActivities: activities,
+                    activities,
                     files
                 })
             );
@@ -108,7 +110,7 @@ export class GitHubPullRequestsImporter {
         for (const assignee of model.pullRequest.assignees) {
             assignee.login = sanitizeUserLogin(assignee);
         }
-        for (const activity of model.pullRequestActivities) {
+        for (const activity of model.activities) {
             const anyActivity = activity as any;
 
             if (anyActivity.comments?.user) {

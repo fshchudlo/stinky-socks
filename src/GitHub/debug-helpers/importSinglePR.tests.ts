@@ -19,7 +19,7 @@ describe("Import single PR debug helper", () => {
                 teamName: "grafana",
                 botUserNames: [],
                 pullRequest,
-                pullRequestActivities: activities,
+                activities,
                 files
             }
         );

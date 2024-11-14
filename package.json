@@ -1,8 +1,16 @@
 {
   "name": "stinky-socks",
+  "author": "Fedor Shchudlo",
+  "license": "Apache 2.0",
   "version": "1.0.0",
   "description": "App to import DevEx metrics of different kind.",
   "main": "dist/main.js",
+  "keywords": [
+    "devex",
+    "jenkins",
+    "bitbucket",
+    "github"
+  ],
   "scripts": {
     "start": "ts-node src/app.ts",
     "build": "tsc -p tsconfig.json",
@@ -10,18 +18,11 @@
     "test": "jest",
     "test:coverage": "jest --coverage",
     "test:update-snapshots": "jest --updateSnapshot",
+
     "migration:generate": "ts-node ./node_modules/typeorm/cli.js migration:generate -d src/MetricsDB/MetricsDB.ts",
     "migration:run": "ts-node ./node_modules/typeorm/cli.js migration:run -d src/MetricsDB/MetricsDB.ts",
     "migration:revert": "ts-node ./node_modules/typeorm/cli.js migration:revert -d src/MetricsDB/MetricsDB.ts"
   },
-  "keywords": [
-    "devex",
-    "jenkins",
-    "bitbucket",
-    "github"
-  ],
-  "author": "Fedor Shchudlo",
-  "license": "Apache 2.0",
   "dependencies": {
     "axios": "^1.7.7",
     "cache-manager": "^6.1.1",

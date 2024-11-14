@@ -4,6 +4,6 @@ export type ImportParams = {
     teamName: string;
     botUserNames: string[],
     pullRequest: GitHubPullRequestModel,
-    pullRequestActivities: GitHubPullRequestActivityModel[],
+    activities: GitHubPullRequestActivityModel[],
     files: GitHubFileDiffModel[]
 }

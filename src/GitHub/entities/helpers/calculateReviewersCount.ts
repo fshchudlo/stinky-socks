@@ -8,17 +8,17 @@ import { ActivityTraits } from "./ActivityTraits";
 * So, we take all the request events and subtract the removal events but only for the users who was requested.
 * */
 export function calculateReviewersCount(model: ImportParams) {
-    const requestedReviewers = model.pullRequestActivities
+    const requestedReviewers = model.activities
         .filter(ActivityTraits.isReviewRequestedEvent)
         .filter(r => r.requested_reviewer)
         .map(r => r.requested_reviewer!.login);
 
-    const removedReviewers = model.pullRequestActivities
+    const removedReviewers = model.activities
         .filter(ActivityTraits.isReviewRequestRemovedEvent)
         .filter(r => r.requested_reviewer)
         .map(r => r.requested_reviewer!.login);
 
-    const reactedReviewers = model.pullRequestActivities
+    const reactedReviewers = model.activities
         .filter(ActivityTraits.isReviewedEvent)
         .filter(r => r.user)
         .map(r => r.user!.login);

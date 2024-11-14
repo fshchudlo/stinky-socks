@@ -47,7 +47,7 @@ export class GitHubPullRequest extends PullRequest {
         this.sharedForReviewDate = calculatePrSharedForReviewDate(model);
         this.mergedDate = new Date(model.pullRequest.merged_at);
 
-        const commitTimestamps = model.pullRequestActivities.filter(ActivityTraits.isCommitedEvent).map((c) => new Date(c.author.date).getTime());
+        const commitTimestamps = model.activities.filter(ActivityTraits.isCommitedEvent).map((c) => new Date(c.author.date).getTime());
         if (commitTimestamps.length > 0) {
             this.initialCommitDate = new Date(Math.min(...commitTimestamps));
             this.lastCommitDate = new Date(Math.max(...commitTimestamps));
@@ -56,7 +56,7 @@ export class GitHubPullRequest extends PullRequest {
     }
 
     private calculateCommitStats(model: ImportParams) {
-        this.totalCommentsCount = getNonBotCommentsTimestamps(model.pullRequestActivities, model.botUserNames).length;
+        this.totalCommentsCount = getNonBotCommentsTimestamps(model.activities, model.botUserNames).length;
 
         this.diffRowsAdded = model.files.reduce((acc, file) => acc + file.additions, 0);
         this.diffRowsDeleted = model.files.reduce((acc, file) => acc + file.deletions, 0);
@@ -68,10 +68,10 @@ export class GitHubPullRequest extends PullRequest {
     private async initializeParticipants(model: ImportParams) {
         const allParticipants = model.pullRequest.requested_reviewers.map(r => r)
             .concat(model.pullRequest.assignees.map(p => p))
-            .concat(model.pullRequestActivities.filter(ActivityTraits.isMergedEvent).map(c => c.actor))
-            .concat(model.pullRequestActivities.filter(ActivityTraits.isCommentedEvent).map(c => c.actor))
-            .concat(model.pullRequestActivities.filter(ActivityTraits.isLineCommentedEvent).flatMap(c => c.comments).map(c => c.user))
-            .concat(model.pullRequestActivities.filter(ActivityTraits.isReviewedEvent).map(u => u.user).filter(u => !!u))
+            .concat(model.activities.filter(ActivityTraits.isMergedEvent).map(c => c.actor))
+            .concat(model.activities.filter(ActivityTraits.isCommentedEvent).map(c => c.actor))
+            .concat(model.activities.filter(ActivityTraits.isLineCommentedEvent).flatMap(c => c.comments).map(c => c.user))
+            .concat(model.activities.filter(ActivityTraits.isReviewedEvent).map(u => u.user).filter(u => !!u))
             .filter(p => !!p?.login)
             .filter(p => p.login !== model.pullRequest.user.login);
 
@@ -94,7 +94,7 @@ export class GitHubPullRequest extends PullRequest {
                     return new GitHubPullRequestParticipant(
                         model.teamName,
                         model.pullRequest,
-                        getActivitiesOf(model.pullRequestActivities, participant.login),
+                        getActivitiesOf(model.activities, participant.login),
                         participantUser
                     );
                 }));
