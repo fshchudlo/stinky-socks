@@ -1,16 +1,11 @@
 import { ImportParams } from "../ImportParams";
-import getNonBotCommentsTimestamps from "./getNonBotCommentsTimestamps";
 import { ActivityTraits } from "./ActivityTraits";
 
 export default function calculatePrSharedForReviewDate(model: ImportParams): Date {
-    const firstCommentDate = getEarliestNonBotCommentTimestamp(model);
-
     const readyForReviewEvents = model.activities.filter(ActivityTraits.isReadyForReviewEvent);
     if (readyForReviewEvents.length > 0) {
         const earliestReadyForReviewEvent = getEarliestTimestamp(readyForReviewEvents.map(a => a.created_at));
-        if (!firstCommentDate || firstCommentDate > earliestReadyForReviewEvent) {
-            return new Date(earliestReadyForReviewEvent);
-        }
+        return new Date(earliestReadyForReviewEvent);
     }
 
     const nonBotReviewerAdditions = getNonBotReviewerAdditions(model);
@@ -20,11 +15,7 @@ export default function calculatePrSharedForReviewDate(model: ImportParams): Dat
         // All reviewers were added after PR creation time
         if (reviewersAddedAfterPRCreation.length === nonBotReviewerAdditions.length) {
             const earliestReviewerAdditionDate = getEarliestTimestamp(nonBotReviewerAdditions.map(a => a.created_at));
-
-
-            if (!firstCommentDate || firstCommentDate > earliestReviewerAdditionDate) {
-                return new Date(earliestReviewerAdditionDate);
-            }
+            return new Date(earliestReviewerAdditionDate);
         }
     }
 
@@ -43,9 +34,4 @@ function getNonBotReviewerAdditions(model: ImportParams): any[] {
 
 function getReviewersAddedAfterPRCreation(activities: any[], prCreationDate: string): any[] {
     return activities.filter(addition => new Date(addition.created_at).getTime() > new Date(prCreationDate).getTime());
-}
-
-function getEarliestNonBotCommentTimestamp(model: ImportParams): number | null {
-    const commentTimeStamps = getNonBotCommentsTimestamps(model.activities, model.botUserNames);
-    return commentTimeStamps.length ? Math.min(...commentTimeStamps) : null;
 }

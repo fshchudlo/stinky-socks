@@ -1,7 +1,7 @@
 import { PullRequestParticipant } from "../../MetricsDB/entities/PullRequestParticipant";
 import { GitHubPullRequestActivityModel, GitHubPullRequestModel } from "../api/GitHubAPI.contracts";
 import { ActivityTraits } from "./helpers/ActivityTraits";
-import getNonBotCommentsTimestamps from "./helpers/getNonBotCommentsTimestamps";
+import getCommentsTimestamps from "./helpers/getCommentsTimestamps";
 import { Actor } from "../../MetricsDB/entities/Actor";
 
 export class GitHubPullRequestParticipant extends PullRequestParticipant {
@@ -24,7 +24,7 @@ export class GitHubPullRequestParticipant extends PullRequestParticipant {
     }
 
     private setCommentStats(participantActivities: GitHubPullRequestActivityModel[]) {
-        const commentTimestamps = getNonBotCommentsTimestamps(participantActivities);
+        const commentTimestamps = getCommentsTimestamps(participantActivities);
         this.firstCommentDate = commentTimestamps.length ? new Date(Math.min(...commentTimestamps)) : null as any;
         this.lastCommentDate = commentTimestamps.length ? new Date(Math.max(...commentTimestamps)) : null as any;
         this.commentsCount = commentTimestamps.length;

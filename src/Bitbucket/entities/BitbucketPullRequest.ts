@@ -49,8 +49,7 @@ export class BitbucketPullRequest extends PullRequest {
 
     private calculateCommitStats(model: ImportParams) {
         this.totalCommentsCount = model.pullRequestActivities
-            .filter(a => a.action === "COMMENTED")
-            .filter(a => !model.botUserSlugs.includes(a.user.slug)).length;
+            .filter(a => a.action === "COMMENTED").length;
 
         const diff = BitbucketPullRequest.getDiffSize(model.diff);
         this.diffRowsAdded = diff.additions;
@@ -89,11 +88,11 @@ export class BitbucketPullRequest extends PullRequest {
         const reviewerAdditions = model.pullRequestActivities.filter(a => "addedReviewers" in a);
 
         if (reviewerAdditions.length > 0) {
-            const initialReviewersSlugs = new Set<string>(model.pullRequest.reviewers.map(r => r.user.slug).filter(s => !model.botUserSlugs.includes(s)));
+            const allReviewersSlugs = new Set<string>(model.pullRequest.reviewers.map(r => r.user.slug));
             const addedReviewersSlugs = new Set<string>(reviewerAdditions.flatMap(a => a.addedReviewers?.map(r => r.slug) || []));
 
             // If all reviewers were added after PR was opened
-            if ([...initialReviewersSlugs].every(s => addedReviewersSlugs.has(s))) {
+            if ([...allReviewersSlugs].every(s => addedReviewersSlugs.has(s))) {
                 return new Date(Math.min(...reviewerAdditions.map(activity => activity.createdDate)));
             }
         }
