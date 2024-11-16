@@ -2,17 +2,13 @@ import "dotenv/config";
 import { BitbucketProjectSettings } from "./Bitbucket/BitbucketPullRequestsImporter";
 import { GitHubProjectSettings } from "./GitHub/GitHubPullRequestsImporter";
 
-export type TeamImportSettings = {
-    teamName: string;
-    bitbucketProjects?: BitbucketProjectSettings[];
-    gitHubProjects?: GitHubProjectSettings[]
-};
+const GITHUB_API_TOKEN = process.env.GITHUB_API_TOKEN as string;
 
 const grafanaTeam: TeamImportSettings = {
     teamName: "Grafana",
     gitHubProjects: [{
         auth: {
-            apiToken: process.env.GITHUB_API_TOKEN as string
+            apiToken: GITHUB_API_TOKEN
         },
         owner: "grafana",
         botUserNames: [],
@@ -24,7 +20,7 @@ const kubernetesTeam: TeamImportSettings = {
     teamName: "Kubernetes",
     gitHubProjects: [{
         auth: {
-            apiToken: process.env.GITHUB_API_TOKEN as string
+            apiToken: GITHUB_API_TOKEN
         },
         owner: "kubernetes",
         botUserNames: [],
@@ -36,7 +32,7 @@ const angularTeam: TeamImportSettings = {
     teamName: "Angular",
     gitHubProjects: [{
         auth: {
-            apiToken: process.env.GITHUB_API_TOKEN as string
+            apiToken: GITHUB_API_TOKEN
         },
         owner: "angular",
         botUserNames: [],
@@ -48,7 +44,7 @@ const reactTeam: TeamImportSettings = {
     teamName: "React",
     gitHubProjects: [{
         auth: {
-            apiToken: process.env.GITHUB_API_TOKEN as string
+            apiToken: GITHUB_API_TOKEN
         },
         owner: "facebook",
         botUserNames: [],
@@ -60,7 +56,7 @@ const vscodeTeam: TeamImportSettings = {
     teamName: "VS Code",
     gitHubProjects: [{
         auth: {
-            apiToken: process.env.GITHUB_API_TOKEN as string
+            apiToken: GITHUB_API_TOKEN
         },
         owner: "microsoft",
         botUserNames: [],
@@ -71,4 +67,9 @@ const vscodeTeam: TeamImportSettings = {
 
 export const appImportConfig = {
     teams: [vscodeTeam, reactTeam, angularTeam, kubernetesTeam, grafanaTeam]
+};
+export type TeamImportSettings = {
+    teamName: string;
+    bitbucketProjects?: BitbucketProjectSettings[];
+    gitHubProjects?: GitHubProjectSettings[]
 };
