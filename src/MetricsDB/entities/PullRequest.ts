@@ -68,9 +68,6 @@ export abstract class PullRequest {
     @Column({ type: "varchar" })
     protected authorRole: ActorRole;
 
-    @Column()
-    protected commitsHistoryWasRewritten: boolean;
-
     @Column({ nullable: true, type: "varchar" })
     protected integrityErrors: string | null;
 
@@ -86,9 +83,6 @@ export abstract class PullRequest {
 
     public calculateAggregations() {
         this.participants.forEach(p => p.calculateAggregations());
-
-        this.commitsHistoryWasRewritten = this.initialCommitDate ? this.initialCommitDate.getTime() > this.createdDate.getTime() : false;
-
 
         this.firstReactionDate = this.participants
             .filter(p => !p.participant.isBotUser)
