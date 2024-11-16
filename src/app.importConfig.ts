@@ -32,6 +32,43 @@ const kubernetesTeam: TeamImportSettings = {
     }]
 };
 
+const angularTeam: TeamImportSettings = {
+    teamName: "Angular",
+    gitHubProjects: [{
+        auth: {
+            apiToken: process.env.GITHUB_API_TOKEN as string
+        },
+        owner: "angular",
+        botUserNames: [],
+        repositoriesSelector: async () => Promise.resolve(["angular"])
+    }]
+};
+
+const reactTeam: TeamImportSettings = {
+    teamName: "React",
+    gitHubProjects: [{
+        auth: {
+            apiToken: process.env.GITHUB_API_TOKEN as string
+        },
+        owner: "facebook",
+        botUserNames: [],
+        repositoriesSelector: async () => Promise.resolve(["react"])
+    }]
+};
+
+const vscodeTeam: TeamImportSettings = {
+    teamName: "VS Code",
+    gitHubProjects: [{
+        auth: {
+            apiToken: process.env.GITHUB_API_TOKEN as string
+        },
+        owner: "microsoft",
+        botUserNames: [],
+        repositoriesSelector: async () => Promise.resolve(["vscode"])
+    }]
+};
+
+
 export const appImportConfig = {
-    teams: [grafanaTeam, kubernetesTeam]
+    teams: [vscodeTeam, reactTeam, angularTeam, kubernetesTeam, grafanaTeam]
 };
