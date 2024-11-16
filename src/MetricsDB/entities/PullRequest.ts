@@ -1,7 +1,7 @@
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryColumn } from "typeorm";
 import { PullRequestParticipant } from "./PullRequestParticipant";
 import { Actor } from "./Actor";
-import { PullRequestAuthorRole } from "./PullRequestAuthorRole";
+import { ActorRole } from "./ActorRole";
 
 @Entity()
 export abstract class PullRequest {
@@ -66,7 +66,7 @@ export abstract class PullRequest {
     protected testsWereTouched: boolean;
 
     @Column({ type: "varchar" })
-    protected authorRole: PullRequestAuthorRole;
+    protected authorRole: ActorRole;
 
     @Column()
     protected commitsHistoryWasRewritten: boolean;

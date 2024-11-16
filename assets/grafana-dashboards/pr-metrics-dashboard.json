@@ -67,7 +67,7 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 3,
+        "h": 5,
         "w": 24,
         "x": 0,
         "y": 1
@@ -76,8 +76,8 @@
       "options": {
         "colorMode": "value",
         "graphMode": "area",
-        "justifyMode": "auto",
-        "orientation": "auto",
+        "justifyMode": "center",
+        "orientation": "vertical",
         "percentChangeColorMode": "standard",
         "reduceOptions": {
           "calcs": [
@@ -100,7 +100,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT PERCENTILE_CONT($percentile) WITHIN GROUP (ORDER BY pr_lead_time)\nFROM \n   (SELECT \n      EXTRACT(EPOCH FROM (merged_date-LEAST(initial_commit_date, shared_for_review_date))) AS pr_lead_time\n   FROM pull_request AS pr\n      INNER JOIN actor AS shadowed_author ON shadowed_author.id = pr.author_id\n      INNER JOIN actor AS author ON COALESCE(shadowed_author.merged_with_id, shadowed_author.id)=author.id\n   WHERE pr.integrity_errors IS NULL\n      AND $__timeFilter(LEAST(initial_commit_date, shared_for_review_date)) \n      AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n      AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n      AND (COALESCE($pr_author_role) IS NULL OR COALESCE(author.team_role, pr.author_role) IN ($pr_author_role))\n      AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n      AND ($include_bots_activities OR NOT author.is_bot_user)\n   ) AS lead_times\nWHERE COALESCE(pr_lead_time, 0)>0",
+          "rawSql": "SELECT PERCENTILE_CONT($percentile) WITHIN GROUP (ORDER BY pr_lead_time) AS \"${percentile:text}\",\nAVG(pr_lead_time) AS \"Average\"\nFROM \n   (SELECT \n      EXTRACT(EPOCH FROM (merged_date-LEAST(initial_commit_date, created_date))) AS pr_lead_time\n   FROM pull_request AS pr\n      INNER JOIN actor AS shadowed_author ON shadowed_author.id = pr.author_id\n      INNER JOIN actor AS author ON COALESCE(shadowed_author.merged_with_id, shadowed_author.id)=author.id\n   WHERE pr.integrity_errors IS NULL\n      AND $__timeFilter(LEAST(initial_commit_date, shared_for_review_date)) \n      AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n      AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n      AND (COALESCE($pr_author_role) IS NULL OR COALESCE(author.team_role, pr.author_role) IN ($pr_author_role))\n      AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n      AND ($include_bots_activities OR NOT author.is_bot_user)\n   ) AS lead_times\nWHERE COALESCE(pr_lead_time, 0)>0",
           "refId": "A",
           "sql": {
             "columns": [
@@ -151,10 +151,10 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 3,
+        "h": 5,
         "w": 6,
         "x": 0,
-        "y": 4
+        "y": 6
       },
       "id": 7,
       "options": {
@@ -184,7 +184,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT PERCENTILE_CONT($percentile) WITHIN GROUP (ORDER BY development_time)\nFROM \n   (SELECT \n      GREATEST(EXTRACT(EPOCH FROM (shared_for_review_date-initial_commit_date)),0) AS development_time\n   FROM pull_request AS pr\n      INNER JOIN actor AS shadowed_author ON shadowed_author.id = pr.author_id\n      INNER JOIN actor AS author ON COALESCE(shadowed_author.merged_with_id, shadowed_author.id)=author.id\n   WHERE pr.integrity_errors IS NULL\n      AND $__timeFilter(LEAST(initial_commit_date, shared_for_review_date)) \n      AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n      AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n      AND (COALESCE($pr_author_role) IS NULL OR COALESCE(author.team_role, pr.author_role) IN ($pr_author_role))\n      AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n      AND ($include_bots_activities OR NOT author.is_bot_user)\n   ) AS timings\nWHERE COALESCE(development_time,0)>0",
+          "rawSql": "SELECT PERCENTILE_CONT($percentile) WITHIN GROUP (ORDER BY development_time) AS \"${percentile:text}\",\nAVG(development_time) AS \"Average\"\nFROM \n   (SELECT \n      EXTRACT(EPOCH FROM (shared_for_review_date-initial_commit_date)) AS development_time\n   FROM pull_request AS pr\n      INNER JOIN actor AS shadowed_author ON shadowed_author.id = pr.author_id\n      INNER JOIN actor AS author ON COALESCE(shadowed_author.merged_with_id, shadowed_author.id)=author.id\n   WHERE pr.integrity_errors IS NULL\n      AND $__timeFilter(LEAST(initial_commit_date, shared_for_review_date)) \n      AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n      AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n      AND (COALESCE($pr_author_role) IS NULL OR COALESCE(author.team_role, pr.author_role) IN ($pr_author_role))\n      AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n      AND ($include_bots_activities OR NOT author.is_bot_user)\n   ) AS timings\nWHERE COALESCE(development_time,0)>0",
           "refId": "A",
           "sql": {
             "columns": [
@@ -235,10 +235,10 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 3,
+        "h": 5,
         "w": 6,
         "x": 6,
-        "y": 4
+        "y": 6
       },
       "id": 3,
       "options": {
@@ -268,7 +268,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT PERCENTILE_CONT($percentile) WITHIN GROUP (ORDER BY time_to_first_reaction)\nFROM (\n    SELECT\n        GREATEST(EXTRACT(EPOCH FROM (first_reaction_date-shared_for_review_date)), 0) AS time_to_first_reaction\n   FROM pull_request AS pr\n      INNER JOIN actor AS shadowed_author ON shadowed_author.id = pr.author_id\n      INNER JOIN actor AS author ON COALESCE(shadowed_author.merged_with_id, shadowed_author.id)=author.id\n   WHERE pr.integrity_errors IS NULL\n      AND $__timeFilter(LEAST(initial_commit_date, shared_for_review_date)) \n      AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n      AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n      AND (COALESCE($pr_author_role) IS NULL OR COALESCE(author.team_role, pr.author_role) IN ($pr_author_role))\n      AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n      AND ($include_bots_activities OR NOT author.is_bot_user)\n      AND first_reaction_date IS NOT NULL\n    ) AS \"First responses\"\nWHERE COALESCE(time_to_first_reaction, 0)>0",
+          "rawSql": "SELECT PERCENTILE_CONT($percentile) WITHIN GROUP (ORDER BY time_to_first_reaction) AS \"${percentile:text}\",\nAVG(time_to_first_reaction) AS \"Average\"\nFROM (\n    SELECT\n        EXTRACT(EPOCH FROM (first_reaction_date-shared_for_review_date)) AS time_to_first_reaction\n   FROM pull_request AS pr\n      INNER JOIN actor AS shadowed_author ON shadowed_author.id = pr.author_id\n      INNER JOIN actor AS author ON COALESCE(shadowed_author.merged_with_id, shadowed_author.id)=author.id\n   WHERE pr.integrity_errors IS NULL\n      AND $__timeFilter(LEAST(initial_commit_date, shared_for_review_date)) \n      AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n      AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n      AND (COALESCE($pr_author_role) IS NULL OR COALESCE(author.team_role, pr.author_role) IN ($pr_author_role))\n      AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n      AND ($include_bots_activities OR NOT author.is_bot_user)\n      AND first_reaction_date IS NOT NULL\n    ) AS \"First responses\"\nWHERE COALESCE(time_to_first_reaction, 0)>0",
           "refId": "A",
           "sql": {
             "columns": [
@@ -319,10 +319,10 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 3,
+        "h": 5,
         "w": 6,
         "x": 12,
-        "y": 4
+        "y": 6
       },
       "id": 6,
       "options": {
@@ -352,7 +352,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT PERCENTILE_CONT($percentile) WITHIN GROUP (ORDER BY rework_time)\nFROM (\n    SELECT\n        GREATEST(EXTRACT(EPOCH FROM (rework_completed_date-first_reaction_date)), 0) AS rework_time\n    FROM pull_request AS pr\n      INNER JOIN actor AS shadowed_author ON shadowed_author.id = pr.author_id\n      INNER JOIN actor AS author ON COALESCE(shadowed_author.merged_with_id, shadowed_author.id)=author.id\n    WHERE pr.integrity_errors IS NULL\n      AND $__timeFilter(LEAST(initial_commit_date, shared_for_review_date)) \n      AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n      AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n      AND (COALESCE($pr_author_role) IS NULL OR COALESCE(author.team_role, pr.author_role) IN ($pr_author_role))\n      AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n      AND ($include_bots_activities OR NOT author.is_bot_user)\n      AND first_reaction_date IS NOT NULL\n      AND rework_completed_date IS NOT NULL\n) AS rework_times\nWHERE COALESCE(rework_time, 0)>0",
+          "rawSql": "SELECT PERCENTILE_CONT($percentile) WITHIN GROUP (ORDER BY rework_time) AS \"${percentile:text}\",\nAVG(rework_time) AS \"Average\"\nFROM (\n    SELECT\n        EXTRACT(EPOCH FROM (rework_completed_date-first_reaction_date)) AS rework_time\n    FROM pull_request AS pr\n      INNER JOIN actor AS shadowed_author ON shadowed_author.id = pr.author_id\n      INNER JOIN actor AS author ON COALESCE(shadowed_author.merged_with_id, shadowed_author.id)=author.id\n    WHERE pr.integrity_errors IS NULL\n      AND $__timeFilter(LEAST(initial_commit_date, shared_for_review_date)) \n      AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n      AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n      AND (COALESCE($pr_author_role) IS NULL OR COALESCE(author.team_role, pr.author_role) IN ($pr_author_role))\n      AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n      AND ($include_bots_activities OR NOT author.is_bot_user)\n      AND first_reaction_date IS NOT NULL\n      AND rework_completed_date IS NOT NULL\n) AS rework_times\nWHERE COALESCE(rework_time, 0)>0",
           "refId": "A",
           "sql": {
             "columns": [
@@ -403,10 +403,10 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 3,
+        "h": 5,
         "w": 6,
         "x": 18,
-        "y": 4
+        "y": 6
       },
       "id": 8,
       "options": {
@@ -436,7 +436,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT PERCENTILE_CONT($percentile) WITHIN GROUP (ORDER BY from_last_approval_to_merge)\nFROM (\n    SELECT\n        EXTRACT(EPOCH FROM (merged_date-last_action_date)) AS from_last_approval_to_merge\n    FROM (\n        SELECT\n            merged_date,\n            GREATEST(pr.last_approval_date, pr.rework_completed_date, pr.last_commit_date) as last_action_date\n        FROM pull_request AS pr\n            INNER JOIN actor AS shadowed_author ON shadowed_author.id = pr.author_id\n            INNER JOIN actor AS author ON COALESCE(shadowed_author.merged_with_id, shadowed_author.id)=author.id\n        WHERE pr.integrity_errors IS NULL\n            AND $__timeFilter(LEAST(initial_commit_date, shared_for_review_date)) \n            AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n            AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n            AND (COALESCE($pr_author_role) IS NULL OR COALESCE(author.team_role, pr.author_role) IN ($pr_author_role))\n            AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n            AND ($include_bots_activities OR NOT author.is_bot_user)\n    ) AS approvals\n) AS timings\nWHERE COALESCE(from_last_approval_to_merge, 0)>0",
+          "rawSql": "SELECT PERCENTILE_CONT($percentile) WITHIN GROUP (ORDER BY from_last_approval_to_merge) AS \"${percentile:text}\",\nAVG(from_last_approval_to_merge) AS \"Average\"\nFROM (\n    SELECT\n        EXTRACT(EPOCH FROM (merged_date-last_action_date)) AS from_last_approval_to_merge\n    FROM (\n        SELECT\n            merged_date,\n            GREATEST(pr.last_approval_date, pr.rework_completed_date, pr.last_commit_date) as last_action_date\n        FROM pull_request AS pr\n            INNER JOIN actor AS shadowed_author ON shadowed_author.id = pr.author_id\n            INNER JOIN actor AS author ON COALESCE(shadowed_author.merged_with_id, shadowed_author.id)=author.id\n        WHERE pr.integrity_errors IS NULL\n            AND $__timeFilter(LEAST(initial_commit_date, shared_for_review_date)) \n            AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n            AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n            AND (COALESCE($pr_author_role) IS NULL OR COALESCE(author.team_role, pr.author_role) IN ($pr_author_role))\n            AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n            AND ($include_bots_activities OR NOT author.is_bot_user)\n    ) AS approvals\n) AS timings\nWHERE COALESCE(from_last_approval_to_merge, 0)>0",
           "refId": "A",
           "sql": {
             "columns": [
@@ -490,7 +490,7 @@
         "h": 3,
         "w": 4,
         "x": 0,
-        "y": 7
+        "y": 11
       },
       "id": 47,
       "options": {
@@ -549,7 +549,7 @@
           "table": "pull_request"
         }
       ],
-      "title": "Pull requests count",
+      "title": "Total pull requests count",
       "type": "stat"
     },
     {
@@ -582,99 +582,7 @@
         "h": 3,
         "w": 4,
         "x": 4,
-        "y": 7
-      },
-      "id": 29,
-      "options": {
-        "colorMode": "value",
-        "graphMode": "area",
-        "justifyMode": "auto",
-        "orientation": "horizontal",
-        "percentChangeColorMode": "standard",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "showPercentChange": false,
-        "textMode": "auto",
-        "wideLayout": true
-      },
-      "pluginVersion": "11.3.0",
-      "targets": [
-        {
-          "dataset": "`stinky-socks`",
-          "datasource": {
-            "type": "postgres",
-            "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
-          },
-          "editorMode": "code",
-          "format": "table",
-          "rawQuery": true,
-          "rawSql": "SELECT AVG(requested_reviewers_count) AS \"Reviewers count\" \nFROM pull_request AS pr\n   INNER JOIN actor AS shadowed_author ON shadowed_author.id = pr.author_id\n   INNER JOIN actor AS author ON COALESCE(shadowed_author.merged_with_id, shadowed_author.id)=author.id\nWHERE pr.integrity_errors IS NULL\n   AND $__timeFilter(LEAST(initial_commit_date, shared_for_review_date)) \n   AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n   AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n   AND (COALESCE($pr_author_role) IS NULL OR COALESCE(author.team_role, pr.author_role) IN ($pr_author_role))\n   AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n   AND ($include_bots_activities OR NOT author.is_bot_user)",
-          "refId": "A",
-          "sql": {
-            "columns": [
-              {
-                "parameters": [
-                  {
-                    "name": "author",
-                    "type": "functionParameter"
-                  }
-                ],
-                "type": "function"
-              }
-            ],
-            "groupBy": [
-              {
-                "property": {
-                  "name": "author",
-                  "type": "string"
-                },
-                "type": "groupBy"
-              }
-            ],
-            "limit": 50
-          },
-          "table": "pull_request"
-        }
-      ],
-      "title": "Average reviewers count",
-      "type": "stat"
-    },
-    {
-      "datasource": {
-        "type": "postgres",
-        "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "fixedColor": "light-blue",
-            "mode": "fixed"
-          },
-          "decimals": 2,
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              }
-            ]
-          },
-          "unit": "locale"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 3,
-        "w": 4,
-        "x": 8,
-        "y": 7
+        "y": 11
       },
       "id": 28,
       "options": {
@@ -765,8 +673,8 @@
       "gridPos": {
         "h": 3,
         "w": 4,
-        "x": 12,
-        "y": 7
+        "x": 8,
+        "y": 11
       },
       "id": 27,
       "options": {
@@ -837,8 +745,9 @@
         "defaults": {
           "color": {
             "fixedColor": "light-blue",
-            "mode": "thresholds"
+            "mode": "fixed"
           },
+          "decimals": 2,
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
@@ -846,28 +755,20 @@
               {
                 "color": "green",
                 "value": null
-              },
-              {
-                "color": "#EAB839",
-                "value": 10
-              },
-              {
-                "color": "red",
-                "value": 25
               }
             ]
           },
-          "unit": "percent"
+          "unit": "locale"
         },
         "overrides": []
       },
       "gridPos": {
         "h": 3,
         "w": 4,
-        "x": 16,
-        "y": 7
+        "x": 12,
+        "y": 11
       },
-      "id": 26,
+      "id": 29,
       "options": {
         "colorMode": "value",
         "graphMode": "area",
@@ -896,7 +797,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT SUM(CASE WHEN tests_were_touched THEN 0 ELSE 1 END)::decimal/COUNT(*)*100 AS \"PRs without tests touch\" \nFROM pull_request AS pr\n   INNER JOIN actor as author ON author.id = pr.author_id\nWHERE pr.integrity_errors IS NULL\n   AND $__timeFilter(LEAST(initial_commit_date, shared_for_review_date)) \n   AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n   AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n   AND (COALESCE($pr_author_role) IS NULL OR COALESCE(author.team_role, pr.author_role) IN ($pr_author_role))\n   AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n   AND ($include_bots_activities OR NOT author.is_bot_user)",
+          "rawSql": "SELECT AVG(requested_reviewers_count) AS \"Reviewers count\" \nFROM pull_request AS pr\n   INNER JOIN actor AS shadowed_author ON shadowed_author.id = pr.author_id\n   INNER JOIN actor AS author ON COALESCE(shadowed_author.merged_with_id, shadowed_author.id)=author.id\nWHERE pr.integrity_errors IS NULL\n   AND $__timeFilter(LEAST(initial_commit_date, shared_for_review_date)) \n   AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n   AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n   AND (COALESCE($pr_author_role) IS NULL OR COALESCE(author.team_role, pr.author_role) IN ($pr_author_role))\n   AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n   AND ($include_bots_activities OR NOT author.is_bot_user)",
           "refId": "A",
           "sql": {
             "columns": [
@@ -924,7 +825,7 @@
           "table": "pull_request"
         }
       ],
-      "title": "PRs without tests touch",
+      "title": "Average reviewers count",
       "type": "stat"
     },
     {
@@ -956,8 +857,8 @@
       "gridPos": {
         "h": 3,
         "w": 4,
-        "x": 20,
-        "y": 7
+        "x": 16,
+        "y": 11
       },
       "id": 48,
       "options": {
@@ -1017,6 +918,105 @@
         }
       ],
       "title": "Total diff",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "light-blue",
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "#EAB839",
+                "value": 10
+              },
+              {
+                "color": "red",
+                "value": 25
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 4,
+        "x": 20,
+        "y": 11
+      },
+      "id": 26,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "horizontal",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.3.0",
+      "targets": [
+        {
+          "dataset": "`stinky-socks`",
+          "datasource": {
+            "type": "postgres",
+            "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT SUM(CASE WHEN tests_were_touched THEN 0 ELSE 1 END)::decimal/COUNT(*)*100 AS \"PRs without tests touch\" \nFROM pull_request AS pr\n   INNER JOIN actor as author ON author.id = pr.author_id\nWHERE pr.integrity_errors IS NULL\n   AND $__timeFilter(LEAST(initial_commit_date, shared_for_review_date)) \n   AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n   AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n   AND (COALESCE($pr_author_role) IS NULL OR COALESCE(author.team_role, pr.author_role) IN ($pr_author_role))\n   AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n   AND ($include_bots_activities OR NOT author.is_bot_user)",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [
+                  {
+                    "name": "author",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "name": "author",
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          },
+          "table": "pull_request"
+        }
+      ],
+      "title": "PRs without tests touch",
       "type": "stat"
     },
     {
@@ -1139,7 +1139,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Percentile of your choice"
+              "options": "Chosen percentile"
             },
             "properties": [
               {
@@ -1156,6 +1156,10 @@
               {
                 "id": "custom.pointSize",
                 "value": 7
+              },
+              {
+                "id": "displayName",
+                "value": "${percentile:text}"
               }
             ]
           },
@@ -1173,6 +1177,41 @@
                 }
               }
             ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Pull requests count"
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom",
+                "value": {
+                  "legend": true,
+                  "tooltip": false,
+                  "viz": false
+                }
+              },
+              {
+                "id": "unit",
+                "value": "locale"
+              },
+              {
+                "id": "custom.lineWidth",
+                "value": 0
+              },
+              {
+                "id": "custom.pointSize",
+                "value": 1
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "blue",
+                  "mode": "fixed"
+                }
+              }
+            ]
           }
         ]
       },
@@ -1180,7 +1219,7 @@
         "h": 16,
         "w": 24,
         "x": 0,
-        "y": 10
+        "y": 14
       },
       "id": 54,
       "options": {
@@ -1210,7 +1249,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT \n    $__timeGroupAlias(start_date, $group_by_period), \n    PERCENTILE_CONT(0.90) WITHIN GROUP (ORDER BY $display_flow_stats_for) AS \"90th percentile\",\n    AVG(AVG($display_flow_stats_for)) OVER (ORDER BY $__timeGroup(start_date, $group_by_period, 0) \n                                ROWS BETWEEN 3 PRECEDING AND CURRENT ROW) AS \"Rolling Average\",\n    PERCENTILE_CONT($percentile) WITHIN GROUP (ORDER BY $display_flow_stats_for) AS \"Percentile of your choice\",\n    PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY $display_flow_stats_for) AS \"25th Percentile\"\n\nFROM \n   (SELECT \n      LEAST(initial_commit_date, shared_for_review_date) AS start_date,\n      EXTRACT(EPOCH FROM (merged_date-LEAST(initial_commit_date, shared_for_review_date))) AS pr_lead_time,\n      EXTRACT(EPOCH FROM (shared_for_review_date-initial_commit_date)) AS development_time,\n      GREATEST(EXTRACT(EPOCH FROM (first_reaction_date-shared_for_review_date)), 0) AS time_to_first_reaction,\n      EXTRACT(EPOCH FROM (rework_completed_date-first_reaction_date)) AS rework_time,\n      EXTRACT(EPOCH FROM (merged_date-GREATEST(pr.last_approval_date, pr.rework_completed_date, pr.last_commit_date))) AS idle_after_approve\n   FROM pull_request AS pr\n      INNER JOIN actor AS shadowed_author ON shadowed_author.id = pr.author_id\n      INNER JOIN actor AS author ON COALESCE(shadowed_author.merged_with_id, shadowed_author.id)=author.id\n   WHERE pr.integrity_errors IS NULL\n      AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n      AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n      AND (COALESCE($pr_author_role) IS NULL OR COALESCE(author.team_role, pr.author_role) IN ($pr_author_role))\n      AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n      AND ($include_bots_activities OR NOT author.is_bot_user)\n   ) AS timings\nWHERE COALESCE($display_flow_stats_for, 0)>0\nGROUP BY 1\nORDER BY $__timeGroup(start_date, $group_by_period, 0)",
+          "rawSql": "SELECT \n    $__timeGroupAlias(start_date, $group_by_period), \n    PERCENTILE_CONT(0.90) WITHIN GROUP (ORDER BY $display_flow_stats_for) AS \"90th percentile\",\n    AVG(AVG($display_flow_stats_for)) OVER (ORDER BY $__timeGroup(start_date, $group_by_period, 0) \n                                ROWS BETWEEN 3 PRECEDING AND CURRENT ROW) AS \"Rolling Average\",\n    PERCENTILE_CONT($percentile) WITHIN GROUP (ORDER BY $display_flow_stats_for) AS \"Chosen percentile\",\n    PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY $display_flow_stats_for) AS \"25th Percentile\",\n    COUNT(*) AS \"Pull requests count\"\n\nFROM \n   (SELECT \n      LEAST(initial_commit_date, shared_for_review_date) AS start_date,\n      EXTRACT(EPOCH FROM (merged_date-LEAST(initial_commit_date, shared_for_review_date))) AS pr_lead_time,\n      EXTRACT(EPOCH FROM (shared_for_review_date-initial_commit_date)) AS development_time,\n      GREATEST(EXTRACT(EPOCH FROM (first_reaction_date-shared_for_review_date)), 0) AS time_to_first_reaction,\n      EXTRACT(EPOCH FROM (rework_completed_date-first_reaction_date)) AS rework_time,\n      EXTRACT(EPOCH FROM (merged_date-GREATEST(pr.last_approval_date, pr.rework_completed_date, pr.last_commit_date))) AS idle_after_approve\n   FROM pull_request AS pr\n      INNER JOIN actor AS shadowed_author ON shadowed_author.id = pr.author_id\n      INNER JOIN actor AS author ON COALESCE(shadowed_author.merged_with_id, shadowed_author.id)=author.id\n   WHERE pr.integrity_errors IS NULL\n      AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n      AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n      AND (COALESCE($pr_author_role) IS NULL OR COALESCE(author.team_role, pr.author_role) IN ($pr_author_role))\n      AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n      AND ($include_bots_activities OR NOT author.is_bot_user)\n   ) AS timings\nWHERE COALESCE($display_flow_stats_for, 0)>0\nGROUP BY 1\nORDER BY $__timeGroup(start_date, $group_by_period, 0)",
           "refId": "Flow stats",
           "sql": {
             "columns": [
@@ -1338,7 +1377,7 @@
         "h": 12,
         "w": 24,
         "x": 0,
-        "y": 26
+        "y": 30
       },
       "id": 34,
       "options": {
@@ -1366,7 +1405,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT \n   $__timeGroupAlias(start_date, $group_by_period),\n   COUNT(*) AS \"PRs count\",\n   COUNT(DISTINCT CASE WHEN author_role IN ('OWNER', 'MEMBER', 'COLLABORATOR') THEN author_id END) AS \"Maintainers contirbuted\",\n   COUNT(DISTINCT CASE WHEN author_role IN ('CONTRIBUTOR', 'FIRST_TIMER', 'FIRST_TIME_CONTRIBUTOR') THEN author_id END) AS \"Contributors contirbuted\",\n   COUNT(DISTINCT author_id) AS \"Total authors contributed\",\n   AVG(requested_reviewers_count) AS \"Average reviewers count\",\n   AVG(total_comments_count) AS \"Average comments count\",\n   SUM(CASE WHEN tests_were_touched THEN 0 ELSE 1 END)::decimal/COUNT(*)*100 AS \"PRs without tests changes\",\n   AVG(CASE WHEN diff_rows_added+diff_rows_deleted=0 THEN NULL ELSE diff_rows_added+diff_rows_deleted END) AS \"Average diff size\",\n   SUM(diff_rows_added+diff_rows_deleted) as \"Lines changed in period\"\nFROM \n   (SELECT \n      LEAST(initial_commit_date, shared_for_review_date) AS start_date,\n      author.id AS author_id,\n      COALESCE(author.team_role, pr.author_role) AS author_role,\n      requested_reviewers_count,\n      total_comments_count,\n      tests_were_touched,\n      diff_rows_added,\n      diff_rows_deleted\n   FROM pull_request AS pr\n      INNER JOIN actor AS shadowed_author ON shadowed_author.id = pr.author_id\n      INNER JOIN actor AS author ON COALESCE(shadowed_author.merged_with_id, shadowed_author.id)=author.id\n   WHERE pr.integrity_errors IS NULL\n      AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n      AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n      AND (COALESCE($pr_author_role) IS NULL OR COALESCE(author.team_role, pr.author_role) IN ($pr_author_role))\n      AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n      AND ($include_bots_activities OR NOT author.is_bot_user)\n   ) AS timings\nGROUP BY 1\nORDER BY $__timeGroup(start_date, $group_by_period, 0)",
+          "rawSql": "SELECT \n   $__timeGroupAlias(start_date, $group_by_period),\n   COUNT(*) AS \"PRs count\",\n   COUNT(DISTINCT CASE WHEN author_role = 'MEMBER' THEN author_id END) AS \"Maintainers contirbuted\",\n   COUNT(DISTINCT CASE WHEN author_role = 'CONTRIBUTOR' THEN author_id END) AS \"Contributors contirbuted\",\n   COUNT(DISTINCT author_id) AS \"Total authors contributed\",\n   AVG(requested_reviewers_count) AS \"Average reviewers count\",\n   AVG(total_comments_count) AS \"Average comments count\",\n   SUM(CASE WHEN tests_were_touched THEN 0 ELSE 1 END)::decimal/COUNT(*)*100 AS \"PRs without tests changes\",\n   AVG(CASE WHEN diff_rows_added+diff_rows_deleted=0 THEN NULL ELSE diff_rows_added+diff_rows_deleted END) AS \"Average diff size\",\n   SUM(diff_rows_added+diff_rows_deleted) as \"Lines changed in period\"\nFROM \n   (SELECT \n      LEAST(initial_commit_date, shared_for_review_date) AS start_date,\n      author.id AS author_id,\n      COALESCE(author.team_role, pr.author_role) AS author_role,\n      requested_reviewers_count,\n      total_comments_count,\n      tests_were_touched,\n      diff_rows_added,\n      diff_rows_deleted\n   FROM pull_request AS pr\n      INNER JOIN actor AS shadowed_author ON shadowed_author.id = pr.author_id\n      INNER JOIN actor AS author ON COALESCE(shadowed_author.merged_with_id, shadowed_author.id)=author.id\n   WHERE pr.integrity_errors IS NULL\n      AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n      AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n      AND (COALESCE($pr_author_role) IS NULL OR COALESCE(author.team_role, pr.author_role) IN ($pr_author_role))\n      AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n      AND ($include_bots_activities OR NOT author.is_bot_user)\n   ) AS timings\nGROUP BY 1\nORDER BY $__timeGroup(start_date, $group_by_period, 0)",
           "refId": "A",
           "sql": {
             "columns": [
@@ -1396,7 +1435,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 38
+        "y": 42
       },
       "id": 24,
       "panels": [],
@@ -1440,7 +1479,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               }
             ]
           }
@@ -1482,7 +1522,7 @@
         "h": 25,
         "w": 12,
         "x": 0,
-        "y": 39
+        "y": 43
       },
       "id": 16,
       "options": {
@@ -1577,7 +1617,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               }
             ]
           }
@@ -1617,7 +1658,7 @@
         "h": 25,
         "w": 12,
         "x": 12,
-        "y": 39
+        "y": 43
       },
       "id": 17,
       "options": {
@@ -1714,7 +1755,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               }
             ]
           },
@@ -1726,7 +1768,7 @@
         "h": 23,
         "w": 24,
         "x": 0,
-        "y": 64
+        "y": 68
       },
       "id": 15,
       "options": {
@@ -1831,7 +1873,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               }
             ]
           },
@@ -1892,7 +1935,7 @@
         "h": 23,
         "w": 24,
         "x": 0,
-        "y": 87
+        "y": 91
       },
       "id": 51,
       "options": {
@@ -1956,7 +1999,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 110
+        "y": 114
       },
       "id": 22,
       "panels": [],
@@ -2001,7 +2044,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               }
             ]
           },
@@ -2013,7 +2057,7 @@
         "h": 19,
         "w": 12,
         "x": 0,
-        "y": 111
+        "y": 115
       },
       "id": 1,
       "options": {
@@ -2118,7 +2162,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               }
             ]
           },
@@ -2147,7 +2192,7 @@
         "h": 19,
         "w": 12,
         "x": 12,
-        "y": 111
+        "y": 115
       },
       "id": 35,
       "options": {
@@ -2243,7 +2288,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               }
             ]
           },
@@ -2272,7 +2318,7 @@
         "h": 18,
         "w": 12,
         "x": 0,
-        "y": 130
+        "y": 134
       },
       "id": 2,
       "options": {
@@ -2375,7 +2421,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               }
             ]
           },
@@ -2408,7 +2455,7 @@
         "h": 18,
         "w": 12,
         "x": 12,
-        "y": 130
+        "y": 134
       },
       "id": 13,
       "options": {
@@ -2512,7 +2559,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               }
             ]
           },
@@ -2541,7 +2589,7 @@
         "h": 18,
         "w": 12,
         "x": 0,
-        "y": 148
+        "y": 152
       },
       "id": 14,
       "options": {
@@ -2645,7 +2693,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               }
             ]
           },
@@ -2674,7 +2723,7 @@
         "h": 18,
         "w": 12,
         "x": 12,
-        "y": 148
+        "y": 152
       },
       "id": 20,
       "options": {
@@ -2777,7 +2826,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "#EAB839",
@@ -2826,7 +2876,7 @@
         "h": 10,
         "w": 12,
         "x": 0,
-        "y": 166
+        "y": 170
       },
       "id": 18,
       "options": {
@@ -2923,7 +2973,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "#EAB839",
@@ -2972,7 +3023,7 @@
         "h": 10,
         "w": 12,
         "x": 12,
-        "y": 166
+        "y": 170
       },
       "id": 19,
       "options": {
@@ -3068,7 +3119,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "#EAB839",
@@ -3101,7 +3153,7 @@
         "h": 10,
         "w": 12,
         "x": 0,
-        "y": 176
+        "y": 180
       },
       "id": 30,
       "options": {
@@ -3198,7 +3250,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "#EAB839",
@@ -3247,7 +3300,7 @@
         "h": 10,
         "w": 12,
         "x": 12,
-        "y": 176
+        "y": 180
       },
       "id": 44,
       "options": {
@@ -3312,7 +3365,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 186
+        "y": 190
       },
       "id": 39,
       "panels": [],
@@ -3343,7 +3396,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               }
             ]
           }
@@ -3425,7 +3479,7 @@
         "h": 14,
         "w": 24,
         "x": 0,
-        "y": 187
+        "y": 191
       },
       "id": 49,
       "options": {
@@ -3509,7 +3563,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               }
             ]
           }
@@ -3551,7 +3606,7 @@
         "h": 14,
         "w": 24,
         "x": 0,
-        "y": 201
+        "y": 205
       },
       "id": 31,
       "options": {
@@ -3680,7 +3735,7 @@
           "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
         },
         "definition": "SELECT \n    DISTINCT author_role\nFROM pull_request \nWHERE pull_request.integrity_errors IS NULL\n    AND $__timeFilter(LEAST(initial_commit_date, shared_for_review_date)) \n    AND (COALESCE($team_name) IS NULL OR pull_request.team_name IN ($team_name))    \n    AND (COALESCE($repository_name) IS NULL OR repository_name IN ($repository_name))\nUNION\nSELECT \n    DISTINCT author.team_role\nFROM pull_request AS pr\n      INNER JOIN actor AS shadowed_author ON shadowed_author.id = pr.author_id\n      INNER JOIN actor AS author ON COALESCE(shadowed_author.merged_with_id, shadowed_author.id)=author.id\nWHERE author.team_role IS NOT NULL \n    AND pr.integrity_errors IS NULL\n    AND $__timeFilter(LEAST(initial_commit_date, shared_for_review_date)) \n    AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))    \n    AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n",
-        "description": "• OWNER: the author is the owner of the repository.\n\n• MEMBER: the author is a member of the organization that owns the repository.\n\n• COLLABORATOR: the author has write access to the repository.\n\n• FIRST_TIMER: the author is making their first contribution to any repository in the organization.\n\n• FIRST_TIME_CONTRIBUTOR: the author is contributing to this particular repository for the first time.\n\n• CONTRIBUTOR: the author has previously committed to the repository but is not necessarily a member or collaborator.\n\n• MANNEQUIN: the author is a placeholder for a previously deleted user.\n\n• NONE: the author has no affiliation with the repository.",
+        "description": "",
         "includeAll": true,
         "label": "Author role",
         "multi": true,
