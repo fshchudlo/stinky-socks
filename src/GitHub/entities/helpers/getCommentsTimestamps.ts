@@ -1,4 +1,4 @@
-import { GitHubPullRequestActivityModel } from "../../api/GitHubAPI.contracts";
+import { GitHubPullRequestActivityModel } from "../../GitHubAPI.contracts";
 import { ActivityTraits } from "./ActivityTraits";
 
 export default function getCommentsTimestamps(activities: GitHubPullRequestActivityModel[]) {

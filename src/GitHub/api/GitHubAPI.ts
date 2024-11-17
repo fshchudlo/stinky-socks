@@ -1,5 +1,5 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
-import { GitHubFileDiffModel, GitHubPullRequestActivityModel, GitHubPullRequestModel } from "./GitHubAPI.contracts";
+import { GitHubFileDiffModel, GitHubPullRequestActivityModel, GitHubPullRequestModel } from "../GitHubAPI.contracts";
 
 let rateLimitLockAcquired = false;
 

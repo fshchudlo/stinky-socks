@@ -1,4 +1,4 @@
-import { GitHubFileDiffModel, GitHubPullRequestActivityModel, GitHubPullRequestModel } from "../api/GitHubAPI.contracts";
+import { GitHubFileDiffModel, GitHubPullRequestActivityModel, GitHubPullRequestModel } from "../GitHubAPI.contracts";
 
 export type ImportParams = {
     teamName: string;

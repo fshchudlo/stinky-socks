@@ -12,6 +12,7 @@
   ],
   "scripts": {
     "start": "ts-node src/app.ts",
+    "start:docker": "docker-compose -f assets/docker-compose.yml -f assets/docker-compose.dev.yml up -d --build && docker logs stinky-socks-importer --follow",
     "build": "tsc -p tsconfig.json",
     "lint": "eslint ./src --fix",
     "test": "jest",

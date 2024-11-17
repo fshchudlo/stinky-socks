@@ -1,5 +1,5 @@
 import { PullRequestParticipant } from "../../MetricsDB/entities/PullRequestParticipant";
-import { GitHubPullRequestActivityModel, GitHubPullRequestModel } from "../api/GitHubAPI.contracts";
+import { GitHubPullRequestActivityModel, GitHubPullRequestModel } from "../GitHubAPI.contracts";
 import { ActivityTraits } from "./helpers/ActivityTraits";
 import getCommentsTimestamps from "./helpers/getCommentsTimestamps";
 import { Actor } from "../../MetricsDB/entities/Actor";

@@ -6,7 +6,7 @@ import {
     GitHubPullRequestActivityReadyForReviewModel,
     GitHubPullRequestActivityReviewedModel,
     GitHubPullRequestActivityReviewRequestedModel
-} from "../../api/GitHubAPI.contracts";
+} from "../../GitHubAPI.contracts";
 
 export const ActivityTraits = {
     isCommitedEvent(event: GitHubPullRequestActivityModel): event is GitHubPullRequestActivityCommitedModel {

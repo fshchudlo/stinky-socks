@@ -3,7 +3,7 @@ import { Repository } from "typeorm";
 import { PullRequest } from "../MetricsDB/entities/PullRequest";
 import { MetricsDB } from "../MetricsDB/MetricsDB";
 import { GitHubPullRequest } from "./entities/GitHubPullRequest";
-import { GitHubPullRequestModel, GitHubUserModel } from "./api/GitHubAPI.contracts";
+import { GitHubPullRequestModel, GitHubUserModel } from "./GitHubAPI.contracts";
 import { ImportParams } from "./entities/ImportParams";
 
 export type GitHubProjectSettings = {

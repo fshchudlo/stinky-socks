@@ -6,7 +6,7 @@ import { ImportParams } from "./ImportParams";
 import getCommentsTimestamps from "./helpers/getCommentsTimestamps";
 import getActivitiesOf from "./helpers/getActivitiesOf";
 import calculatePrSharedForReviewDate from "./helpers/calculatePrSharedForReviewDate";
-import { GitHubUserModel } from "../api/GitHubAPI.contracts";
+import { GitHubUserModel } from "../GitHubAPI.contracts";
 import { calculateReviewersCount } from "./helpers/calculateReviewersCount";
 import { mapGithubUserAssociationToActorRole } from "./helpers/mapGithubUserAssociationToActorRole";
 
