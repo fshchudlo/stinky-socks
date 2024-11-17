@@ -1,0 +1,41 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`GitHubPullRequest Should map basic fields 1`] = `
+GitHubPullRequest {
+  "author": {
+    "duplicates": [],
+    "id": 1,
+    "isBotUser": false,
+    "isFormerParticipant": false,
+    "login": "TestUser",
+    "nickname": "TestUser nickname",
+    "participations": [],
+    "pullRequests": [],
+    "teamName": "Test team",
+    "teamRole": null,
+  },
+  "authorRole": "MEMBER",
+  "createdDate": 2021-01-01T00:00:00.000Z,
+  "diffRowsAdded": 0,
+  "diffRowsDeleted": 0,
+  "firstReactionDate": null,
+  "initialCommitDate": undefined,
+  "integrityErrors": undefined,
+  "lastApprovalDate": null,
+  "lastCommitDate": undefined,
+  "mergedDate": 2021-01-01T00:03:00.000Z,
+  "participants": [],
+  "projectName": "TestOwner",
+  "pullRequestNumber": 1,
+  "repositoryName": "TestRepo",
+  "requestedReviewersCount": 0,
+  "reworkCompletedDate": null,
+  "sharedForReviewDate": 2021-01-01T00:00:00.000Z,
+  "targetBranch": "main",
+  "teamName": "Test team",
+  "testsWereTouched": false,
+  "totalCommentsCount": 0,
+  "updatedDate": 2021-01-01T00:01:00.000Z,
+  "viewURL": "https://github.com/TestOwner/TestRepo/pull/1",
+}
+`;

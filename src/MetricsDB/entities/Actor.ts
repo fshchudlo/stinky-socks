@@ -30,7 +30,7 @@ export class Actor {
     teamRole: ActorTeamRole | null;
 
     @ManyToOne(() => Actor, (actor) => actor.duplicates, { nullable: true })
-    mergedWith: Actor;
+    mergedWith?: Actor;
 
     @OneToMany(() => Actor, (actor) => actor.mergedWith)
     duplicates: Actor[];

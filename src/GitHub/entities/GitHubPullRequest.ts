@@ -19,7 +19,7 @@ export class GitHubPullRequest extends PullRequest {
             .calculateCommitStats(model)
             .initializeParticipants(model);
 
-        return this.validateDataIntegrity().calculateAggregations();
+        return this.calculateAggregations();
     }
 
     private async initializeBaseProperties(model: ImportParams) {

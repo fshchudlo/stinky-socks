@@ -210,12 +210,10 @@ export abstract class PullRequest {
 
         if (errors.length > 0) {
             this.integrityErrors = JSON.stringify(errors);
-
-            console.warn(`☣️ PullRequest ${this.viewURL} has the following integrity errors:\n\t• ${errors.join("\n\t• ")}`);
         } else {
             this.integrityErrors = null;
         }
-        return this;
+        return errors;
     }
 }
 

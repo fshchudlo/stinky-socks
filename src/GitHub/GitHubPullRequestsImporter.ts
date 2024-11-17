@@ -94,6 +94,11 @@ export class GitHubPullRequestsImporter {
                     files
                 })
             );
+
+            const integrityErrors = pullRequestEntity.validateDataIntegrity();
+            if (integrityErrors) {
+                console.warn(`☣️ PullRequest ${pullRequest.html_url} has the following integrity errors:\n\t• ${integrityErrors.join("\n\t• ")}`);
+            }
             await this.repository.save(pullRequestEntity);
         } catch (error) {
             console.error(`❌ Error while saving pull request ${pullRequest.html_url}: ${error}`);
