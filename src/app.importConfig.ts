@@ -1,5 +1,4 @@
 import "dotenv/config";
-import { BitbucketProjectSettings } from "./Bitbucket/BitbucketPullRequestsImporter";
 import { GitHubProjectSettings } from "./GitHub/GitHubPullRequestsImporter";
 
 const GITHUB_API_TOKEN = process.env.GITHUB_API_TOKEN as string;
@@ -70,6 +69,5 @@ export const appImportConfig = {
 };
 export type TeamImportSettings = {
     teamName: string;
-    bitbucketProjects?: BitbucketProjectSettings[];
     gitHubProjects?: GitHubProjectSettings[]
 };
