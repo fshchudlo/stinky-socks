@@ -12,7 +12,6 @@
   ],
   "scripts": {
     "start": "ts-node src/app.ts",
-    "start:docker": "docker-compose -f assets/docker-compose.yml -f assets/docker-compose.dev.yml up -d --build && docker logs stinky-socks-importer --follow",
     "build": "tsc -p tsconfig.json",
     "lint": "eslint ./src --fix",
     "test": "jest",
@@ -21,7 +20,11 @@
 
     "migration:generate": "ts-node ./node_modules/typeorm/cli.js migration:generate -d src/MetricsDB/MetricsDB.ts",
     "migration:run": "ts-node ./node_modules/typeorm/cli.js migration:run -d src/MetricsDB/MetricsDB.ts",
-    "migration:revert": "ts-node ./node_modules/typeorm/cli.js migration:revert -d src/MetricsDB/MetricsDB.ts"
+    "migration:revert": "ts-node ./node_modules/typeorm/cli.js migration:revert -d src/MetricsDB/MetricsDB.ts",
+
+    "docker:init": "docker-compose -f assets/docker-compose.yml up -d",
+    "docker-import:start": "docker-compose -f assets/docker-compose.yml -f assets/docker-compose.dev.yml up -d --build && docker logs stinky-socks-importer --follow",
+    "docker-import:stop": "docker-compose -f assets/docker-compose.yml -f assets/docker-compose.dev.yml down"
   },
   "dependencies": {
     "axios": "1.7.7",
