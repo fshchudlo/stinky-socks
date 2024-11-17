@@ -24,7 +24,7 @@ const animals = [
     "Rabbit", "Hedgehog", "Parrot", "Owl", "Moose", "Duck", "Goose", "Ferret", "Octopus", "Platypus"
 ];
 const actorsRepository: Repository<Actor> = MetricsDB.getRepository(Actor);
-const actorsCache = createCache();
+const actorsCache: ReturnType<typeof createCache> = createCache();
 
 export class ActorFactory {
     public static async preloadCacheByTeam(teamName: string): Promise<void> {
