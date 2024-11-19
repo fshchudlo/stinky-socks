@@ -1,6 +1,6 @@
 import { ImportParams } from "../ImportParams";
 import {
-    GitHubPullRequestActivityReviewedModel,
+    GitHubPullRequestActivityReviewedModel, GitHubPullRequestAuthorRole,
     GitHubPullRequestReviewRequestActivityModel,
     GitHubUserModel
 } from "../../GitHubAPI.contracts";
@@ -101,6 +101,21 @@ export class TestGitHubImportModelBuilder {
         const index = this.model.pullRequest.requested_reviewers.findIndex(r => r.login == who.login);
         this.model.pullRequest.requested_reviewers.splice(index, 1);
         this.model.activities.push(event);
+        return this;
+    }
+
+    authorIs(role: GitHubPullRequestAuthorRole): this {
+        this.model.pullRequest.author_association = role;
+        return this;
+    }
+
+    authorIsBot(): this {
+        this.model.pullRequest.user.type = "Bot";
+        return this;
+    }
+
+    addKnownBotUser(botUserLogin: string): this {
+        this.model.botUserNames.push(botUserLogin);
         return this;
     }
 }
