@@ -23,7 +23,7 @@ export type GitHubPullRequestActivityModel =
     GitHubPullRequestActivityLineCommentedModel
     | GitHubPullRequestActivityCommitedModel
     | GitHubPullRequestActivityCommentedModel
-    | GitHubPullRequestActivityReviewRequestedModel
+    | GitHubPullRequestReviewRequestActivityModel
     | GitHubPullRequestActivityReviewedModel
     | GitHubPullRequestActivityReadyForReviewModel
     | GitHubPullRequestActivityMergedModel;
@@ -51,7 +51,7 @@ export type GitHubPullRequestActivityCommentedModel = {
     created_at: string;
     actor: GitHubUserModel;
 };
-export type GitHubPullRequestActivityReviewRequestedModel = {
+export type GitHubPullRequestReviewRequestActivityModel = {
     event: "review_requested" | "review_request_removed";
     actor: GitHubUserModel;
     requested_reviewer?: GitHubUserModel;

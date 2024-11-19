@@ -6,70 +6,70 @@ import { ActorRole } from "./ActorRole";
 @Entity()
 export abstract class PullRequest {
     @PrimaryColumn()
-    protected teamName: string;
+    teamName: string;
 
     @PrimaryColumn()
-    protected projectName: string;
+    projectName: string;
 
     @PrimaryColumn()
-    protected repositoryName: string;
+    repositoryName: string;
 
     @PrimaryColumn()
-    protected pullRequestNumber: number;
+    pullRequestNumber: number;
 
     @Column()
-    protected viewURL: string;
+    viewURL: string;
 
     @Column()
-    protected targetBranch: string;
+    targetBranch: string;
 
     @Column()
-    protected createdDate: Date;
+    createdDate: Date;
 
     @Column()
-    protected updatedDate: Date;
+    updatedDate: Date;
 
     @Column()
-    protected sharedForReviewDate: Date;
+    sharedForReviewDate: Date;
 
     @Column({ nullable: true, type: "timestamp" })
-    protected initialCommitDate: Date | null;
+    initialCommitDate: Date | null;
 
     @Column({ nullable: true, type: "timestamp" })
-    protected lastCommitDate: Date | null;
+    lastCommitDate: Date | null;
 
     @Column({ nullable: true, type: "timestamp" })
-    protected firstReactionDate: Date | null;
+    firstReactionDate: Date | null;
 
     @Column({ nullable: true, type: "timestamp" })
-    protected lastApprovalDate: Date | null;
+    lastApprovalDate: Date | null;
 
     @Column({ nullable: true, type: "timestamp" })
-    protected reworkCompletedDate: Date | null;
+    reworkCompletedDate: Date | null;
 
     @Column()
-    protected mergedDate: Date;
+    mergedDate: Date;
 
     @Column()
-    protected requestedReviewersCount: number;
+    requestedReviewersCount: number;
 
     @Column()
-    protected totalCommentsCount: number;
+    totalCommentsCount: number;
 
     @Column({ type: "numeric" })
-    protected diffRowsAdded: number;
+    diffRowsAdded: number;
 
     @Column({ type: "numeric" })
-    protected diffRowsDeleted: number;
+    diffRowsDeleted: number;
 
     @Column()
-    protected testsWereTouched: boolean;
+    testsWereTouched: boolean;
 
     @Column({ type: "varchar" })
-    protected authorRole: ActorRole;
+    authorRole: ActorRole;
 
     @Column({ nullable: true, type: "varchar" })
-    protected integrityErrors: string | null;
+    integrityErrors: string | null;
 
     @OneToMany(() => PullRequestParticipant, (participant) => participant.pullRequest, {
         cascade: true

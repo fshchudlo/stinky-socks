@@ -5,7 +5,7 @@ import {
     GitHubPullRequestActivityModel,
     GitHubPullRequestActivityReadyForReviewModel,
     GitHubPullRequestActivityReviewedModel,
-    GitHubPullRequestActivityReviewRequestedModel
+    GitHubPullRequestReviewRequestActivityModel
 } from "../../GitHubAPI.contracts";
 
 export const ActivityTraits = {
@@ -18,10 +18,10 @@ export const ActivityTraits = {
     isLineCommentedEvent(event: GitHubPullRequestActivityModel): event is GitHubPullRequestActivityLineCommentedModel {
         return event.event === "line-commented";
     },
-    isReviewRequestedEvent(event: GitHubPullRequestActivityModel): event is GitHubPullRequestActivityReviewRequestedModel {
+    isReviewRequestedEvent(event: GitHubPullRequestActivityModel): event is GitHubPullRequestReviewRequestActivityModel {
         return event.event === "review_requested";
     },
-    isReviewRequestRemovedEvent(event: GitHubPullRequestActivityModel): event is GitHubPullRequestActivityReviewRequestedModel {
+    isReviewRequestRemovedEvent(event: GitHubPullRequestActivityModel): event is GitHubPullRequestReviewRequestActivityModel {
         return event.event === "review_request_removed";
     },
     isReadyForReviewEvent(event: GitHubPullRequestActivityModel): event is GitHubPullRequestActivityReadyForReviewModel {
