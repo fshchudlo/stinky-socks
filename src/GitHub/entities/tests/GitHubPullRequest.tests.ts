@@ -163,7 +163,7 @@ describe("GitHubPullRequest", () => {
     });
 
     describe("`totalCommentsCount`", () => {
-        it("Is set from comments history represented in activities", async () => {
+        it("Is set from participants comments count", async () => {
             const model = prBuilder.pullRequest()
                 .addComment(prBuilder.firstReviewer)
                 .addComment(prBuilder.firstReviewer)
@@ -171,16 +171,17 @@ describe("GitHubPullRequest", () => {
 
             const prEntity = await new GitHubPullRequest().init(model);
 
+            expect(prEntity.participants[0].commentsCount).toEqual(2);
             expect(prEntity.totalCommentsCount).toEqual(2);
         });
-        it("Includes bot comments", async () => {
+        it("Excludes bot comments", async () => {
             const model = prBuilder.pullRequest()
                 .addComment(prBuilder.botReviewer)
                 .build();
 
             const prEntity = await new GitHubPullRequest().init(model);
 
-            expect(prEntity.totalCommentsCount).toEqual(1);
+            expect(prEntity.totalCommentsCount).toEqual(0);
         });
     });
 

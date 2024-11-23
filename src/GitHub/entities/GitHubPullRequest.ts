@@ -3,7 +3,6 @@ import { GitHubPullRequestParticipant } from "./GitHubPullRequestParticipant";
 import { ActorFactory } from "../../MetricsDB/ActorFactory";
 import { ActivityTraits } from "./helpers/ActivityTraits";
 import { ImportParams } from "./ImportParams";
-import getCommentsTimestamps from "./helpers/getCommentsTimestamps";
 import getActivitiesOf from "./helpers/getActivitiesOf";
 import calculatePrSharedForReviewDate from "./helpers/calculatePrSharedForReviewDate";
 import { GitHubUserModel } from "../GitHubAPI.contracts";
@@ -31,7 +30,6 @@ export class GitHubPullRequest extends PullRequest {
         this.targetBranch = model.pullRequest.base.ref;
 
         this.requestedReviewersCount = calculateReviewersCount(model);
-        this.totalCommentsCount = getCommentsTimestamps(model.activities).length;
 
         this.authorRole = mapGithubUserAssociationToActorRole(model.pullRequest.author_association);
         this.createdDate = new Date(model.pullRequest.created_at);

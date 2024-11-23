@@ -84,6 +84,11 @@ export abstract class PullRequest {
     public calculateAggregations() {
         this.participants.forEach(p => p.calculateAggregations());
 
+        this.totalCommentsCount = this.participants
+            .filter(p => !p.participant.isBotUser)
+            .map(p => p.commentsCount)
+            .reduce((total, count) => total + count, 0);
+
         this.firstReactionDate = this.participants
             .filter(p => !p.participant.isBotUser)
             .map(p => p.firstReactionDate)
@@ -116,7 +121,7 @@ export abstract class PullRequest {
         if (!this.lastCommitDate) {
             errors.push("`lastCommitDate` field is empty. Is that possible that pull request has no commits?");
         }
-        if (this.requestedReviewersCount<0) {
+        if (this.requestedReviewersCount < 0) {
             errors.push("`requestedReviewersCount` is less than 0. Recheck the import logic on this sample.");
         }
 

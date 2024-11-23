@@ -1,7 +1,6 @@
 import { PullRequestParticipant } from "../../MetricsDB/entities/PullRequestParticipant";
 import { GitHubPullRequestActivityModel, GitHubPullRequestModel } from "../GitHubAPI.contracts";
 import { ActivityTraits } from "./helpers/ActivityTraits";
-import getCommentsTimestamps from "./helpers/getCommentsTimestamps";
 import { Actor } from "../../MetricsDB/entities/Actor";
 
 export class GitHubPullRequestParticipant extends PullRequestParticipant {
@@ -52,4 +51,20 @@ export class GitHubPullRequestParticipant extends PullRequestParticipant {
     }
 
 }
-  
+
+function getCommentsTimestamps(activities: GitHubPullRequestActivityModel[]) {
+    const comments = activities
+        .filter(ActivityTraits.isCommentedEvent)
+        .map(c => new Date(c.created_at).getTime());
+
+    const lineComments = activities.filter(ActivityTraits.isLineCommentedEvent)
+        .flatMap(a => a.comments)
+        .map(c => new Date(c.created_at).getTime());
+
+    const reviewComments = activities.filter(ActivityTraits.isReviewedEvent)
+        .filter(a => a.state == "commented" || !!a.body)
+        .map(c => new Date(c.submitted_at).getTime());
+
+    return comments
+        .concat(lineComments, reviewComments);
+}
