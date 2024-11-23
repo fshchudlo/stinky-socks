@@ -1,5 +1,6 @@
 import { ImportParams } from "../ImportParams";
 import { ActivityTraits } from "./ActivityTraits";
+import { GitHubPullRequestActivityModel } from "../../GitHubAPI.contracts";
 
 export default function calculatePrSharedForReviewDate(model: ImportParams): Date {
     const readyForReviewEvents = model.activities.filter(ActivityTraits.isReadyForReviewEvent);
@@ -8,17 +9,10 @@ export default function calculatePrSharedForReviewDate(model: ImportParams): Dat
         return new Date(earliestReadyForReviewEvent);
     }
 
-    const nonBotReviewerAdditions = getNonBotReviewerAdditions(model);
-    if (nonBotReviewerAdditions.length > 0) {
-        const reviewersAddedAfterPRCreation = getReviewersAddedAfterPRCreation(nonBotReviewerAdditions, model.pullRequest.created_at);
-
-        // All reviewers were added after PR creation time
-        if (reviewersAddedAfterPRCreation.length === nonBotReviewerAdditions.length) {
-            const earliestReviewerAdditionDate = getEarliestTimestamp(nonBotReviewerAdditions.map(a => a.created_at));
-            return new Date(earliestReviewerAdditionDate);
-        }
+    if (isAllReviewersAddedAfterPRCreation(model.activities, model.pullRequest.created_at)) {
+        const earliestReviewerAdditionDate = getEarliestTimestamp(model.activities.filter(ActivityTraits.isReviewRequestedEvent).map(a => a.created_at));
+        return new Date(earliestReviewerAdditionDate);
     }
-
     return new Date(model.pullRequest.created_at);
 }
 
@@ -26,12 +20,10 @@ function getEarliestTimestamp(dates: string[]): number {
     return Math.min(...dates.map(date => new Date(date).getTime()));
 }
 
-function getNonBotReviewerAdditions(model: ImportParams): any[] {
-    return model.activities
-        .filter(ActivityTraits.isReviewRequestedEvent)
-        .filter(a => !model.botUserNames.includes((a.requested_reviewer?.login || a.requested_team?.name)!));
-}
+function isAllReviewersAddedAfterPRCreation(activities: GitHubPullRequestActivityModel[], prCreationDate: string): boolean {
+    const allReviewerAdditions = activities.filter(ActivityTraits.isReviewRequestedEvent);
 
-function getReviewersAddedAfterPRCreation(activities: any[], prCreationDate: string): any[] {
-    return activities.filter(addition => new Date(addition.created_at).getTime() > new Date(prCreationDate).getTime());
+    const reviewersAddedAfterPRCreation = allReviewerAdditions.filter(addition => new Date(addition.created_at).getTime() > new Date(prCreationDate).getTime());
+
+    return allReviewerAdditions.length > 0 && reviewersAddedAfterPRCreation.length === allReviewerAdditions.length;
 }

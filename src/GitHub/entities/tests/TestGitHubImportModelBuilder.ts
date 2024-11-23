@@ -1,15 +1,18 @@
 import { ImportParams } from "../ImportParams";
 import {
+    GitHubPullRequestActivityCommentedModel,
+    GitHubPullRequestActivityCommitedModel,
+    GitHubPullRequestActivityReadyForReviewModel,
     GitHubPullRequestActivityReviewedModel, GitHubPullRequestAuthorRole,
     GitHubPullRequestReviewRequestActivityModel,
     GitHubUserModel
 } from "../../GitHubAPI.contracts";
-import dayjs from "dayjs";
+import dayjs, { Dayjs } from "dayjs";
 
 
 export class TestGitHubImportModelBuilder {
     private model: ImportParams;
-    private prCreatedAt = dayjs();
+    public prCreatedAt = dayjs();
 
     prAuthor: GitHubUserModel = {
         login: "test.author",
@@ -21,6 +24,18 @@ export class TestGitHubImportModelBuilder {
         login: "first.reviewer",
         type: "User",
         html_url: "https://github.com/first.reviewer"
+    };
+
+    secondReviewer: GitHubUserModel = {
+        login: "second.reviewer",
+        type: "User",
+        html_url: "https://github.com/second.reviewer"
+    };
+
+    botReviewer: GitHubUserModel = {
+        login: "bot.reviewer",
+        type: "Bot",
+        html_url: "https://github.com/bot.reviewer"
     };
 
     build(): ImportParams {
@@ -60,6 +75,47 @@ export class TestGitHubImportModelBuilder {
             activities: [],
             files: []
         };
+        return this;
+    }
+
+    addCommit(when: Dayjs): this {
+        const event: GitHubPullRequestActivityCommitedModel = {
+            event: "committed",
+            author: {
+                date: when.toISOString()
+            },
+            committer: {
+                date: when.toISOString()
+            }
+        };
+        this.model.activities.push(event);
+        return this;
+    }
+
+    addComment(who = this.firstReviewer, when: Dayjs = this.prCreatedAt.add(15, "minutes")): this {
+        const event: GitHubPullRequestActivityCommentedModel = {
+            event: "commented",
+            user: {
+                ...who
+            },
+            actor: {
+                ...who
+            },
+            created_at: when.toISOString()
+        };
+        this.model.activities.push(event);
+        return this;
+    }
+
+    isReadyForReview(when: Dayjs): this {
+        const event: GitHubPullRequestActivityReadyForReviewModel = {
+            event: "ready_for_review",
+            actor: {
+                ...this.model.pullRequest.user
+            },
+            created_at: when.toISOString()
+        };
+        this.model.activities.push(event);
         return this;
     }
 
@@ -104,7 +160,7 @@ export class TestGitHubImportModelBuilder {
         return this;
     }
 
-    authorIs(role: GitHubPullRequestAuthorRole): this {
+    setAuthor(role: GitHubPullRequestAuthorRole): this {
         this.model.pullRequest.author_association = role;
         return this;
     }

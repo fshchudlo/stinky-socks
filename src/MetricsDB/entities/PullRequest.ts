@@ -111,10 +111,10 @@ export abstract class PullRequest {
         const errors: string[] = [];
 
         if (!this.initialCommitDate) {
-            errors.push("`initialCommitDate` field is null. Is that possible that pull request has no commits?");
+            errors.push("`initialCommitDate` field is empty. Is that possible that pull request has no commits?");
         }
         if (!this.lastCommitDate) {
-            errors.push("`lastCommitDate` field is null. Is that possible that pull request has no commits?");
+            errors.push("`lastCommitDate` field is empty. Is that possible that pull request has no commits?");
         }
         if (this.requestedReviewersCount<0) {
             errors.push("`requestedReviewersCount` is less than 0. Recheck the import logic on this sample.");
