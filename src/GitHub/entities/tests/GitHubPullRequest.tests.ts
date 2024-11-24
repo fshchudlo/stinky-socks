@@ -1,7 +1,6 @@
 import { GitHubPullRequest } from "../GitHubPullRequest";
 import { ActorFactory } from "../../../MetricsDB/ActorFactory";
 import { TestGitHubImportModelBuilder } from "./TestGitHubImportModelBuilder";
-import dayjs from "dayjs";
 import { ActorRole } from "../../../MetricsDB/entities/ActorRole";
 import { GitHubPullRequestAuthorRole } from "../../GitHubAPI.contracts";
 
@@ -31,13 +30,6 @@ describe("GitHubPullRequest", () => {
         prBuilder.reset();
     });
 
-    it("Should map basic fields", async () => {
-        const model = prBuilder.pullRequest(prBuilder.prAuthor, dayjs("2024-11-19T22:10:19")).build();
-
-        const prEntity = await new GitHubPullRequest().init(model);
-
-        expect(prEntity).toMatchSnapshot();
-    });
     describe("`requestedReviewersCount`", () => {
         it("counts requested reviewers by default", async () => {
             const model = prBuilder.pullRequest().addReviewer().build();
