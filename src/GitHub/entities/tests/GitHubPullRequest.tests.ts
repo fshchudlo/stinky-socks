@@ -207,5 +207,75 @@ describe("GitHubPullRequest", () => {
         const prWithTestsTouched = await new GitHubPullRequest().init(modelWithTestsTouched);
         expect(prWithTestsTouched.testsWereTouched).toEqual(true);
     });
+
+    describe("`participants`", () => {
+        it("are those who were requested as reviewers", async () => {
+            const model = prBuilder.pullRequest()
+                .addReviewer(prBuilder.firstReviewer)
+                .build();
+
+            const prEntity = await new GitHubPullRequest().init(model);
+            expect(prEntity.participants.map(p=>p.participant.login)).toEqual([prBuilder.firstReviewer.login]);
+        });
+
+        it("are those who are assignees", async () => {
+            const model = prBuilder.pullRequest()
+                .addAssignee(prBuilder.firstReviewer)
+                .build();
+
+            const prEntity = await new GitHubPullRequest().init(model);
+            expect(prEntity.participants.map(p=>p.participant.login)).toEqual([prBuilder.firstReviewer.login]);
+        });
+
+        it("are those who merged the PR", async () => {
+            const model = prBuilder.pullRequest()
+                .merge(prBuilder.firstReviewer)
+                .build();
+
+            const prEntity = await new GitHubPullRequest().init(model);
+            expect(prEntity.participants.map(p=>p.participant.login)).toEqual([prBuilder.firstReviewer.login]);
+        });
+
+        it("are those who commented the PR", async () => {
+            const model = prBuilder.pullRequest()
+                .addComment(prBuilder.firstReviewer)
+                .build();
+
+            const prEntity = await new GitHubPullRequest().init(model);
+            expect(prEntity.participants.map(p=>p.participant.login)).toEqual([prBuilder.firstReviewer.login]);
+        });
+
+        it("are those who line-commented the PR", async () => {
+            const model = prBuilder.pullRequest()
+                .addLineComment(prBuilder.firstReviewer)
+                .build();
+
+            const prEntity = await new GitHubPullRequest().init(model);
+            expect(prEntity.participants.map(p=>p.participant.login)).toEqual([prBuilder.firstReviewer.login]);
+        });
+
+        it("are those who reviewed the PR", async () => {
+            const model = prBuilder.pullRequest()
+                .submitReview(prBuilder.firstReviewer)
+                .build();
+
+            const prEntity = await new GitHubPullRequest().init(model);
+            expect(prEntity.participants.map(p=>p.participant.login)).toEqual([prBuilder.firstReviewer.login]);
+        });
+
+        it("author is never a participant", async () => {
+            const model = prBuilder.pullRequest()
+                .addReviewer(prBuilder.prAuthor)
+                .addAssignee(prBuilder.prAuthor)
+                .addComment(prBuilder.prAuthor)
+                .addLineComment(prBuilder.prAuthor)
+                .submitReview(prBuilder.prAuthor)
+                .merge(prBuilder.prAuthor)
+                .build();
+
+            const prEntity = await new GitHubPullRequest().init(model);
+            expect(prEntity.participants.map(p=>p.participant.login)).toHaveLength(0);
+        });
+    });
 });
 

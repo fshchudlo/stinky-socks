@@ -2,7 +2,7 @@ import { ImportParams } from "../ImportParams";
 import {
     GitHubFileDiffModel,
     GitHubPullRequestActivityCommentedModel,
-    GitHubPullRequestActivityCommitedModel,
+    GitHubPullRequestActivityCommitedModel, GitHubPullRequestActivityLineCommentedModel,
     GitHubPullRequestActivityReadyForReviewModel,
     GitHubPullRequestActivityReviewedModel, GitHubPullRequestAuthorRole,
     GitHubPullRequestReviewRequestActivityModel,
@@ -112,6 +112,20 @@ export class TestGitHubImportModelBuilder {
         return this;
     }
 
+    addLineComment(who = this.firstReviewer, when: Dayjs = this.prCreatedAt.add(15, "minutes")): this {
+        const event: GitHubPullRequestActivityLineCommentedModel = {
+            event: "line-commented",
+            comments: [{
+                user: {
+                    ...who
+                },
+                created_at: when.toISOString()
+            }]
+        };
+        this.model.activities.push(event);
+        return this;
+    }
+
     isReadyForReview(when: Dayjs): this {
         const event: GitHubPullRequestActivityReadyForReviewModel = {
             event: "ready_for_review",
@@ -135,6 +149,11 @@ export class TestGitHubImportModelBuilder {
         };
         this.model.pullRequest.requested_reviewers.push(event.requested_reviewer!);
         this.model.activities.push(event);
+        return this;
+    }
+
+    addAssignee(who = this.firstReviewer): this {
+        this.model.pullRequest.assignees.push(who);
         return this;
     }
 
@@ -172,6 +191,16 @@ export class TestGitHubImportModelBuilder {
 
     authorIsBot(): this {
         this.model.pullRequest.user.type = "Bot";
+        return this;
+    }
+
+    merge(who = this.firstReviewer, when = this.prCreatedAt.add(3, "hours")) {
+        this.model.activities.push({
+            event: "merged",
+            actor: who,
+            created_at: this.prCreatedAt.add(2, "hours").toISOString()
+        });
+        this.model.pullRequest.merged_at = when.toISOString();
         return this;
     }
 }
