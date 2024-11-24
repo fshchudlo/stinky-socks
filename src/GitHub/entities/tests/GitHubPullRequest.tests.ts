@@ -5,7 +5,7 @@ import { ActorRole } from "../../../MetricsDB/entities/ActorRole";
 import { GitHubPullRequestAuthorRole } from "../../GitHubAPI.contracts";
 
 let fetchCallsCounter = 0;
-jest.spyOn(ActorFactory, "fetch").mockImplementation(async ({ teamName, login, isBotUser }: {
+const actorFactorySpy = jest.spyOn(ActorFactory, "fetch").mockImplementation(async ({ teamName, login, isBotUser }: {
     teamName: string,
     login: string,
     isBotUser: boolean
@@ -28,6 +28,7 @@ const prBuilder = new TestGitHubImportModelBuilder();
 describe("GitHubPullRequest", () => {
     beforeEach(() => {
         prBuilder.reset();
+        actorFactorySpy.mockClear();
     });
 
     describe("`requestedReviewersCount`", () => {
@@ -77,6 +78,14 @@ describe("GitHubPullRequest", () => {
     });
 
     describe("`author`", () => {
+        it("Instantiates `actor` user with ActorFactory", async () => {
+            const model = prBuilder.pullRequest().authorIsBot().build();
+
+            const prEntity = await new GitHubPullRequest().init(model);
+
+            expect(ActorFactory.fetch).toHaveBeenCalledTimes(1);
+            await expect((<any>ActorFactory.fetch).mock.results[0].value).resolves.toEqual(prEntity.author)
+        });
         it("Sets `actor.is_bot_user` flag if author is marked as bot by GitHub", async () => {
             const model = prBuilder.pullRequest().authorIsBot().build();
 
