@@ -84,7 +84,7 @@ describe("GitHubPullRequest", () => {
             const prEntity = await new GitHubPullRequest().init(model);
 
             expect(ActorFactory.fetch).toHaveBeenCalledTimes(1);
-            await expect((<any>ActorFactory.fetch).mock.results[0].value).resolves.toEqual(prEntity.author)
+            await expect((<any>ActorFactory.fetch).mock.results[0].value).resolves.toEqual(prEntity.author);
         });
         it("Sets `actor.is_bot_user` flag if author is marked as bot by GitHub", async () => {
             const model = prBuilder.pullRequest().authorIsBot().build();
@@ -165,6 +165,47 @@ describe("GitHubPullRequest", () => {
             const prEntity = await new GitHubPullRequest().init(model);
             expect(prEntity.authorCommentsCount).toEqual(2);
         });
+    });
+
+    it("`diffRowsAdded` and `diffRowsDeleted` are set from pr files", async () => {
+        const model = prBuilder.pullRequest()
+            .addCommit(prBuilder.prCreatedAt.subtract(3, "hours"), [{
+                additions: 10,
+                deletions: 5,
+                filename: "src/index.ts"
+            }])
+            .build();
+
+        const prEntity = await new GitHubPullRequest().init(model);
+        expect(prEntity.diffRowsAdded).toEqual(10);
+        expect(prEntity.diffRowsDeleted).toEqual(5);
+    });
+
+    it("`testsWereTouched` is false if there are no files with `test` in path name", async () => {
+        const modelWithoutTestsTouched = prBuilder.pullRequest()
+            .addCommit(prBuilder.prCreatedAt.subtract(3, "hours"), [{
+                additions: 10,
+                deletions: 5,
+                filename: "src/index.ts"
+            }])
+            .build();
+
+        const prWithoutTestsTouched = await new GitHubPullRequest().init(modelWithoutTestsTouched);
+        expect(prWithoutTestsTouched.testsWereTouched).toEqual(false);
+
+    });
+
+    it("`testsWereTouched` is true if there are files with `test` in path name", async () => {
+        const modelWithTestsTouched = prBuilder.pullRequest()
+            .addCommit(prBuilder.prCreatedAt.subtract(3, "hours"), [{
+                additions: 10,
+                deletions: 5,
+                filename: "src/index.test.ts"
+            }])
+            .build();
+
+        const prWithTestsTouched = await new GitHubPullRequest().init(modelWithTestsTouched);
+        expect(prWithTestsTouched.testsWereTouched).toEqual(true);
     });
 });
 

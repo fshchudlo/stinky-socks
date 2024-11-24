@@ -1,5 +1,6 @@
 import { ImportParams } from "../ImportParams";
 import {
+    GitHubFileDiffModel,
     GitHubPullRequestActivityCommentedModel,
     GitHubPullRequestActivityCommitedModel,
     GitHubPullRequestActivityReadyForReviewModel,
@@ -77,7 +78,11 @@ export class TestGitHubImportModelBuilder {
         return this;
     }
 
-    addCommit(when: Dayjs): this {
+    addCommit(when: Dayjs, changedFiles: GitHubFileDiffModel[] = [{
+        additions: 10,
+        deletions: 5,
+        filename: "src/index.ts"
+    }]): this {
         const event: GitHubPullRequestActivityCommitedModel = {
             event: "committed",
             author: {
@@ -88,6 +93,7 @@ export class TestGitHubImportModelBuilder {
             }
         };
         this.model.activities.push(event);
+        this.model.files.push(...changedFiles);
         return this;
     }
 
