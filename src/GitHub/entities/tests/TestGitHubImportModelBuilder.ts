@@ -33,12 +33,6 @@ export class TestGitHubImportModelBuilder {
         html_url: "https://github.com/second.reviewer"
     };
 
-    botReviewer: GitHubUserModel = {
-        login: "bot.reviewer",
-        type: "Bot",
-        html_url: "https://github.com/bot.reviewer"
-    };
-
     build(): ImportParams {
         return this.model;
     }
@@ -78,18 +72,22 @@ export class TestGitHubImportModelBuilder {
         return this;
     }
 
-    addCommit(when: Dayjs, changedFiles: GitHubFileDiffModel[] = [{
+    addCommit(when: Dayjs, who = this.prAuthor, changedFiles: GitHubFileDiffModel[] = [{
         additions: 10,
         deletions: 5,
         filename: "src/index.ts"
     }]): this {
         const event: GitHubPullRequestActivityCommitedModel = {
             event: "committed",
+            message: "Some commit",
+            html_url: "https://github.com/TestOwner/TestRepo/pull/1/commits/43535bdaosd87",
             author: {
-                date: when.toISOString()
+                date: when.toISOString(),
+                name: who.login
             },
             committer: {
-                date: when.toISOString()
+                date: when.toISOString(),
+                name: who.login
             }
         };
         this.model.activities.push(event);
@@ -106,6 +104,8 @@ export class TestGitHubImportModelBuilder {
             actor: {
                 ...who
             },
+            body: "Some comment",
+            html_url: "https://github.com/TestOwner/TestRepo/pull/1#issuecomment-1",
             created_at: when.toISOString()
         };
         this.model.activities.push(event);
@@ -119,6 +119,8 @@ export class TestGitHubImportModelBuilder {
                 user: {
                     ...who
                 },
+                body: "Some comment",
+                html_url: "https://github.com/TestOwner/TestRepo/pull/1#issuecomment-1",
                 created_at: when.toISOString()
             }]
         };
@@ -160,6 +162,7 @@ export class TestGitHubImportModelBuilder {
     submitReview(who = this.firstReviewer, when = this.prCreatedAt.add(30, "minutes")): this {
         const event: GitHubPullRequestActivityReviewedModel = {
             event: "reviewed",
+            html_url: "https://github.com/TestOwner/TestRepo/pull/1#pullrequestreview-1",
             user: who,
             submitted_at: when.toISOString(),
             body: "LGTM",

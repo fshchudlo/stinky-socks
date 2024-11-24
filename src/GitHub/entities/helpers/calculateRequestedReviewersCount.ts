@@ -7,7 +7,7 @@ import { ActivityTraits } from "./ActivityTraits";
 * Another point is that GitHub sometimes GitHub replays review request removal events but omits review requests events.
 * So, we take all the request events and subtract the removal events but only for the users who was requested.
 * */
-export function calculateReviewersCount(model: ImportParams) {
+export function calculateRequestedReviewersCount(model: ImportParams) {
     const requestedReviewers = model.activities
         .filter(ActivityTraits.isReviewRequestedEvent)
         .filter(r => r.requested_reviewer)

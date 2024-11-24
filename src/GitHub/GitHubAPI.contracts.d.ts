@@ -32,16 +32,22 @@ export type GitHubPullRequestActivityLineCommentedModel = {
     event: "line-commented";
     comments: {
         created_at: string;
-        user: GitHubUserModel
+        user: GitHubUserModel;
+        body: string;
+        html_url: string;
     }[];
 };
 
 export type GitHubPullRequestActivityCommitedModel = {
     event: "committed";
+    message: string;
+    html_url: string;
     committer: {
+        name: string;
         date: string;
     };
     author: {
+        name: string;
         date: string;
     };
 };
@@ -50,6 +56,8 @@ export type GitHubPullRequestActivityCommentedModel = {
     user: GitHubUserModel;
     created_at: string;
     actor: GitHubUserModel;
+    body: string;
+    html_url: string;
 };
 export type GitHubPullRequestReviewRequestActivityModel = {
     event: "review_requested" | "review_request_removed";
@@ -59,9 +67,10 @@ export type GitHubPullRequestReviewRequestActivityModel = {
     created_at: string;
 };
 export type GitHubPullRequestActivityReviewedModel = {
-    body?: string;
+    body: string | null;
     event: "reviewed";
     state: "approved" | "changes_requested" | "commented" | "dismissed" | "pending";
+    html_url: string;
     submitted_at: string;
     user?: GitHubUserModel;
 };
@@ -83,6 +92,7 @@ export type GitHubFileDiffModel = {
     filename: string;
 };
 export type GitHubUserModel = {
+    id: number;
     login: string;
     type: "User" | "Organization" | "Mannequin" | "Bot";
     html_url: string;

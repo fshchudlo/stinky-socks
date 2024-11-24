@@ -169,7 +169,7 @@ describe("GitHubPullRequest", () => {
 
     it("`diffRowsAdded` and `diffRowsDeleted` are set from pr files", async () => {
         const model = prBuilder.pullRequest()
-            .addCommit(prBuilder.prCreatedAt.subtract(3, "hours"), [{
+            .addCommit(prBuilder.prCreatedAt.subtract(3, "hours"), prBuilder.prAuthor, [{
                 additions: 10,
                 deletions: 5,
                 filename: "src/index.ts"
@@ -183,7 +183,7 @@ describe("GitHubPullRequest", () => {
 
     it("`testsWereTouched` is false if there are no files with `test` in path name", async () => {
         const modelWithoutTestsTouched = prBuilder.pullRequest()
-            .addCommit(prBuilder.prCreatedAt.subtract(3, "hours"), [{
+            .addCommit(prBuilder.prCreatedAt.subtract(3, "hours"), prBuilder.prAuthor, [{
                 additions: 10,
                 deletions: 5,
                 filename: "src/index.ts"
@@ -197,7 +197,7 @@ describe("GitHubPullRequest", () => {
 
     it("`testsWereTouched` is true if there are files with `test` in path name", async () => {
         const modelWithTestsTouched = prBuilder.pullRequest()
-            .addCommit(prBuilder.prCreatedAt.subtract(3, "hours"), [{
+            .addCommit(prBuilder.prCreatedAt.subtract(3, "hours"), prBuilder.prAuthor, [{
                 additions: 10,
                 deletions: 5,
                 filename: "src/index.test.ts"

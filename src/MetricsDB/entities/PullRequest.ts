@@ -2,6 +2,7 @@ import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryColumn } from 
 import { PullRequestParticipant } from "./PullRequestParticipant";
 import { Actor } from "./Actor";
 import { ActorRole } from "./ActorRole";
+import { PullRequestActivity } from "./PullRequestActivity";
 
 @Entity()
 export abstract class PullRequest {
@@ -66,6 +67,11 @@ export abstract class PullRequest {
         cascade: true
     })
     participants: PullRequestParticipant[];
+
+    @OneToMany(() => PullRequestActivity, (activity) => activity.pullRequest, {
+        cascade: true
+    })
+    activities: PullRequestActivity[];
 
     @ManyToOne(() => Actor, (author) => author.pullRequests, { onDelete: "CASCADE" })
     @JoinColumn()
