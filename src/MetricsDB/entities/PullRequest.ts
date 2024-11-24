@@ -38,15 +38,6 @@ export abstract class PullRequest {
     @Column({ nullable: true, type: "timestamp" })
     lastCommitDate: Date | null;
 
-    @Column({ nullable: true, type: "timestamp" })
-    firstReactionDate: Date | null;
-
-    @Column({ nullable: true, type: "timestamp" })
-    lastApprovalDate: Date | null;
-
-    @Column({ nullable: true, type: "timestamp" })
-    reworkCompletedDate: Date | null;
-
     @Column()
     mergedDate: Date;
 
@@ -54,7 +45,7 @@ export abstract class PullRequest {
     requestedReviewersCount: number;
 
     @Column()
-    totalCommentsCount: number;
+    authorCommentsCount: number;
 
     @Column({ type: "numeric" })
     diffRowsAdded: number;
@@ -83,32 +74,6 @@ export abstract class PullRequest {
 
     public calculateAggregations() {
         this.participants.forEach(p => p.calculateAggregations());
-
-        this.totalCommentsCount = this.participants
-            .filter(p => !p.participant.isBotUser)
-            .map(p => p.commentsCount)
-            .reduce((total, count) => total + count, 0);
-
-        this.firstReactionDate = this.participants
-            .filter(p => !p.participant.isBotUser)
-            .map(p => p.firstReactionDate)
-            .filter(d => d)
-            .map(d => <Date>d)
-            .filter(d => d.getTime() < this.mergedDate.getTime() && d.getTime() > this.sharedForReviewDate.getTime())
-            .reduce((minDate: Date | null, date) => !minDate || date!.getTime() < (<Date>minDate).getTime() ? date : minDate, null);
-
-
-        this.lastApprovalDate = this.participants
-            .filter(p => !p.participant.isBotUser)
-            .map(p => p.lastApprovalDate)
-            .filter(d => d)
-            .map(d => <Date>d)
-            .reduce((maxDate: Date | null, date) => !maxDate || date!.getTime() > (<Date>maxDate).getTime() ? date : maxDate, null);
-
-        this.reworkCompletedDate = [this.lastCommitDate, this.lastApprovalDate]
-            .filter(d => d)
-            .filter(d => d!.getTime() > this.sharedForReviewDate.getTime())
-            .reduce((maxDate: Date | null, date) => !maxDate || date!.getTime() > (<Date>maxDate).getTime() ? date : maxDate, null);
         return this;
     }
 

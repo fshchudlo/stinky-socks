@@ -162,28 +162,16 @@ describe("GitHubPullRequest", () => {
         });
     });
 
-    describe("`totalCommentsCount`", () => {
-        it("Is set from participants comments count", async () => {
+    describe("`authorCommentsCount`", () => {
+        it("Is set from comment activities", async () => {
             const model = prBuilder.pullRequest()
-                .addComment(prBuilder.firstReviewer)
-                .addComment(prBuilder.firstReviewer)
+                .addComment(prBuilder.prAuthor)
+                .addComment(prBuilder.prAuthor)
                 .build();
 
             const prEntity = await new GitHubPullRequest().init(model);
-
-            expect(prEntity.participants[0].commentsCount).toEqual(2);
-            expect(prEntity.totalCommentsCount).toEqual(2);
-        });
-        it("Excludes bot comments", async () => {
-            const model = prBuilder.pullRequest()
-                .addComment(prBuilder.botReviewer)
-                .build();
-
-            const prEntity = await new GitHubPullRequest().init(model);
-
-            expect(prEntity.totalCommentsCount).toEqual(0);
+            expect(prEntity.authorCommentsCount).toEqual(2);
         });
     });
-
 });
 

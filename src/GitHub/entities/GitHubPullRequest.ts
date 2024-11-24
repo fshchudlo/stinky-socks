@@ -8,6 +8,7 @@ import calculatePrSharedForReviewDate from "./helpers/calculatePrSharedForReview
 import { GitHubUserModel } from "../GitHubAPI.contracts";
 import { calculateReviewersCount } from "./helpers/calculateReviewersCount";
 import { mapGithubUserAssociationToActorRole } from "./helpers/mapGithubUserAssociationToActorRole";
+import { getCommentsTimestamps } from "./helpers/getCommentsTimestamps";
 
 
 export class GitHubPullRequest extends PullRequest {
@@ -30,6 +31,7 @@ export class GitHubPullRequest extends PullRequest {
         this.targetBranch = model.pullRequest.base.ref;
 
         this.requestedReviewersCount = calculateReviewersCount(model);
+        this.authorCommentsCount = getCommentsTimestamps(getActivitiesOf(model.activities, model.pullRequest.user.login)).length;
 
         this.authorRole = mapGithubUserAssociationToActorRole(model.pullRequest.author_association);
         this.createdDate = new Date(model.pullRequest.created_at);
