@@ -84,14 +84,6 @@ describe("GitHubPullRequest", () => {
 
             expect(prEntity.author.isBotUser).toBe(true);
         });
-
-        it("Sets `actor.is_bot_user` flag from known bots list", async () => {
-            const model = prBuilder.pullRequest().addKnownBotUser(prBuilder.prAuthor.login).build();
-
-            const prEntity = await new GitHubPullRequest().init(model);
-
-            expect(prEntity.author.isBotUser).toBe(true);
-        });
     });
 
     describe("`sharedForReviewDate`", () => {

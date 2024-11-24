@@ -49,7 +49,6 @@ export class TestGitHubImportModelBuilder {
     pullRequest(author = this.prAuthor, createdAt = this.prCreatedAt): this {
         this.model = {
             teamName: "Test team",
-            botUserNames: ["dependabot"],
             pullRequest: {
                 created_at: createdAt.toISOString(),
                 updated_at: createdAt.add(1, "day").toISOString(),
@@ -167,11 +166,6 @@ export class TestGitHubImportModelBuilder {
 
     authorIsBot(): this {
         this.model.pullRequest.user.type = "Bot";
-        return this;
-    }
-
-    addKnownBotUser(botUserLogin: string): this {
-        this.model.botUserNames.push(botUserLogin);
         return this;
     }
 }

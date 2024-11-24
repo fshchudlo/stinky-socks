@@ -17,7 +17,6 @@ describe("Import single PR debug helper", () => {
         ]);
         const pullRequestEntity = await new GitHubPullRequest().init({
                 teamName: "grafana",
-                botUserNames: [],
                 pullRequest,
                 activities,
                 files

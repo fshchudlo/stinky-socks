@@ -42,7 +42,7 @@ export class GitHubPullRequest extends PullRequest {
         this.author = await ActorFactory.fetch({
             teamName: model.teamName,
             login: authorLogin,
-            isBotUser: model.botUserNames.includes(authorLogin) || model.pullRequest.user.type === "Bot"
+            isBotUser: model.pullRequest.user.type === "Bot"
         });
 
         return this;
@@ -91,7 +91,7 @@ export class GitHubPullRequest extends PullRequest {
                     const participantUser = await ActorFactory.fetch({
                         teamName: model.teamName,
                         login: participant.login,
-                        isBotUser: model.botUserNames.includes(participant.login) || participant.type === "Bot"
+                        isBotUser: participant.type === "Bot"
                     });
 
                     return new GitHubPullRequestParticipant(
