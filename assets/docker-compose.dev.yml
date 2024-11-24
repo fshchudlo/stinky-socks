@@ -9,7 +9,7 @@ services:
     image: stinky-socks-importer
     pull_policy: never
     container_name: "stinky-socks-importer"
-    restart: always
+    restart: no
     command: npm run start
     environment:
       - NODE_ENV=development
