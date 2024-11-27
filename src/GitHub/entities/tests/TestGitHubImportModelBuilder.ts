@@ -16,18 +16,21 @@ export class TestGitHubImportModelBuilder {
     public prCreatedAt = dayjs();
 
     prAuthor: GitHubUserModel = {
+        id: 111,
         login: "test.author",
         type: "User",
         html_url: "https://github.com/test.author"
     };
 
     firstReviewer: GitHubUserModel = {
+        id: 222,
         login: "first.reviewer",
         type: "User",
         html_url: "https://github.com/first.reviewer"
     };
 
     secondReviewer: GitHubUserModel = {
+        id: 333,
         login: "second.reviewer",
         type: "User",
         html_url: "https://github.com/second.reviewer"
@@ -58,6 +61,7 @@ export class TestGitHubImportModelBuilder {
                     ref: "main",
                     repo: {
                         owner: {
+                            id: 1,
                             login: "TestOwner",
                             type: "Organization",
                             html_url: "https://github.com/TestOwner"
