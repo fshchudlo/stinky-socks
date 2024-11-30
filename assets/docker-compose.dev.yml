@@ -11,6 +11,8 @@ services:
     container_name: "stinky-socks-importer"
     restart: no
     command: npm run start
+    networks:
+      - stinky_socks_network
     environment:
       - NODE_ENV=development
       - DB_HOST=postgres

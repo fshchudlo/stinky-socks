@@ -6,13 +6,15 @@ services:
     restart: always
     ports:
       - "5432:5432"
+    networks:
+        - stinky_socks_network
     environment:
       POSTGRES_DB: stinky-socks
       POSTGRES_USER: stinky-socks
       POSTGRES_PASSWORD: "CHANGE-ME!"
     shm_size: 1g
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - stinky_socks_postgres_data:/var/lib/postgresql/data
 
   # http://127.0.0.1:3000
   grafana:
@@ -21,6 +23,8 @@ services:
     restart: always
     ports:
       - 3000:3000
+    networks:
+        - stinky_socks_network
     environment:
       - GF_SECURITY_ADMIN_USER=stinky-socks
       - GF_SECURITY_ADMIN_PASSWORD=CHANGE-ME!
@@ -30,4 +34,8 @@ services:
       - ./grafana-dashboards:/var/lib/grafana/dashboards
 
 volumes:
-  postgres_data:
+  stinky_socks_postgres_data:
+
+networks:
+  stinky_socks_network:
+    driver: bridge
