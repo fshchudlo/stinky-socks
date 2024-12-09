@@ -9,8 +9,8 @@ export default async function importTeamProjects() {
     const timelogLabel = `🎉 Teams data import completed!`;
     console.time(timelogLabel);
     console.group("🚀 Starting Pull Requests import...");
-    await runImportForAppInstallations();
     await runImportForThePublicProjects();
+    await runImportForAppInstallations();
 
     console.groupEnd();
     console.timeEnd(timelogLabel);
