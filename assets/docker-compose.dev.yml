@@ -14,7 +14,7 @@ services:
     networks:
       - stinky_socks_network
     environment:
-      - NODE_ENV=development
+      - NODE_ENV=production
       - DB_HOST=postgres
       - DB_PORT=5432
       - DB_PASSWORD=CHANGE-ME!

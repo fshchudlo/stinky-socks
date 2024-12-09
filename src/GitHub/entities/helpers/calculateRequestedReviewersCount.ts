@@ -19,8 +19,7 @@ export function calculateRequestedReviewersCount(model: ImportParams) {
         .map(r => r.requested_reviewer!.login);
 
     const reactedReviewers = model.activities
-        .filter(ActivityTraits.isReviewedEvent)
-        .filter(r => r.user)
+        .filter(ActivityTraits.isConsistentReviewedEvent)
         .map(r => r.user!.login);
 
     const remainedReviewers = requestedReviewers

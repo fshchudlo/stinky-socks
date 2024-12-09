@@ -77,8 +77,8 @@ export class GitHubPullRequest extends PullRequest {
             .concat(model.activities.filter(ActivityTraits.isMergedEvent).map(c => c.actor))
             .concat(model.activities.filter(ActivityTraits.isCommentedEvent).map(c => c.actor))
             .concat(model.activities.filter(ActivityTraits.isLineCommentedEvent).flatMap(c => c.comments).map(c => c.user))
-            .concat(model.activities.filter(ActivityTraits.isReviewedEvent).map(u => u.user).filter(u => !!u))
-            .filter(p => !!p?.login)
+            .concat(model.activities.filter(ActivityTraits.isConsistentReviewedEvent).map(u => u.user!))
+            .filter(p => !!p.login)
             .filter(p => p.login !== model.pullRequest.user.login);
 
         const uniqueParticipants = Object.values(
@@ -126,9 +126,11 @@ export class GitHubPullRequest extends PullRequest {
         this.activities.push(...commitActivities);
 
 
-        const reviewActivities = model.activities.filter(ActivityTraits.isReviewedEvent).map(review => {
-            return new GitHubPullRequestActivity(model.teamName, model.pullRequest, review.state == "commented" ? review.event : review.state, new Date(review.submitted_at), review.user!.login, review.body, review.html_url);
-        });
+        const reviewActivities = model.activities
+            .filter(ActivityTraits.isConsistentReviewedEvent)
+            .map(review => {
+                return new GitHubPullRequestActivity(model.teamName, model.pullRequest, review.state == "commented" ? review.event : review.state, new Date(review.submitted_at), review.user!.login, review.body, review.html_url);
+            });
         this.activities.push(...reviewActivities);
 
         const readyForReviewActivities = model.activities.filter(ActivityTraits.isReadyForReviewEvent).map(event => {

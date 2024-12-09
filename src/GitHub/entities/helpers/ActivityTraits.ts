@@ -30,6 +30,10 @@ export const ActivityTraits = {
     isReviewedEvent(event: GitHubPullRequestActivityModel): event is GitHubPullRequestActivityReviewedModel {
         return event.event === "reviewed";
     },
+    isConsistentReviewedEvent(event: GitHubPullRequestActivityModel): event is GitHubPullRequestActivityReviewedModel {
+        // Deleted GitHub users are replaced by https://github.com/ghost which is represented as a null in the review event
+        return event.event === "reviewed" && !!event.user;
+    },
     isMergedEvent(event: GitHubPullRequestActivityModel): event is GitHubPullRequestActivityMergedModel {
         return event.event === "merged";
     }

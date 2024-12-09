@@ -20,7 +20,7 @@ class MetricsDataSource extends DataSource {
             synchronize: false,
             migrations: ["src/MetricsDB/migrations/*.ts"],
             migrationsRun: true,
-            logging: false
+            logging: !AppConfig.IS_PRODUCTION
         });
     }
 

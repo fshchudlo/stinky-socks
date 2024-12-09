@@ -72,7 +72,8 @@ export type GitHubPullRequestActivityReviewedModel = {
     state: "approved" | "changes_requested" | "commented" | "dismissed" | "pending";
     html_url: string;
     submitted_at: string;
-    user?: GitHubUserModel;
+    // Deleted GitHub users are replaced by https://github.com/ghost which is represented as a null in the review event
+    user: GitHubUserModel | null;
 };
 export type GitHubPullRequestActivityMergedModel = {
     event: "merged";
