@@ -1,16 +1,23 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
 import { GitHubFileDiffModel, GitHubPullRequestActivityModel, GitHubPullRequestModel } from "../GitHubAPI.contracts";
+import { fetchAccessToken } from "./GitHubCredentialsHelper";
 
-let rateLimitLockAcquired = false;
+const rateLimitLocks: { [key: string]: boolean; } = {};
+export type GitHubAppAuthParams = { appId: number, privateKey: string, organizationId: number };
 
 export class GitHubAPI {
-    private readonly token: string;
+    private readonly getAuthHeader: () => Promise<string>;
     private readonly baseUrl = "https://api.github.com";
-    private readonly pauseOnRateLimitThreshold: boolean;
 
-    constructor(token: string, addressRateLimits: boolean = true) {
-        this.token = token;
-        this.pauseOnRateLimitThreshold = addressRateLimits;
+    constructor(auth: string | GitHubAppAuthParams) {
+        if (typeof auth === "string") {
+            this.getAuthHeader = () => Promise.resolve(`token ${auth}`);
+        } else {
+            this.getAuthHeader = async () => {
+                const jwtToken = await fetchAccessToken(auth.appId, auth.privateKey, auth.organizationId);
+                return `Bearer ${jwtToken}`;
+            };
+        }
     }
 
     async fetchAllRepositories(owner: string): Promise<any[]> {
@@ -47,7 +54,7 @@ export class GitHubAPI {
     private async get(url: string, params: any = undefined): Promise<any> {
         const config: AxiosRequestConfig = {
             headers: {
-                "Authorization": `token ${this.token}`,
+                "Authorization": await this.getAuthHeader(),
                 "Accept": "application/vnd.github.v3+json"
             },
             params: params
@@ -84,21 +91,22 @@ export class GitHubAPI {
     }
 
     private async checkRateLimits(response: AxiosResponse<any>) {
-        if (this.pauseOnRateLimitThreshold && parseInt(response.headers["x-ratelimit-remaining"], 10) <= 10) {
+        if (parseInt(response.headers["x-ratelimit-remaining"], 10) <= 10) {
             const resetTime = parseInt(response.headers["x-ratelimit-reset"], 10) * 1000;
             // Add ten more seconds to ensure we didn't violate the rate limit
             const waitTime = 10000 + resetTime - Date.now();
+            const lockKey = await this.getAuthHeader();
 
             // We run requests in parallel, and it's possible that a request was blocked because this check was triggered by another request.
             // By the time it resumes execution, the rate limit may have already reset.
             // To avoid redundant waiting, we recheck the actual wait time, as it represents an absolute value.
-            if (waitTime <= 0 || rateLimitLockAcquired) {
+            if (waitTime <= 0 || rateLimitLocks[lockKey]) {
                 return;
             }
 
             console.log(`🫸 The GitHub API rate limit exceeded. Waiting for ${convertMillisecondsToHumanReadableTime(waitTime)}...`);
-            rateLimitLockAcquired = true;
-            await new Promise(resolve => setTimeout(resolve, waitTime)).finally(() => rateLimitLockAcquired = false);
+            rateLimitLocks[lockKey] = true;
+            await new Promise(resolve => setTimeout(resolve, waitTime)).finally(() => rateLimitLocks[lockKey] = false);
             console.log(`💃 The GitHub API rate limit is updated. Let's move on...`);
         }
 

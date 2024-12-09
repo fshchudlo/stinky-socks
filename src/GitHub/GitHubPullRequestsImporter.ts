@@ -8,11 +8,7 @@ import { ImportParams } from "./entities/ImportParams";
 
 export type GitHubProjectSettings = {
     owner: string;
-    repositoriesSelector: (api: GitHubAPI) => Promise<string[]>;
-    pullRequestsFilterFn?: (pr: GitHubPullRequestModel) => boolean,
-    auth: {
-        apiToken: string;
-    }
+    repositoriesSelector?: (api: GitHubAPI) => Promise<string[]>;
 }
 
 export class GitHubPullRequestsImporter {
@@ -29,7 +25,11 @@ export class GitHubPullRequestsImporter {
     }
 
     async importPullRequests() {
-        for (const repositoryName of await this.project.repositoriesSelector(this.gitHubAPI)) {
+        const repositories = this.project.repositoriesSelector ?
+            await this.project.repositoriesSelector(this.gitHubAPI) :
+            (await this.gitHubAPI.fetchAllRepositories(this.project.owner)).map(repo => repo.name);
+
+        for (const repositoryName of repositories) {
             console.group(`🔁 Importing pull requests for the '${repositoryName}' repository`);
 
             const timelogLabel = `✅ '${repositoryName}' pull requests import completed`;
@@ -63,11 +63,7 @@ export class GitHubPullRequestsImporter {
                     continue;
                 }
 
-                if (!this.project.pullRequestsFilterFn || this.project.pullRequestsFilterFn(pullRequest)) {
-                    await this.savePullRequest(this.project, repositoryName, pullRequest);
-                } else {
-                    console.warn(`⚠️ Pull request ${pullRequest.number} was filtered out by specified pullRequestsFilterFn function`);
-                }
+                await this.savePullRequest(this.project, repositoryName, pullRequest);
             }
             console.timeEnd(timelogLabel);
 
@@ -94,7 +90,7 @@ export class GitHubPullRequestsImporter {
             );
 
             const integrityErrors = pullRequestEntity.validateDataIntegrity();
-            if (integrityErrors.length>0) {
+            if (integrityErrors.length > 0) {
                 console.warn(`☣️ PullRequest ${pullRequest.html_url} has the following integrity errors:\n\t• ${integrityErrors.join("\n\t• ")}`);
             }
             await this.repository.save(pullRequestEntity);

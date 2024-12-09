@@ -8,5 +8,10 @@ export const AppConfig = {
         DB_PASSWORD: process.env.DB_PASSWORD,
         DB_USERNAME: process.env.DB_USERNAME,
         DB_NAME: process.env.DB_NAME
-    }
+    },
+    STINKY_SOCKS_GITHUB_APP_ID: process.env.STINKY_SOCKS_GITHUB_APP_ID ? +(process.env.STINKY_SOCKS_GITHUB_APP_ID) : null,
+    STINKY_SOCKS_GITHUB_APP_PRIVATE_KEY: process.env.STINKY_SOCKS_GITHUB_APP_PRIVATE_KEY ? process.env.STINKY_SOCKS_GITHUB_APP_PRIVATE_KEY.replace(
+        /\\n/g,
+        "\n"
+    ) : null
 };

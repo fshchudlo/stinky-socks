@@ -1,14 +1,9 @@
 import "dotenv/config";
 import { GitHubProjectSettings } from "./GitHub/GitHubPullRequestsImporter";
 
-const GITHUB_API_TOKEN = process.env.GITHUB_API_TOKEN as string;
-
 const grafanaTeam: TeamImportSettings = {
     teamName: "Grafana",
     gitHubProjects: [{
-        auth: {
-            apiToken: GITHUB_API_TOKEN
-        },
         owner: "grafana",
         repositoriesSelector: async () => Promise.resolve(["grafana"])
     }]
@@ -17,9 +12,6 @@ const grafanaTeam: TeamImportSettings = {
 const kubernetesTeam: TeamImportSettings = {
     teamName: "Kubernetes",
     gitHubProjects: [{
-        auth: {
-            apiToken: GITHUB_API_TOKEN
-        },
         owner: "kubernetes",
         repositoriesSelector: async () => Promise.resolve(["kubernetes"])
     }]
@@ -28,9 +20,6 @@ const kubernetesTeam: TeamImportSettings = {
 const angularTeam: TeamImportSettings = {
     teamName: "Angular",
     gitHubProjects: [{
-        auth: {
-            apiToken: GITHUB_API_TOKEN
-        },
         owner: "angular",
         repositoriesSelector: async () => Promise.resolve(["angular"])
     }]
@@ -39,9 +28,6 @@ const angularTeam: TeamImportSettings = {
 const reactTeam: TeamImportSettings = {
     teamName: "React",
     gitHubProjects: [{
-        auth: {
-            apiToken: GITHUB_API_TOKEN
-        },
         owner: "facebook",
         repositoriesSelector: async () => Promise.resolve(["react"])
     }]
@@ -50,16 +36,14 @@ const reactTeam: TeamImportSettings = {
 const vscodeTeam: TeamImportSettings = {
     teamName: "VS Code",
     gitHubProjects: [{
-        auth: {
-            apiToken: GITHUB_API_TOKEN
-        },
         owner: "microsoft",
         repositoriesSelector: async () => Promise.resolve(["vscode"])
     }]
 };
 
-export const appImportConfig = {
-    teams: [grafanaTeam, kubernetesTeam, vscodeTeam, reactTeam, angularTeam]
+export const publicProjectsImportConfig = {
+    gitHubApiToken: process.env.GITHUB_PUBLIC_API_TOKEN as string,
+    teams: [grafanaTeam, kubernetesTeam, vscodeTeam, angularTeam, reactTeam]
 };
 export type TeamImportSettings = {
     teamName: string;

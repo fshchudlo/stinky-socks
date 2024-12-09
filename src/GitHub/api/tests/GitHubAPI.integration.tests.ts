@@ -5,7 +5,7 @@ describe("GitHubAPI 𝑰𝒏𝒕𝒆𝒈𝒓𝒂𝒕𝒊𝒐𝒏 Test", () => {
     it.skip("should fetch pull requests history", async () => {
         const owner = "grafana";
         const repoName = "grafana";
-        const sut = new GitHubAPI(process.env.GITHUB_API_TOKEN as string);
+        const sut = new GitHubAPI(process.env.GITHUB_PUBLIC_API_TOKEN as string);
 
         const repositories = await sut.fetchAllRepositories(owner);
         expect(repositories).not.toHaveLength(0);
