@@ -23,7 +23,7 @@ function getEarliestTimestamp(dates: string[]): number {
 function isAllReviewersAddedAfterPRCreation(activities: GitHubPullRequestActivityModel[], prCreationDate: string, prAuthor: GitHubUserModel): boolean {
     const reviewersAddedByAuthor = activities
         .filter(ActivityTraits.isReviewRequestedEvent)
-        .filter(r => r.actor.id == prAuthor.id);
+        .filter(r => r.actor?.id == prAuthor.id);
 
     const reviewersAddedAfterPRCreation = reviewersAddedByAuthor.filter(addition => new Date(addition.created_at).getTime() > new Date(prCreationDate).getTime());
 

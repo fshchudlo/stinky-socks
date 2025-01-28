@@ -1,9 +1,11 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
 import { GitHubFileDiffModel, GitHubPullRequestActivityModel, GitHubPullRequestModel } from "../GitHubAPI.contracts";
 import { fetchAccessToken } from "./GitHubCredentialsHelper";
+import * as https from "node:https";
 
 const rateLimitLocks: { [key: string]: boolean; } = {};
 export type GitHubAppAuthParams = { appId: number, privateKey: string, organizationId: number };
+const agent = new https.Agent({ keepAlive: true });
 
 export class GitHubAPI {
     private readonly getAuthHeader: () => Promise<string>;
@@ -57,6 +59,7 @@ export class GitHubAPI {
                 "Authorization": await this.getAuthHeader(),
                 "Accept": "application/vnd.github.v3+json"
             },
+            httpsAgent: agent,
             params: params
         };
         const response = await axios.get(url, config);
