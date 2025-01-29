@@ -1,15 +1,15 @@
-import { PullRequest } from "../../MetricsDB/entities/PullRequest";
-import { GitHubPullRequestParticipant } from "./GitHubPullRequestParticipant";
-import { ActorFactory } from "../../MetricsDB/ActorFactory";
-import { ActivityTraits } from "./helpers/ActivityTraits";
-import { ImportParams } from "./ImportParams";
+import {PullRequest} from "../../MetricsDB/entities/PullRequest";
+import {GitHubPullRequestParticipant} from "./GitHubPullRequestParticipant";
+import {ActorFactory} from "../../MetricsDB/ActorFactory";
+import {ActivityTraits} from "./helpers/ActivityTraits";
+import {ImportParams} from "./ImportParams";
 import getActivitiesOf from "./helpers/getActivitiesOf";
 import calculatePrSharedForReviewDate from "./helpers/calculatePrSharedForReviewDate";
-import { GitHubUserModel } from "../GitHubAPI.contracts";
-import { calculateRequestedReviewersCount } from "./helpers/calculateRequestedReviewersCount";
-import { mapGithubUserAssociationToActorRole } from "./helpers/mapGithubUserAssociationToActorRole";
-import { getCommentsTimestamps } from "./helpers/getCommentsTimestamps";
-import { GitHubPullRequestActivity } from "./GitHubPullRequestActivity";
+import {GitHubUserModel} from "../GitHubAPI.contracts";
+import {calculateRequestedReviewersCount} from "./helpers/calculateRequestedReviewersCount";
+import {mapGithubUserAssociationToActorRole} from "./helpers/mapGithubUserAssociationToActorRole";
+import {getCommentsTimestamps} from "./helpers/getCommentsTimestamps";
+import {GitHubPullRequestActivity} from "./GitHubPullRequestActivity";
 
 
 export class GitHubPullRequest extends PullRequest {
@@ -76,7 +76,7 @@ export class GitHubPullRequest extends PullRequest {
             .concat(model.pullRequest.assignees.map(p => p))
             .concat(model.activities.filter(ActivityTraits.isMergedEvent).map(c => c.actor))
             .concat(model.activities.filter(ActivityTraits.isCommentedEvent).map(c => c.actor))
-            .concat(model.activities.filter(ActivityTraits.isLineCommentedEvent).flatMap(c => c.comments).map(c => c.user))
+            .concat(model.activities.filter(ActivityTraits.isLineCommentedEvent).flatMap(c => c.comments).filter(c => !!c.user).map(c => c.user!))
             .concat(model.activities.filter(ActivityTraits.isConsistentReviewedEvent).map(u => u.user!))
             .filter(p => !!p.login)
             .filter(p => p.login !== model.pullRequest.user.login);
@@ -115,8 +115,8 @@ export class GitHubPullRequest extends PullRequest {
         });
         this.activities.push(...commentActivities);
 
-        const lineCommentActivities = model.activities.filter(ActivityTraits.isLineCommentedEvent).flatMap(a => a.comments).map(lineComment => {
-            return new GitHubPullRequestActivity(model.teamName, model.pullRequest, "commented", new Date(lineComment.created_at), lineComment.user.login, lineComment.body, lineComment.html_url);
+        const lineCommentActivities = model.activities.filter(ActivityTraits.isLineCommentedEvent).flatMap(a => a.comments).filter(c => !!c.user).map(lineComment => {
+            return new GitHubPullRequestActivity(model.teamName, model.pullRequest, "commented", new Date(lineComment.created_at), lineComment.user!.login, lineComment.body, lineComment.html_url);
         });
         this.activities.push(...lineCommentActivities);
 

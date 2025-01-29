@@ -1,4 +1,4 @@
-import { GitHubPullRequestAuthorRole } from "./GitHubPullRequestAuthorRole";
+import {GitHubPullRequestAuthorRole} from "./GitHubPullRequestAuthorRole";
 
 export type GitHubPullRequestModel = {
     author_association: GitHubPullRequestAuthorRole;
@@ -32,7 +32,7 @@ export type GitHubPullRequestActivityLineCommentedModel = {
     event: "line-commented";
     comments: {
         created_at: string;
-        user: GitHubUserModel;
+        user: GitHubUserModel | null;
         body: string;
         html_url: string;
     }[];
