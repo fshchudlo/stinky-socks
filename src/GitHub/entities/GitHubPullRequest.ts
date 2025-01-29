@@ -74,7 +74,7 @@ export class GitHubPullRequest extends PullRequest {
         const allParticipants = model.pullRequest
             .requested_reviewers.map(r => r)
             .concat(model.pullRequest.assignees.map(p => p))
-            .concat(model.activities.filter(ActivityTraits.isMergedEvent).map(c => c.actor))
+            .concat(model.activities.filter(ActivityTraits.isConsistentMergedEvent).map(c => c.actor))
             .concat(model.activities.filter(ActivityTraits.isCommentedEvent).map(c => c.actor))
             .concat(model.activities.filter(ActivityTraits.isLineCommentedEvent).flatMap(c => c.comments).filter(c => !!c.user).map(c => c.user!))
             .concat(model.activities.filter(ActivityTraits.isConsistentReviewedEvent).map(u => u.user!))
@@ -138,7 +138,7 @@ export class GitHubPullRequest extends PullRequest {
         });
         this.activities.push(...readyForReviewActivities);
 
-        const mergeActivities = model.activities.filter(ActivityTraits.isMergedEvent).map(merge => {
+        const mergeActivities = model.activities.filter(ActivityTraits.isConsistentMergedEvent).map(merge => {
             return new GitHubPullRequestActivity(model.teamName, model.pullRequest, merge.event, new Date(merge.created_at), merge.actor.login, null, null);
         });
         this.activities.push(...mergeActivities);
