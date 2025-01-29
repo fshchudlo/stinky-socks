@@ -2,7 +2,7 @@ import {publicProjectsImportConfig, TeamImportSettings} from "./publicProjectsIm
 import {ActorFactory} from "./MetricsDB/ActorFactory";
 import {GitHubAPI} from "./GitHub/api/GitHubAPI";
 import {GitHubPullRequestsImporter} from "./GitHub/GitHubPullRequestsImporter";
-import {fetchInstallationTokenHeader, getAppInstallations} from "./GitHub/api/GitHubAppCredentialsHelper";
+import {fetchInstallationTokenHeader, getAppInstallations} from "./GitHub/api/GitHubAppCredentialsHelpers";
 import {AppConfig} from "./app.config";
 import {fetchNextTokenHeader} from "./GitHub/api/GitHubTokenCredentialsHelper";
 

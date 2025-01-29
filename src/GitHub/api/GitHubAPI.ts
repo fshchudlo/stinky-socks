@@ -1,9 +1,8 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
 import { GitHubFileDiffModel, GitHubPullRequestActivityModel, GitHubPullRequestModel } from "../GitHubAPI.contracts";
 import * as https from "node:https";
+import {checkAPIRateLimits} from "./checkAPIRateLimits";
 
-const rateLimitLocks: { [key: string]: boolean; } = {};
-export type GitHubAppAuthParams = { appId: number, privateKey: string, organizationId: number };
 const agent = new https.Agent({ keepAlive: true });
 
 export class GitHubAPI {
@@ -46,9 +45,11 @@ export class GitHubAPI {
     }
 
     private async get(url: string, params: any = undefined): Promise<any> {
+        const authHeader = await this.getAuthHeader();
+        
         const config: AxiosRequestConfig = {
             headers: {
-                "Authorization": await this.getAuthHeader(),
+                "Authorization": authHeader,
                 "Accept": "application/vnd.github.v3+json"
             },
             httpsAgent: agent,
@@ -56,7 +57,7 @@ export class GitHubAPI {
         };
         const response = await axios.get(url, config);
 
-        await this.checkRateLimits(response);
+        await checkAPIRateLimits(response, authHeader);
 
         if (response.status === 200) {
             return response.data;
@@ -83,47 +84,5 @@ export class GitHubAPI {
             requestParams.page++;
         }
         return result;
-    }
-
-    private async checkRateLimits(response: AxiosResponse<any>) {
-        if (parseInt(response.headers["x-ratelimit-remaining"], 10) <= 10) {
-            const resetTime = parseInt(response.headers["x-ratelimit-reset"], 10) * 1000;
-            // Add ten more seconds to ensure we didn't violate the rate limit
-            const waitTime = 10000 + resetTime - Date.now();
-            const lockKey = await this.getAuthHeader();
-
-            // We run requests in parallel, and it's possible that a request was blocked because this check was triggered by another request.
-            // By the time it resumes execution, the rate limit may have already reset.
-            // To avoid redundant waiting, we recheck the actual wait time, as it represents an absolute value.
-            if (waitTime <= 0 || rateLimitLocks[lockKey]) {
-                return;
-            }
-
-            console.log(`🫸 The GitHub API rate limit exceeded. Waiting for ${convertMillisecondsToHumanReadableTime(waitTime)}...`);
-            rateLimitLocks[lockKey] = true;
-            await new Promise(resolve => setTimeout(resolve, waitTime)).finally(() => rateLimitLocks[lockKey] = false);
-            console.log(`💃 The GitHub API rate limit is updated. Let's move on...`);
-        }
-
-        function convertMillisecondsToHumanReadableTime(milliseconds: number): string {
-            let seconds = milliseconds / 1000;
-            const units: [string, number][] = [
-                ["hour", 3600],
-                ["minute", 60],
-                ["second", 1]
-            ];
-
-            const parts: string[] = [];
-
-            for (const [unitName, unitSeconds] of units) {
-                const unitValue = Math.floor(seconds / unitSeconds);
-                if (unitValue > 0) {
-                    parts.push(`${unitValue} ${unitName}${unitValue > 1 ? "s" : ""}`);
-                }
-                seconds %= unitSeconds;
-            }
-
-            return parts.join(", ");
-        }
     }
 }
