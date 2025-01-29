@@ -22,7 +22,7 @@ const organizationTokensCache: ReturnType<typeof createCache> = createCache({
     ttl: 59 * 60 * 1000
 });
 
-export function fetchAccessToken(
+export function fetchInstallationTokenHeader(
     appId: number,
     privateKey: string,
     organizationId: number
@@ -52,7 +52,7 @@ export function fetchAccessToken(
                     }
                 }
             );
-            return response.data.token;
+            return `Bearer ${response.data.token}`;
         }
     );
 }

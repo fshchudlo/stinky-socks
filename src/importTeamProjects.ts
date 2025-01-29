@@ -1,9 +1,10 @@
-import { publicProjectsImportConfig, TeamImportSettings } from "./publicProjectsImportConfig";
-import { ActorFactory } from "./MetricsDB/ActorFactory";
-import { GitHubAPI } from "./GitHub/api/GitHubAPI";
-import { GitHubPullRequestsImporter } from "./GitHub/GitHubPullRequestsImporter";
-import { getAppInstallations } from "./GitHub/api/GitHubCredentialsHelper";
-import { AppConfig } from "./app.config";
+import {publicProjectsImportConfig, TeamImportSettings} from "./publicProjectsImportConfig";
+import {ActorFactory} from "./MetricsDB/ActorFactory";
+import {GitHubAPI} from "./GitHub/api/GitHubAPI";
+import {GitHubPullRequestsImporter} from "./GitHub/GitHubPullRequestsImporter";
+import {fetchInstallationTokenHeader, getAppInstallations} from "./GitHub/api/GitHubAppCredentialsHelper";
+import {AppConfig} from "./app.config";
+import {fetchNextTokenHeader} from "./GitHub/api/GitHubTokenCredentialsHelper";
 
 export default async function importTeamProjects() {
     const timelogLabel = `🎉 Teams data import completed!`;
@@ -27,11 +28,14 @@ async function runImportForAppInstallations() {
         console.log(`🔁 Importing pull requests for the '${installation.organizationLogin}' organization`);
 
         await ActorFactory.preloadCacheByTeam(installation.organizationLogin);
-        const githubAPI = new GitHubAPI({
-            appId: AppConfig.STINKY_SOCKS_GITHUB_APP_ID!,
-            organizationId: installation.organizationId,
-            privateKey: AppConfig.STINKY_SOCKS_GITHUB_APP_PRIVATE_KEY!
-        });
+        const githubAPI = new GitHubAPI(
+            async () => await fetchInstallationTokenHeader(
+                AppConfig.STINKY_SOCKS_GITHUB_APP_ID!,
+                AppConfig.STINKY_SOCKS_GITHUB_APP_PRIVATE_KEY!,
+                installation.organizationId
+            )
+        );
+
 
         await importGitHubPullRequests({
             teamName: installation.organizationLogin,
@@ -47,7 +51,7 @@ async function runImportForThePublicProjects() {
         console.log(`🔁 Importing pull requests for the '${team.teamName}' team`);
 
         await ActorFactory.preloadCacheByTeam(team.teamName);
-        const gitHubAPI = new GitHubAPI(publicProjectsImportConfig.gitHubApiToken);
+        const gitHubAPI = new GitHubAPI(async () => await fetchNextTokenHeader(publicProjectsImportConfig.gitHubApiTokens));
 
         await importGitHubPullRequests(team, gitHubAPI);
     }

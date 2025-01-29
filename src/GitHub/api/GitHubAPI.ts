@@ -1,6 +1,5 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
 import { GitHubFileDiffModel, GitHubPullRequestActivityModel, GitHubPullRequestModel } from "../GitHubAPI.contracts";
-import { fetchAccessToken } from "./GitHubCredentialsHelper";
 import * as https from "node:https";
 
 const rateLimitLocks: { [key: string]: boolean; } = {};
@@ -11,15 +10,8 @@ export class GitHubAPI {
     private readonly getAuthHeader: () => Promise<string>;
     private readonly baseUrl = "https://api.github.com";
 
-    constructor(auth: string | GitHubAppAuthParams) {
-        if (typeof auth === "string") {
-            this.getAuthHeader = () => Promise.resolve(`token ${auth}`);
-        } else {
-            this.getAuthHeader = async () => {
-                const jwtToken = await fetchAccessToken(auth.appId, auth.privateKey, auth.organizationId);
-                return `Bearer ${jwtToken}`;
-            };
-        }
+    constructor(authHeaderBuilder: () => Promise<string>) {
+        this.getAuthHeader = authHeaderBuilder;
     }
 
     async fetchAllRepositories(owner: string): Promise<any[]> {
