@@ -1,16 +1,16 @@
-import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
+import axios, { AxiosRequestConfig } from "axios";
 import { GitHubFileDiffModel, GitHubPullRequestActivityModel, GitHubPullRequestModel } from "../GitHubAPI.contracts";
 import * as https from "node:https";
-import {checkAPIRateLimits} from "./checkAPIRateLimits";
+import {GitHubCredentialsEmitter} from "./GitHubCredentialsEmitter";
 
 const agent = new https.Agent({ keepAlive: true });
 
 export class GitHubAPI {
-    private readonly getAuthHeader: () => Promise<string>;
+    private readonly credentialsEmitter: GitHubCredentialsEmitter;
     private readonly baseUrl = "https://api.github.com";
 
-    constructor(authHeaderBuilder: () => Promise<string>) {
-        this.getAuthHeader = authHeaderBuilder;
+    constructor(credentialsEmitter: GitHubCredentialsEmitter) {
+        this.credentialsEmitter = credentialsEmitter;
     }
 
     async fetchAllRepositories(owner: string): Promise<any[]> {
@@ -45,7 +45,7 @@ export class GitHubAPI {
     }
 
     private async get(url: string, params: any = undefined): Promise<any> {
-        const authHeader = await this.getAuthHeader();
+        const authHeader = await this.credentialsEmitter.getAuthHeader();
         
         const config: AxiosRequestConfig = {
             headers: {
@@ -57,7 +57,7 @@ export class GitHubAPI {
         };
         const response = await axios.get(url, config);
 
-        await checkAPIRateLimits(response, authHeader);
+        await this.credentialsEmitter.checkAPIRateLimits(response, authHeader, 10);
 
         if (response.status === 200) {
             return response.data;

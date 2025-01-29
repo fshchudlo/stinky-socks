@@ -5,6 +5,7 @@ import {GitHubPullRequestsImporter} from "./GitHub/GitHubPullRequestsImporter";
 import {fetchInstallationTokenHeader, getAppInstallations} from "./GitHub/api/GitHubAppCredentialsHelpers";
 import {AppConfig} from "./app.config";
 import {fetchNextTokenHeader} from "./GitHub/api/GitHubTokenCredentialsHelper";
+import {checkAPIRateLimits} from "./GitHub/api/checkAPIRateLimits";
 
 export default async function importTeamProjects() {
     const timelogLabel = `🎉 Teams data import completed!`;
@@ -29,11 +30,14 @@ async function runImportForAppInstallations() {
 
         await ActorFactory.preloadCacheByTeam(installation.organizationLogin);
         const githubAPI = new GitHubAPI(
-            async () => await fetchInstallationTokenHeader(
-                AppConfig.STINKY_SOCKS_GITHUB_APP_ID!,
-                AppConfig.STINKY_SOCKS_GITHUB_APP_PRIVATE_KEY!,
-                installation.organizationId
-            )
+            {
+                getAuthHeader: async () => await fetchInstallationTokenHeader(
+                    AppConfig.STINKY_SOCKS_GITHUB_APP_ID!,
+                    AppConfig.STINKY_SOCKS_GITHUB_APP_PRIVATE_KEY!,
+                    installation.organizationId
+                ),
+                checkAPIRateLimits: checkAPIRateLimits
+            }
         );
 
 
@@ -51,7 +55,10 @@ async function runImportForThePublicProjects() {
         console.log(`🔁 Importing pull requests for the '${team.teamName}' team`);
 
         await ActorFactory.preloadCacheByTeam(team.teamName);
-        const gitHubAPI = new GitHubAPI(async () => await fetchNextTokenHeader(publicProjectsImportConfig.gitHubApiTokens));
+        const gitHubAPI = new GitHubAPI({
+            getAuthHeader: async () => await fetchNextTokenHeader(publicProjectsImportConfig.gitHubApiTokens),
+            checkAPIRateLimits: checkAPIRateLimits
+        });
 
         await importGitHubPullRequests(team, gitHubAPI);
     }
