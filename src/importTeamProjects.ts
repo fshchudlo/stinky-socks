@@ -2,10 +2,9 @@ import {publicProjectsImportConfig, TeamImportSettings} from "./publicProjectsIm
 import {ActorFactory} from "./MetricsDB/ActorFactory";
 import {GitHubAPI} from "./GitHub/api/GitHubAPI";
 import {GitHubPullRequestsImporter} from "./GitHub/GitHubPullRequestsImporter";
-import {fetchInstallationTokenHeader, getAppInstallations} from "./GitHub/api/GitHubAppCredentialsHelpers";
 import {AppConfig} from "./app.config";
-import {fetchNextTokenHeader} from "./GitHub/api/GitHubTokenCredentialsHelper";
-import {checkAPIRateLimits} from "./GitHub/api/checkAPIRateLimits";
+import {PersonalTokensRotator} from "./GitHub/api/PersonalTokensRotator"; 
+import {getAppInstallations, InstallationTokensEmitter} from "./GitHub/api/InstallationTokensEmitter";
 
 export default async function importTeamProjects() {
     const timelogLabel = `🎉 Teams data import completed!`;
@@ -29,16 +28,11 @@ async function runImportForAppInstallations() {
         console.log(`🔁 Importing pull requests for the '${installation.organizationLogin}' organization`);
 
         await ActorFactory.preloadCacheByTeam(installation.organizationLogin);
-        const githubAPI = new GitHubAPI(
-            {
-                getAuthHeader: async () => await fetchInstallationTokenHeader(
-                    AppConfig.STINKY_SOCKS_GITHUB_APP_ID!,
-                    AppConfig.STINKY_SOCKS_GITHUB_APP_PRIVATE_KEY!,
-                    installation.organizationId
-                ),
-                checkAPIRateLimits: checkAPIRateLimits
-            }
-        );
+
+        const appTokensEmitter = new InstallationTokensEmitter(AppConfig.STINKY_SOCKS_GITHUB_APP_ID!,
+            AppConfig.STINKY_SOCKS_GITHUB_APP_PRIVATE_KEY!,
+            installation.organizationId);
+        const githubAPI = new GitHubAPI(appTokensEmitter);
 
 
         await importGitHubPullRequests({
@@ -55,10 +49,8 @@ async function runImportForThePublicProjects() {
         console.log(`🔁 Importing pull requests for the '${team.teamName}' team`);
 
         await ActorFactory.preloadCacheByTeam(team.teamName);
-        const gitHubAPI = new GitHubAPI({
-            getAuthHeader: async () => await fetchNextTokenHeader(publicProjectsImportConfig.gitHubApiTokens),
-            checkAPIRateLimits: checkAPIRateLimits
-        });
+        const tokensRotator = new PersonalTokensRotator(publicProjectsImportConfig.gitHubApiTokens);
+        const gitHubAPI = new GitHubAPI(tokensRotator);
 
         await importGitHubPullRequests(team, gitHubAPI);
     }

@@ -1,6 +1,47 @@
+import {GitHubCredentialsEmitter} from "./GitHubCredentialsEmitter";
+import {AxiosResponse} from "axios";
+
+const rateLimitLocks: { [key: string]: boolean; } = {};
+
+export class InstallationTokensEmitter implements GitHubCredentialsEmitter {
+    constructor(private readonly appId: number,
+                private readonly privateKey: string,
+                private readonly organizationId: number) {
+    }
+
+    async getAuthHeader() {
+        return await fetchInstallationTokenHeader(
+            this.appId,
+            this.privateKey,
+            this.organizationId
+        );
+    }
+
+    async checkAPIRateLimits(response: AxiosResponse<any>, authHeader: string, reserveRequestsNumber = 10): Promise<void> {
+        if (parseInt(response.headers["x-ratelimit-remaining"], 10) <= reserveRequestsNumber) {
+            const resetTime = parseInt(response.headers["x-ratelimit-reset"], 10) * 1000;
+            // Add ten more seconds to ensure we didn't violate the rate limit
+            const waitTime = 10000 + resetTime - Date.now();
+
+            // We run requests in parallel, and it's possible that a request was blocked because this check was triggered by another request.
+            // By the time it resumes execution, the rate limit may have already reset.
+            // To avoid redundant waiting, we recheck the actual wait time, as it represents an absolute value.
+            if (waitTime <= 0 || rateLimitLocks[authHeader]) {
+                return;
+            }
+
+            console.log(`🫸 The GitHub API rate limit exceeded. Waiting for ${convertMillisecondsToHumanReadableTime(waitTime)}...`);
+            rateLimitLocks[authHeader] = true;
+            await new Promise(resolve => setTimeout(resolve, waitTime)).finally(() => rateLimitLocks[authHeader] = false);
+            console.log(`💃 The GitHub API rate limit is updated. Let's move on...`);
+        }
+    }
+}
+
 import jwt from "jsonwebtoken";
 import axios from "axios";
 import { createCache } from "cache-manager";
+import {convertMillisecondsToHumanReadableTime} from "./convertMillisecondsToHumanReadableTime";
 
 type AppInstallation = {
     installationId: number;
