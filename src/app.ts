@@ -24,5 +24,5 @@ MetricsDB.initialize().then(() => {
 
     setInterval(() => {
         runDataImports().catch(error => console.error(error));
-    }, 15 * 60 * 1000); //each 15 minutes
+    }, 5 * 60 * 1000); //each 5 minutes
 });

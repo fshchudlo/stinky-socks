@@ -11,7 +11,7 @@ export class GitHubPullRequestActivity extends PullRequestActivity {
         this.what = what;
         this.when = when;
         this.who = who;
-        this.description = description;
+        this.description = description?.replace(/\x00/g, '') || null;
         this.viewURL = viewURL;
     }
 }
