@@ -43,7 +43,7 @@ const vscodeTeam: TeamImportSettings = {
 
 export const publicProjectsImportConfig = {
     gitHubApiTokens: (process.env.GITHUB_PUBLIC_API_TOKENS as string)?.split(' ')||[],
-    teams: [kubernetesTeam, grafanaTeam, vscodeTeam, angularTeam, reactTeam]
+    teams: [grafanaTeam, kubernetesTeam, vscodeTeam, angularTeam, reactTeam]
 };
 
 
