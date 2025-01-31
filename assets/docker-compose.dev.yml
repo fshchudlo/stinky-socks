@@ -9,7 +9,7 @@ services:
     image: stinky-socks-importer
     pull_policy: never
     container_name: "stinky-socks-importer"
-    restart: no
+    restart: on-failure
     command: npm run start
     networks:
       - stinky_socks_network

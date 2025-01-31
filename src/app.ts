@@ -20,9 +20,15 @@ async function runDataImports() {
 }
 
 MetricsDB.initialize().then(() => {
-    runDataImports().catch(error => console.error(error));
+    runDataImports().catch(error => {
+        console.error(error);
+        throw error;
+    });
 
     setInterval(() => {
-        runDataImports().catch(error => console.error(error));
+        runDataImports().catch(error => {
+            console.error(error);
+            throw error;
+        });
     }, 5 * 60 * 1000); //each 5 minutes
 });
