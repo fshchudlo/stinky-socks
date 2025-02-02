@@ -33,17 +33,9 @@ const reactTeam: TeamImportSettings = {
     }]
 };
 
-const vscodeTeam: TeamImportSettings = {
-    teamName: "VS Code",
-    gitHubProjects: [{
-        owner: "microsoft",
-        repositoriesSelector: async () => Promise.resolve(["vscode"])
-    }]
-};
-
 export const publicProjectsImportConfig = {
     gitHubApiTokens: (process.env.GITHUB_PUBLIC_API_TOKENS as string)?.split(' ')||[],
-    teams: [grafanaTeam, kubernetesTeam, vscodeTeam, angularTeam, reactTeam]
+    teams: [grafanaTeam, kubernetesTeam, angularTeam, reactTeam]
 };
 
 
