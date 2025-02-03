@@ -22,9 +22,7 @@ async function runImportForAppInstallations() {
         console.log(`STINKY_SOCKS_GITHUB_APP_ID is not set. Skipping the organizations import.`);
     }
     const installations = await getAppInstallations(AppConfig.STINKY_SOCKS_GITHUB_APP_ID!, AppConfig.STINKY_SOCKS_GITHUB_APP_PRIVATE_KEY!);
-    const filteredInstallations = installations.filter(i => [56657254].includes(i.installationId));
-
-    for (const installation of filteredInstallations) {
+    for (const installation of installations) {
         console.log(`🔁 Importing pull requests for the '${installation.organizationLogin}' organization`);
 
         await ActorFactory.preloadCacheByTeam(installation.organizationLogin);
