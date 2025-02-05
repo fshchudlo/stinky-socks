@@ -14,7 +14,7 @@ export class PersonalTokensRotator implements GitHubCredentialsEmitter {
         const tokensWithDates = await Promise.all(
             this.tokens.map(async t => ({
                 token: t,
-                refreshTimestamp: await tokenRefreshDates.get<number>(this.getHeaderValue(t)) || null
+                resetTimestamp: await tokenRefreshDates.get<number>(this.getHeaderValue(t)) || null
             }))
         );
 
@@ -22,14 +22,14 @@ export class PersonalTokensRotator implements GitHubCredentialsEmitter {
             if (min === null) {
                 return current;
             }
-            if (min.refreshTimestamp === null) {
+            if (min.resetTimestamp === null) {
                 return min;
             }
-            return current.refreshTimestamp === null || min.refreshTimestamp > current.refreshTimestamp ? current : min;
+            return current.resetTimestamp === null || min.resetTimestamp > current.resetTimestamp ? current : min;
         });
 
-        if (nextTokenToUse.refreshTimestamp !== null) {
-            const waitTime = nextTokenToUse.refreshTimestamp - Date.now();
+        if (nextTokenToUse.resetTimestamp !== null) {
+            const waitTime = nextTokenToUse.resetTimestamp - Date.now();
 
             console.log(`🫸 The GitHub API rate limit exceeded. Waiting for ${convertMillisecondsToHumanReadableTime(waitTime)}...`);
             await new Promise(resolve => setTimeout(resolve, waitTime < 0 ? 0 : waitTime));
@@ -40,12 +40,16 @@ export class PersonalTokensRotator implements GitHubCredentialsEmitter {
 
     async checkAPIRateLimits(response: AxiosResponse<any>, authHeader: string, reserveRequestsNumber: number): Promise<void> {
         if (parseInt(response.headers["x-ratelimit-remaining"], 10) <= reserveRequestsNumber) {
-            const resetTime = parseInt(response.headers["x-ratelimit-reset"], 10) * 1000;
+            let tokenResetTime = parseInt(response.headers["x-ratelimit-reset"], 10) * 1000;
 
             // Add ten more seconds to ensure we didn't violate the rate limit
-            const waitTime = 10000 + resetTime - Date.now();
+            tokenResetTime+=10*1000;
+            
+            const cacheTtl = tokenResetTime - Date.now();
+            
+            console.log(`🫸 The token enriched its rate limit until ${new Date(tokenResetTime).toLocaleString()}`)
 
-            await tokenRefreshDates.set(authHeader, resetTime, waitTime);
+            await tokenRefreshDates.set(authHeader, tokenResetTime, cacheTtl);
         }
     }
 

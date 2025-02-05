@@ -1,6 +1,6 @@
 import "reflect-metadata";
 
-import { MetricsDB } from "./MetricsDB/MetricsDB";
+import {MetricsDB} from "./MetricsDB/MetricsDB";
 import importTeamProjects from "./importTeamProjects";
 
 let isImportRunning = false;
@@ -19,16 +19,20 @@ async function runDataImports() {
     }
 }
 
+function logErrorAndExit(error: any) {
+    console.error(error);
+    // I wasn't able to understand why, but an app degradates with "socket hang up" and is not able to run after that.
+    // For such cases we crash-and-restart a container, but only after a minute to avoid ddos-ing GitHub API 
+    setTimeout(() => {
+        console.error("Exiting due to error:", error);
+        process.exit(1);
+    }, 60 * 1000);
+}
+
 MetricsDB.initialize().then(() => {
-    runDataImports().catch(error => {
-        console.error(error);
-        throw error;
-    });
+    runDataImports().catch(logErrorAndExit);
 
     setInterval(() => {
-        runDataImports().catch(error => {
-            console.error(error);
-            throw error;
-        });
+        runDataImports().catch(logErrorAndExit);
     }, 5 * 60 * 1000); //each 5 minutes
 });

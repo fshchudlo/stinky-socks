@@ -24,6 +24,9 @@ export class GitHubAPI {
         });
     }
 
+    async triggerTokenRateLimitVerification(): Promise<void> {
+        await this.get(`/rate_limit`);
+    }
     async fetchAllRepositories(owner: string): Promise<any[]> {
         const repositories = await this.getFullList(`/orgs/${owner}/repos`);
         return repositories.filter(repo => !repo.archived && !repo.disabled);

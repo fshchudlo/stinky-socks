@@ -49,7 +49,10 @@ async function runImportForThePublicProjects() {
         await ActorFactory.preloadCacheByTeam(team.teamName);
         const tokensRotator = new PersonalTokensRotator(publicProjectsImportConfig.gitHubApiTokens);
         const gitHubAPI = new GitHubAPI(tokensRotator);
-
+        for(const {} of publicProjectsImportConfig.gitHubApiTokens)
+        {
+            await gitHubAPI.triggerTokenRateLimitVerification();
+        }
         await importGitHubPullRequests(team, gitHubAPI);
     }
 }
