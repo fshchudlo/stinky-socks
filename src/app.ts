@@ -34,5 +34,5 @@ MetricsDB.initialize().then(() => {
 
     setInterval(() => {
         runDataImports().catch(logErrorAndExit);
-    }, 5 * 60 * 1000); //each 5 minutes
+    }, 60 * 60 * 1000); //each 60 minutes
 });
