@@ -1,6 +1,11 @@
 import "dotenv/config";
 import { GitHubProjectSettings } from "./GitHub/GitHubPullRequestsImporter";
 
+export type TeamImportSettings = {
+    teamName: string;
+    gitHubProjects?: GitHubProjectSettings[]
+};
+
 const grafanaTeam: TeamImportSettings = {
     teamName: "Grafana",
     gitHubProjects: [{
@@ -33,13 +38,25 @@ const reactTeam: TeamImportSettings = {
     }]
 };
 
-export const publicProjectsImportConfig = {
-    gitHubApiTokens: (process.env.GITHUB_PUBLIC_API_TOKENS as string)?.split(' ')||[],
-    teams: [grafanaTeam, kubernetesTeam, angularTeam, reactTeam]
+const phpTeam: TeamImportSettings = {
+    teamName: "PHP",
+    gitHubProjects: [{
+        owner: "php",
+        repositoriesSelector: async () => Promise.resolve(["php-src"])
+    }]
+};
+
+const databricksTeam: TeamImportSettings = {
+    teamName: "Databricks",
+    gitHubProjects: [{
+        owner: "databricks",
+        repositoriesSelector: async () => Promise.resolve(["terraform-provider-databricks", "dbt-databricks", "koalas", "cli", "databricks-sdk-go", "databricks-sdk-py", "databricks-sdk-java"])
+    }]
 };
 
 
-export type TeamImportSettings = {
-    teamName: string;
-    gitHubProjects?: GitHubProjectSettings[]
+const tokens = (process.env.GITHUB_PUBLIC_API_TOKENS as string)?.split(' ')||[];
+export const publicProjectsImportConfig = {
+    gitHubApiTokens: tokens,
+    teams: [phpTeam, databricksTeam, kubernetesTeam, grafanaTeam, angularTeam, reactTeam]
 };
