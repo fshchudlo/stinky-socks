@@ -20,6 +20,7 @@ export default async function importTeamProjects() {
 async function runImportForAppInstallations() {
     if (!AppConfig.STINKY_SOCKS_GITHUB_APP_ID) {
         console.log(`STINKY_SOCKS_GITHUB_APP_ID is not set. Skipping the organizations import.`);
+        return;
     }
     const installations = await getAppInstallations(AppConfig.STINKY_SOCKS_GITHUB_APP_ID!, AppConfig.STINKY_SOCKS_GITHUB_APP_PRIVATE_KEY!);
     for (const installation of installations) {
