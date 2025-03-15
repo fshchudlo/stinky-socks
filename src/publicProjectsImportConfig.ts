@@ -46,11 +46,11 @@ const phpTeam: TeamImportSettings = {
     }]
 };
 
-const databricksTeam: TeamImportSettings = {
-    teamName: "Databricks",
+const clickHouseTeam: TeamImportSettings = {
+    teamName: "ClickHouse",
     gitHubProjects: [{
-        owner: "databricks",
-        repositoriesSelector: async () => Promise.resolve(["terraform-provider-databricks", "dbt-databricks", "koalas", "cli", "databricks-sdk-go", "databricks-sdk-py", "databricks-sdk-java"])
+        owner: "ClickHouse",
+        repositoriesSelector: async () => Promise.resolve(["ClickHouse"])
     }]
 };
 
@@ -58,5 +58,5 @@ const databricksTeam: TeamImportSettings = {
 const tokens = (process.env.GITHUB_PUBLIC_API_TOKENS as string)?.split(' ')||[];
 export const publicProjectsImportConfig = {
     gitHubApiTokens: tokens,
-    teams: [phpTeam, databricksTeam, kubernetesTeam, grafanaTeam, angularTeam, reactTeam]
+    teams: [phpTeam, clickHouseTeam, kubernetesTeam, grafanaTeam, angularTeam, reactTeam]
 };
