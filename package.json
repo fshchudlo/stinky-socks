@@ -26,12 +26,12 @@
     "docker-import:stop": "docker-compose -p stinky-socks -f assets/docker-compose.yml -f assets/docker-compose.dev.yml down"
   },
   "dependencies": {
-    "axios": "1.8.2",
+    "axios": "1.8.3",
     "axios-retry": "^4.5.0",
     "cache-manager": "6.4.1",
     "dotenv": "16.4.7",
     "jsonwebtoken": "^9.0.2",
-    "pg": "8.13.3",
+    "pg": "8.14.1",
     "reflect-metadata": "0.2.2",
     "ts-node": "10.9.2",
     "typeorm": "0.3.21",
