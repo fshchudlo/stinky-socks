@@ -5,7 +5,7 @@ services:
       - postgres
     build:
       context: ../
-      dockerfile: Dockerfile
+      dockerfile: packages/importer/Dockerfile
     image: stinky-socks-importer
     pull_policy: never
     container_name: "stinky-socks-importer"

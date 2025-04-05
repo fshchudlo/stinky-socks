@@ -4,38 +4,25 @@
   "license": "Apache 2.0",
   "version": "1.0.0",
   "description": "App to import DevEx metrics of different kind.",
-  "main": "dist/main.js",
   "keywords": [
     "devex",
     "jenkins",
     "github"
   ],
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
-    "start": "ts-node src/app.ts",
-    "build": "tsc -p tsconfig.json",
-    "lint": "eslint ./src --fix",
-    "test": "jest",
-    "test:coverage": "jest --coverage",
-    "test:update-snapshots": "jest --updateSnapshot",
-    "migration:generate": "ts-node ./node_modules/typeorm/cli.js migration:generate -d src/MetricsDB/MetricsDB.ts",
-    "migration:run": "ts-node ./node_modules/typeorm/cli.js migration:run -d src/MetricsDB/MetricsDB.ts",
-    "migration:revert": "ts-node ./node_modules/typeorm/cli.js migration:revert -d src/MetricsDB/MetricsDB.ts",
+
+    "start": "npm run start --workspace=packages",
+    "build": "npm run build --workspace=packages",
+    "test": "npm run test --workspace=packages",
+    "lint": "eslint ./packages --fix",
+    
     "docker:init": "docker-compose -p stinky-socks -f assets/docker-compose.yml up -d",
     "docker:destroy": "docker-compose -p stinky-socks -f assets/docker-compose.yml down -v",
     "docker-import:start": "docker-compose -p stinky-socks -f assets/docker-compose.yml -f assets/docker-compose.dev.yml up -d --build && docker logs stinky-socks-importer --follow",
     "docker-import:stop": "docker-compose -p stinky-socks -f assets/docker-compose.yml -f assets/docker-compose.dev.yml down"
-  },
-  "dependencies": {
-    "axios": "1.8.4",
-    "axios-retry": "^4.5.0",
-    "cache-manager": "6.4.1",
-    "dotenv": "16.4.7",
-    "jsonwebtoken": "^9.0.2",
-    "pg": "8.14.1",
-    "reflect-metadata": "0.2.2",
-    "ts-node": "10.9.2",
-    "typeorm": "0.3.21",
-    "typeorm-naming-strategies": "4.1.0"
   },
   "devDependencies": {
     "@types/jest": "29.5.14",

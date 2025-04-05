@@ -1,0 +1,37 @@
+{
+  "name": "stinky-socks-importer",
+  "author": "Fedor Shchudlo",
+  "license": "Apache 2.0",
+  "version": "1.0.0",
+  "main": "dist/app.js",
+  "keywords": [
+    "devex",
+    "jenkins",
+    "github"
+  ],
+  "scripts": {
+    "start": "ts-node src/app.ts",
+    
+    "build": "tsc -p ../../tsconfig.json",
+    "test": "jest --config ../../jest.config.ts",
+    "test:coverage": "jest --config ../../jest.config.ts --coverage",
+    "test:update-snapshots": "jest --config ../../jest.config.ts --updateSnapshot",
+
+    
+    "migration:generate": "ts-node ../../node_modules/typeorm/cli.js migration:generate -d src/MetricsDB/MetricsDB.ts",
+    "migration:run": "ts-node ../../node_modules/typeorm/cli.js migration:run -d src/MetricsDB/MetricsDB.ts",
+    "migration:revert": "ts-node ../../node_modules/typeorm/cli.js migration:revert -d src/MetricsDB/MetricsDB.ts"
+  },
+  "dependencies": {
+    "axios": "1.8.4",
+    "axios-retry": "^4.5.0",
+    "cache-manager": "6.4.1",
+    "dotenv": "16.4.7",
+    "jsonwebtoken": "^9.0.2",
+    "pg": "8.14.1",
+    "reflect-metadata": "0.2.2",
+    "ts-node": "10.9.2",
+    "typeorm": "0.3.21",
+    "typeorm-naming-strategies": "4.1.0"
+  }
+}
