@@ -30,9 +30,9 @@
 - Install [Node.js and npm](https://nodejs.org) on your machine
 - Run `npm i` from the repo root directory
 - Run `npm run docker:init` to start preconfigured Postgres and Grafana.
-- Create `.env` file in the root of the project, copy variables from [docker-compose.dev.yml](assets/docker-compose.dev.yml) into it and
+- Create `packages/importer/.env` file, copy variables from [docker-compose.dev.yml](assets/docker-compose.dev.yml) into it and
   fill with relevant values.
-- Specify repos you're interested in [publicProjectsImportConfig.ts](src/publicProjectsImportConfig.ts).
+- Specify repos you're interested in [publicProjectsImportConfig.ts](packages/importer/src/publicProjectsImportConfig.ts).
 - Run ```npm run start``` to initiate the import of the data on your local machine
 
 ### Running unit tests
