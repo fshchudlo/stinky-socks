@@ -24,14 +24,14 @@
   },
   "dependencies": {
     "axios": "1.8.4",
-    "axios-retry": "^4.5.0",
-    "cache-manager": "6.4.1",
+    "axios-retry": "4.5.0",
+    "cache-manager": "6.4.2",
     "dotenv": "16.4.7",
     "jsonwebtoken": "^9.0.2",
     "pg": "8.14.1",
     "reflect-metadata": "0.2.2",
     "ts-node": "10.9.2",
-    "typeorm": "0.3.21",
+    "typeorm": "0.3.22",
     "typeorm-naming-strategies": "4.1.0"
   }
 }

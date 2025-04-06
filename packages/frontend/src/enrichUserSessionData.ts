@@ -1,10 +1,10 @@
 import {Profile} from "passport-github2";
 import {GitHubAPI} from "./GitHubAPI";
 
-export type StinkySocksUserProfile = Profile & {
+export type StinkySocksUserProfile = Express.User & Profile & {
     repositories: Array<string>;
 }
-export async function enrichUserSessionData(accessToken: string, refreshToken: string, githubProfile: StinkySocksUserProfile, done: Function) {
+export async function enrichUserSessionData(accessToken: string, refreshToken: string, githubProfile: StinkySocksUserProfile, done: any) {
     try {
         const repositories = await GitHubAPI.getUserRepositories(accessToken);
 

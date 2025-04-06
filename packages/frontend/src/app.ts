@@ -2,7 +2,9 @@ import express from 'express';
 import passport from 'passport';
 import {Strategy as GitHubStrategy} from 'passport-github2';
 import {AppConfig} from "./app.config";
-import {enrichUserSessionData, StinkySocksUserProfile} from "./enrichUserSessionData";
+import {enrichUserSessionData} from "./enrichUserSessionData";
+import rateLimit from 'express-rate-limit';
+import session from 'express-session';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -16,15 +18,21 @@ passport.use(new GitHubStrategy({
     callbackURL: "http://localhost:3000/auth/github/callback"
 }, enrichUserSessionData));
 
-passport.serializeUser((githubProfile: StinkySocksUserProfile, done: Function) => {
+passport.serializeUser((githubProfile: any, done: any) => {
     done(null, githubProfile);
 });
 
-passport.deserializeUser((githubProfile: StinkySocksUserProfile, done: Function) => {
+passport.deserializeUser((githubProfile: any, done: any) => {
     done(null, githubProfile);
 });
 
-app.use(require('express-session')({
+
+app.use(rateLimit({
+    windowMs: 15 * 60 * 1000,
+    limit: 100
+}));
+
+app.use(session({
     secret: AppConfig.SESSION_SECRET,
     resave: true,
     saveUninitialized: true,
@@ -58,7 +66,7 @@ app.get('/logout', (req, res, next) => {
 
 app.get('/', (req, res) => {
     if (req.isAuthenticated()) {
-        res.send(`Hello ${req.user.username}. You have access to the following repositories: ${req.user.repositories.map((r: string)=>`<br/>${r}`).join('')} repositories. <br/> <a href="/logout">Logout</a>`);
+        res.send(`Hello ${req.user.username}. You have access to the following repositories: ${req.user.repositories.map((r: string) => `<br/>${r}`).join('')} repositories. <br/> <a href="/logout">Logout</a>`);
     } else {
         res.send('<a href="/auth/github">Login with GitHub</a>');
     }
