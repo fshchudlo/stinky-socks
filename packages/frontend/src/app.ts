@@ -24,7 +24,15 @@ passport.deserializeUser((githubProfile: StinkySocksUserProfile, done: Function)
     done(null, githubProfile);
 });
 
-app.use(require('express-session')({secret: AppConfig.SESSION_SECRET, resave: true, saveUninitialized: true}));
+app.use(require('express-session')({
+    secret: AppConfig.SESSION_SECRET,
+    resave: true,
+    saveUninitialized: true,
+    cookie: {
+        secure: process.env.NODE_ENV === 'production',
+        httpOnly: true
+    }
+}));
 app.use(passport.initialize());
 app.use(passport.session());
 
