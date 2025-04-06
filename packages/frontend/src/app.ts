@@ -39,9 +39,18 @@ app.get('/auth/github/callback',
     }
 );
 
+app.get('/logout', (req, res, next) => {
+    (<any>req).logout((err: any) => {
+        if (err) {
+            return next(err);
+        }
+        res.redirect('/');
+    });
+});
+
 app.get('/', (req, res) => {
     if (req.isAuthenticated()) {
-        res.send(`Hello ${req.user.username}. You belong to ${req.user.organizations.length} organizations and have ${req.user.repositories.length} repositories.`);
+        res.send(`Hello ${req.user.username}. You have access to the following repositories: ${req.user.repositories.map((r: string)=>`<br/>${r}`).join('')} repositories. <br/> <a href="/logout">Logout</a>`);
     } else {
         res.send('<a href="/auth/github">Login with GitHub</a>');
     }
