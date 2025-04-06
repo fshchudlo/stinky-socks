@@ -20,6 +20,7 @@
     "@types/express": "^5.0.1",
     "@types/passport": "^0.4.0",
     "@types/passport-github2": "^1.2.9",
+    "axios": "^1.8.4",
     "express": "^5.1.0",
     "express-session": "^1.18.1",
     "passport": "^0.7.0",
