@@ -1,0 +1,31 @@
+{
+  "name": "stinky-socks-frontend",
+  "author": "Fedor Shchudlo",
+  "license": "Apache 2.0",
+  "version": "1.0.0",
+  "main": "dist/app.js",
+  "keywords": [
+    "devex",
+    "jenkins",
+    "github"
+  ],
+  "scripts": {
+    "start": "ts-node src/app.ts",
+    "build": "tsc -p ../../tsconfig.json",
+    "test": "jest --config ../../jest.config.ts",
+    "test:coverage": "jest --config ../../jest.config.ts --coverage",
+    "test:update-snapshots": "jest --config ../../jest.config.ts --updateSnapshot"
+  },
+  "dependencies": {
+    "@types/express": "5.0.1",
+    "@types/express-session": "^1.18.1",
+    "@types/passport": "1.0.17",
+    "@types/passport-github2": "1.2.9",
+    "axios": "1.8.4",
+    "express": "5.1.0",
+    "express-session": "1.18.1",
+    "express-rate-limit": "7.5.0",
+    "passport": "0.7.0",
+    "passport-github2": "0.1.12"
+  }
+}
