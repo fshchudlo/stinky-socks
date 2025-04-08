@@ -5,9 +5,11 @@ import {AppConfig} from "./app.config";
 import {enrichUserSessionData} from "./enrichUserSessionData";
 import rateLimit from 'express-rate-limit';
 import session from 'express-session';
+import { renderApp } from './server-renderer';
+import path from 'path';
+import { getOwnersHandler } from './routes/owners';
 
 const app = express();
-const PORT = process.env.PORT || 3000;
 
 const clientId = AppConfig.GITHUB_APP_CLIENT_ID!;
 const clientSecret = AppConfig.GITHUB_APP_CLIENT_SECRET!;
@@ -15,7 +17,7 @@ const clientSecret = AppConfig.GITHUB_APP_CLIENT_SECRET!;
 passport.use(new GitHubStrategy({
     clientID: clientId,
     clientSecret: clientSecret,
-    callbackURL: "http://localhost:3000/auth/github/callback"
+    callbackURL: `http://localhost:${AppConfig.WEB_UI_PORT}/auth/github/callback`
 }, enrichUserSessionData));
 
 passport.serializeUser((githubProfile: any, done: any) => {
@@ -25,7 +27,6 @@ passport.serializeUser((githubProfile: any, done: any) => {
 passport.deserializeUser((githubProfile: any, done: any) => {
     done(null, githubProfile);
 });
-
 
 app.use(rateLimit({
     windowMs: 15 * 60 * 1000,
@@ -43,6 +44,9 @@ app.use(session({
 }));
 app.use(passport.initialize());
 app.use(passport.session());
+
+// Serve static files from the public directory
+app.use(express.static(path.join(__dirname, '../dist')));
 
 app.get('/auth/github',
     passport.authenticate('github', {scope: ['user:email', 'read:org', 'repo']})
@@ -64,14 +68,16 @@ app.get('/logout', (req, res, next) => {
     });
 });
 
+app.get('/owners', getOwnersHandler);
+
 app.get('/', (req, res) => {
     if (req.isAuthenticated()) {
-        res.send(`Hello ${req.user.username}. You have access to the following repositories: ${req.user.repositories.map((r: string) => `<br/>${r}`).join('')} repositories. <br/> <a href="/logout">Logout</a>`);
+        res.send(renderApp(req.url));
     } else {
         res.send('<a href="/auth/github">Login with GitHub</a>');
     }
 });
 
-app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
+app.listen(AppConfig.WEB_UI_PORT, () => {
+    console.log(`Server is running on http://localhost:${AppConfig.WEB_UI_PORT}`);
 });

@@ -21,7 +21,7 @@ services:
     container_name: "stinky-socks-grafana"
     restart: always
     ports:
-      - 3000:3000
+      - 3333:3000
     networks:
         - stinky_socks_network
     environment:
