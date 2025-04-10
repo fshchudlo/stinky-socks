@@ -12,4 +12,10 @@ export const MetricsDB = new DataSource({
     namingStrategy: new SnakeNamingStrategy(),
     synchronize: false,
     logging: !AppConfig.IS_PRODUCTION
-}); 
+});
+
+export const initializeMetricsDB = async () => {
+    if (!MetricsDB.isInitialized) {
+        await MetricsDB.initialize();
+    }
+};

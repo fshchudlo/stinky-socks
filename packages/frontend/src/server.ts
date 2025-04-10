@@ -7,7 +7,7 @@ import rateLimit from 'express-rate-limit';
 import session from 'express-session';
 import { renderApp } from './server-renderer';
 import path from 'path';
-import { getProjectsHandler } from './routes/projects';
+import { getProjectsHandler, getRepositoriesHandler } from './routes/projects';
 
 const app = express();
 
@@ -69,6 +69,8 @@ app.get('/logout', (req, res, next) => {
 });
 
 app.get('/projects', getProjectsHandler);
+
+app.get('/repositories', getRepositoriesHandler);
 
 app.get('/', (req, res) => {
     if (req.isAuthenticated()) {
