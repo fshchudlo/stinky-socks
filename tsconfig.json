@@ -13,6 +13,7 @@
     "sourceMap": true,
     "moduleResolution": "node",
     "outDir": "./dist",
+    "jsx": "react",
     "paths": {
       "*": [
         "./node_modules/*"

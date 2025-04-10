@@ -1,18 +1,14 @@
 import globals from "globals";
 import tseslint from "typescript-eslint";
 
-
 export default [
-    {
-        files: ["**/*.ts"]
+  ...tseslint.configs.recommended,
+  {
+    files: ['**/*.{js,ts,tsx}'],
+    languageOptions: {
+      globals: globals.node,
     },
-    {
-        languageOptions: { globals: globals.node }
+    rules: {
+      "@typescript-eslint/no-explicit-any": "off",
     },
-    ...tseslint.configs.recommended,
-    {
-        rules: {
-            "@typescript-eslint/no-explicit-any": "off"
-        }
-    }
-];
+  }]
