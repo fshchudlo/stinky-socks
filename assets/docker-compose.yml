@@ -19,6 +19,7 @@ services:
   grafana:
     image: grafana/grafana
     container_name: "stinky-socks-grafana"
+    pull_policy: always
     restart: always
     ports:
       - 3000:3000

@@ -44,8 +44,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               }
             ]
           },
@@ -77,7 +76,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "11.3.1",
+      "pluginVersion": "12.0.0+security-01",
       "targets": [
         {
           "dataset": "`stinky-socks`",
@@ -136,8 +135,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               }
             ]
           },
@@ -169,7 +167,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "11.3.1",
+      "pluginVersion": "12.0.0+security-01",
       "targets": [
         {
           "datasource": {
@@ -200,8 +198,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               }
             ]
           },
@@ -233,7 +230,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "11.3.1",
+      "pluginVersion": "12.0.0+security-01",
       "targets": [
         {
           "datasource": {
@@ -264,8 +261,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               }
             ]
           },
@@ -297,7 +293,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "11.3.1",
+      "pluginVersion": "12.0.0+security-01",
       "targets": [
         {
           "datasource": {
@@ -328,8 +324,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               }
             ]
           },
@@ -361,7 +356,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "11.3.1",
+      "pluginVersion": "12.0.0+security-01",
       "targets": [
         {
           "datasource": {
@@ -392,8 +387,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               }
             ]
           },
@@ -425,7 +419,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "11.3.1",
+      "pluginVersion": "12.0.0+security-01",
       "targets": [
         {
           "datasource": {
@@ -456,8 +450,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               }
             ]
           },
@@ -489,7 +482,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "11.3.1",
+      "pluginVersion": "12.0.0+security-01",
       "targets": [
         {
           "datasource": {
@@ -519,8 +512,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "#EAB839",
@@ -560,7 +552,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "11.3.1",
+      "pluginVersion": "12.0.0+security-01",
       "targets": [
         {
           "datasource": {
@@ -604,8 +596,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               }
             ]
           },
@@ -637,7 +628,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "11.3.1",
+      "pluginVersion": "12.0.0+security-01",
       "targets": [
         {
           "datasource": {
@@ -688,8 +679,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               }
             ]
           },
@@ -721,7 +711,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "11.3.1",
+      "pluginVersion": "12.0.0+security-01",
       "targets": [
         {
           "datasource": {
@@ -772,8 +762,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               }
             ]
           },
@@ -805,7 +794,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "11.3.1",
+      "pluginVersion": "12.0.0+security-01",
       "targets": [
         {
           "datasource": {
@@ -856,8 +845,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               }
             ]
           },
@@ -889,7 +877,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "11.3.1",
+      "pluginVersion": "12.0.0+security-01",
       "targets": [
         {
           "datasource": {
@@ -940,8 +928,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               }
             ]
           },
@@ -973,7 +960,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "11.3.1",
+      "pluginVersion": "12.0.0+security-01",
       "targets": [
         {
           "datasource": {
@@ -1058,8 +1045,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               }
             ]
           },
@@ -1221,11 +1207,12 @@
           "showLegend": true
         },
         "tooltip": {
+          "hideZeros": false,
           "mode": "multi",
           "sort": "none"
         }
       },
-      "pluginVersion": "11.3.1",
+      "pluginVersion": "12.0.0+security-01",
       "repeat": "display_flow_stats_for",
       "repeatDirection": "v",
       "targets": [
@@ -1237,7 +1224,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "WITH aggregations AS\n(SELECT pr.team_name,\n         pr.project_name,\n         pr.repository_name,\n         pr.pull_request_number,\n         SUM(CASE WHEN participant.is_bot_user THEN 0 ELSE pr_participant.comments_count END) AS participants_comments_count,\n         MIN(CASE\n                  WHEN participant.is_bot_user OR pr_participant.first_reaction_date > pr.merged_date OR\n                     pr_participant.first_reaction_date < pr.shared_for_review_date THEN NULL\n                  ELSE pr_participant.first_reaction_date END) AS first_reaction_date,\n         MAX(CASE WHEN participant.is_bot_user THEN NULL ELSE pr_participant.last_approval_date END) AS last_approval_date,\n         CASE WHEN pr.last_commit_date > pr.shared_for_review_date THEN pr.last_commit_date ELSE NULL END AS last_commit_date\n   FROM pull_request AS pr\n            LEFT JOIN pull_request_participant AS pr_participant ON pr.team_name = pr_participant.team_name AND pr.project_name = pr_participant.project_name AND pr.repository_name = pr_participant.repository_name AND pr.pull_request_number = pr_participant.pull_request_number\n            LEFT JOIN actor AS shadowed_participant ON shadowed_participant.id = pr_participant.participant_id\n            LEFT JOIN actor AS participant ON COALESCE(shadowed_participant.merged_with_id, shadowed_participant.id) = participant.id\n   GROUP BY pr.team_name, pr.project_name, pr.repository_name, pr.pull_request_number,\n            pr.last_commit_date, pr.shared_for_review_date\n)\nSELECT \n    $__timeGroupAlias(start_date, $group_by_period), \n    PERCENTILE_CONT(0.90) WITHIN GROUP (ORDER BY $display_flow_stats_for) AS \"90th percentile\",\n    AVG(AVG($display_flow_stats_for)) OVER (ORDER BY $__timeGroup(start_date, $group_by_period, 0) \n                                ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) AS \"Rolling Average\",\n    PERCENTILE_CONT($percentile) WITHIN GROUP (ORDER BY $display_flow_stats_for) AS \"Chosen percentile\",\n    PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY $display_flow_stats_for) AS \"25th Percentile\",\n    COUNT(*) AS \"Pull requests count\"\n\nFROM \n   (SELECT \n      LEAST(initial_commit_date, shared_for_review_date) AS start_date,\n      EXTRACT(EPOCH FROM (merged_date-LEAST(initial_commit_date, shared_for_review_date))) AS pr_lead_time,\n      EXTRACT(EPOCH FROM (shared_for_review_date-initial_commit_date)) AS development_time,\n      GREATEST(EXTRACT(EPOCH FROM (first_reaction_date-shared_for_review_date)), 0) AS time_to_first_reaction,\n      EXTRACT(EPOCH FROM (GREATEST(COALESCE(pr_aggregations.last_commit_date, pr_aggregations.last_approval_date), COALESCE(pr_aggregations.last_approval_date, pr_aggregations.last_commit_date))-first_reaction_date)) AS rework_time,\n      EXTRACT(EPOCH FROM (merged_date-GREATEST(pr_aggregations.last_approval_date, pr.last_commit_date))) AS idle_after_approve\n   FROM pull_request AS pr\n      INNER JOIN aggregations AS pr_aggregations\n                   ON pr.team_name = pr_aggregations.team_name AND pr.project_name = pr_aggregations.project_name\n                       AND pr.repository_name = pr_aggregations.repository_name\n                       AND pr.pull_request_number = pr_aggregations.pull_request_number\n      INNER JOIN actor AS shadowed_author ON shadowed_author.id = pr.author_id\n      INNER JOIN actor AS author ON COALESCE(shadowed_author.merged_with_id, shadowed_author.id)=author.id\n   WHERE pr.integrity_errors IS NULL\n      AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n      AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n      AND (COALESCE($pr_author_role) IS NULL OR COALESCE(author.team_role, pr.author_role) IN ($pr_author_role))\n      AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n      AND ($include_bots_activities OR NOT author.is_bot_user)\n   ) AS timings\nWHERE COALESCE($display_flow_stats_for, 0)>0\nGROUP BY 1\nORDER BY $__timeGroup(start_date, $group_by_period, 0)",
+          "rawSql": "WITH aggregations AS\n(SELECT pr.team_name,\n         pr.project_name,\n         pr.repository_name,\n         pr.pull_request_number,\n         SUM(CASE WHEN participant.is_bot_user THEN 0 ELSE pr_participant.comments_count END) AS participants_comments_count,\n         MIN(CASE\n                  WHEN participant.is_bot_user OR pr_participant.first_reaction_date > pr.merged_date OR\n                     pr_participant.first_reaction_date < pr.shared_for_review_date THEN NULL\n                  ELSE pr_participant.first_reaction_date END) AS first_reaction_date,\n         MAX(CASE WHEN participant.is_bot_user THEN NULL ELSE pr_participant.last_approval_date END) AS last_approval_date,\n         CASE WHEN pr.last_commit_date > pr.shared_for_review_date THEN pr.last_commit_date ELSE NULL END AS last_commit_date\n   FROM pull_request AS pr\n            LEFT JOIN pull_request_participant AS pr_participant ON pr.team_name = pr_participant.team_name AND pr.project_name = pr_participant.project_name AND pr.repository_name = pr_participant.repository_name AND pr.pull_request_number = pr_participant.pull_request_number\n            LEFT JOIN actor AS shadowed_participant ON shadowed_participant.id = pr_participant.participant_id\n            LEFT JOIN actor AS participant ON COALESCE(shadowed_participant.merged_with_id, shadowed_participant.id) = participant.id\n   GROUP BY pr.team_name, pr.project_name, pr.repository_name, pr.pull_request_number,\n            pr.last_commit_date, pr.shared_for_review_date\n)\nSELECT \n    $__timeGroupAlias(start_date, $group_by_period), \n    PERCENTILE_CONT(0.90) WITHIN GROUP (ORDER BY ${display_flow_stats_for:raw}) AS \"90th percentile\",\n    AVG(AVG(${display_flow_stats_for:raw})) OVER (ORDER BY $__timeGroup(start_date, $group_by_period, 0) \n                                ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) AS \"Rolling Average\",\n    PERCENTILE_CONT($percentile) WITHIN GROUP (ORDER BY ${display_flow_stats_for:raw}) AS \"Chosen percentile\",\n    PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY ${display_flow_stats_for:raw}) AS \"25th Percentile\",\n    COUNT(*) AS \"Pull requests count\"\n\nFROM \n   (SELECT \n      LEAST(initial_commit_date, shared_for_review_date) AS start_date,\n      EXTRACT(EPOCH FROM (merged_date-LEAST(initial_commit_date, shared_for_review_date))) AS pr_lead_time,\n      EXTRACT(EPOCH FROM (shared_for_review_date-initial_commit_date)) AS development_time,\n      GREATEST(EXTRACT(EPOCH FROM (first_reaction_date-shared_for_review_date)), 0) AS time_to_first_reaction,\n      EXTRACT(EPOCH FROM (GREATEST(COALESCE(pr_aggregations.last_commit_date, pr_aggregations.last_approval_date), COALESCE(pr_aggregations.last_approval_date, pr_aggregations.last_commit_date))-first_reaction_date)) AS rework_time,\n      EXTRACT(EPOCH FROM (merged_date-GREATEST(pr_aggregations.last_approval_date, pr.last_commit_date))) AS idle_after_approve\n   FROM pull_request AS pr\n      INNER JOIN aggregations AS pr_aggregations\n                   ON pr.team_name = pr_aggregations.team_name AND pr.project_name = pr_aggregations.project_name\n                       AND pr.repository_name = pr_aggregations.repository_name\n                       AND pr.pull_request_number = pr_aggregations.pull_request_number\n      INNER JOIN actor AS shadowed_author ON shadowed_author.id = pr.author_id\n      INNER JOIN actor AS author ON COALESCE(shadowed_author.merged_with_id, shadowed_author.id)=author.id\n   WHERE pr.integrity_errors IS NULL\n      AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n      AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n      AND (COALESCE($pr_author_role) IS NULL OR COALESCE(author.team_role, pr.author_role) IN ($pr_author_role))\n      AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n      AND ($include_bots_activities OR NOT author.is_bot_user)\n   ) AS timings\nWHERE COALESCE(${display_flow_stats_for:raw}, 0)>0\nGROUP BY 1\nORDER BY $__timeGroup(start_date, $group_by_period, 0)",
           "refId": "Flow stats",
           "sql": {
             "columns": [
@@ -1378,11 +1365,12 @@
           "showLegend": true
         },
         "tooltip": {
+          "hideZeros": false,
           "mode": "multi",
           "sort": "none"
         }
       },
-      "pluginVersion": "11.3.1",
+      "pluginVersion": "12.0.0+security-01",
       "targets": [
         {
           "datasource": {
@@ -1524,13 +1512,14 @@
             "showValue": "never",
             "stacking": "normal",
             "tooltip": {
+              "hideZeros": false,
               "mode": "single",
               "sort": "none"
             },
             "xTickLabelRotation": 0,
             "xTickLabelSpacing": 0
           },
-          "pluginVersion": "11.3.1",
+          "pluginVersion": "12.0.0+security-01",
           "targets": [
             {
               "datasource": {
@@ -1660,13 +1649,14 @@
             "showValue": "never",
             "stacking": "none",
             "tooltip": {
+              "hideZeros": false,
               "mode": "single",
               "sort": "none"
             },
             "xTickLabelRotation": 0,
             "xTickLabelSpacing": 0
           },
-          "pluginVersion": "11.3.1",
+          "pluginVersion": "12.0.0+security-01",
           "targets": [
             {
               "datasource": {
@@ -1769,13 +1759,14 @@
             "showValue": "auto",
             "stacking": "normal",
             "tooltip": {
+              "hideZeros": false,
               "mode": "single",
               "sort": "none"
             },
             "xTickLabelRotation": 0,
             "xTickLabelSpacing": 0
           },
-          "pluginVersion": "11.3.1",
+          "pluginVersion": "12.0.0+security-01",
           "targets": [
             {
               "datasource": {
@@ -1935,13 +1926,14 @@
             "showValue": "never",
             "stacking": "normal",
             "tooltip": {
+              "hideZeros": false,
               "mode": "multi",
               "sort": "none"
             },
             "xTickLabelRotation": 0,
             "xTickLabelSpacing": 0
           },
-          "pluginVersion": "11.3.1",
+          "pluginVersion": "12.0.0+security-01",
           "targets": [
             {
               "datasource": {
@@ -2057,13 +2049,14 @@
             "showValue": "auto",
             "stacking": "none",
             "tooltip": {
+              "hideZeros": false,
               "mode": "multi",
               "sort": "none"
             },
             "xTickLabelRotation": 0,
             "xTickLabelSpacing": 0
           },
-          "pluginVersion": "11.3.1",
+          "pluginVersion": "12.0.0+security-01",
           "targets": [
             {
               "dataset": "`stinky-socks`",
@@ -2191,13 +2184,14 @@
             "showValue": "auto",
             "stacking": "normal",
             "tooltip": {
+              "hideZeros": false,
               "mode": "multi",
               "sort": "none"
             },
             "xTickLabelRotation": 0,
             "xTickLabelSpacing": 0
           },
-          "pluginVersion": "11.3.1",
+          "pluginVersion": "12.0.0+security-01",
           "targets": [
             {
               "datasource": {
@@ -2316,13 +2310,14 @@
             "showValue": "auto",
             "stacking": "none",
             "tooltip": {
+              "hideZeros": false,
               "mode": "multi",
               "sort": "none"
             },
             "xTickLabelRotation": 0,
             "xTickLabelSpacing": 0
           },
-          "pluginVersion": "11.3.1",
+          "pluginVersion": "12.0.0+security-01",
           "targets": [
             {
               "dataset": "`stinky-socks`",
@@ -2452,13 +2447,14 @@
             "showValue": "auto",
             "stacking": "none",
             "tooltip": {
+              "hideZeros": false,
               "mode": "multi",
               "sort": "none"
             },
             "xTickLabelRotation": 0,
             "xTickLabelSpacing": 0
           },
-          "pluginVersion": "11.3.1",
+          "pluginVersion": "12.0.0+security-01",
           "targets": [
             {
               "dataset": "`stinky-socks`",
@@ -2585,13 +2581,14 @@
             "showValue": "auto",
             "stacking": "none",
             "tooltip": {
+              "hideZeros": false,
               "mode": "multi",
               "sort": "none"
             },
             "xTickLabelRotation": 0,
             "xTickLabelSpacing": 0
           },
-          "pluginVersion": "11.3.1",
+          "pluginVersion": "12.0.0+security-01",
           "targets": [
             {
               "dataset": "`stinky-socks`",
@@ -2718,13 +2715,14 @@
             "showValue": "auto",
             "stacking": "none",
             "tooltip": {
+              "hideZeros": false,
               "mode": "multi",
               "sort": "none"
             },
             "xTickLabelRotation": 0,
             "xTickLabelSpacing": 0
           },
-          "pluginVersion": "11.3.1",
+          "pluginVersion": "12.0.0+security-01",
           "targets": [
             {
               "dataset": "`stinky-socks`",
@@ -2870,6 +2868,7 @@
             "showValue": "auto",
             "stacking": "none",
             "tooltip": {
+              "hideZeros": false,
               "mode": "multi",
               "sort": "none"
             },
@@ -2877,7 +2876,7 @@
             "xTickLabelRotation": 0,
             "xTickLabelSpacing": 0
           },
-          "pluginVersion": "11.3.1",
+          "pluginVersion": "12.0.0+security-01",
           "targets": [
             {
               "datasource": {
@@ -3016,6 +3015,7 @@
             "showValue": "auto",
             "stacking": "none",
             "tooltip": {
+              "hideZeros": false,
               "mode": "single",
               "sort": "none"
             },
@@ -3023,7 +3023,7 @@
             "xTickLabelRotation": 0,
             "xTickLabelSpacing": 0
           },
-          "pluginVersion": "11.3.1",
+          "pluginVersion": "12.0.0+security-01",
           "targets": [
             {
               "datasource": {
@@ -3145,6 +3145,7 @@
             "showValue": "auto",
             "stacking": "none",
             "tooltip": {
+              "hideZeros": false,
               "mode": "single",
               "sort": "none"
             },
@@ -3152,7 +3153,7 @@
             "xTickLabelRotation": 0,
             "xTickLabelSpacing": 0
           },
-          "pluginVersion": "11.3.1",
+          "pluginVersion": "12.0.0+security-01",
           "targets": [
             {
               "datasource": {
@@ -3291,6 +3292,7 @@
             "showValue": "auto",
             "stacking": "none",
             "tooltip": {
+              "hideZeros": false,
               "mode": "single",
               "sort": "none"
             },
@@ -3298,7 +3300,7 @@
             "xTickLabelRotation": 0,
             "xTickLabelSpacing": 0
           },
-          "pluginVersion": "11.3.1",
+          "pluginVersion": "12.0.0+security-01",
           "targets": [
             {
               "datasource": {
@@ -3452,7 +3454,7 @@
             "h": 14,
             "w": 24,
             "x": 0,
-            "y": 338
+            "y": 45
           },
           "id": 49,
           "options": {
@@ -3469,7 +3471,7 @@
             "showHeader": true,
             "sortBy": []
           },
-          "pluginVersion": "11.3.0",
+          "pluginVersion": "12.0.0+security-01",
           "targets": [
             {
               "datasource": {
@@ -3578,7 +3580,7 @@
             "h": 14,
             "w": 24,
             "x": 0,
-            "y": 352
+            "y": 59
           },
           "id": 31,
           "options": {
@@ -3600,7 +3602,7 @@
               }
             ]
           },
-          "pluginVersion": "11.3.0",
+          "pluginVersion": "12.0.0+security-01",
           "targets": [
             {
               "datasource": {
@@ -3641,16 +3643,14 @@
   ],
   "preload": false,
   "refresh": "",
-  "schemaVersion": 40,
+  "schemaVersion": 41,
   "tags": [],
   "templating": {
     "list": [
       {
         "allValue": "NULL",
         "current": {
-          "text": [
-            "All"
-          ],
+          "text": "All",
           "value": [
             "$__all"
           ]
@@ -3673,9 +3673,7 @@
       {
         "allValue": "NULL",
         "current": {
-          "text": [
-            "All"
-          ],
+          "text": "All",
           "value": [
             "$__all"
           ]
@@ -3699,9 +3697,7 @@
       {
         "allValue": "NULL",
         "current": {
-          "text": [
-            "All"
-          ],
+          "text": "All",
           "value": [
             "$__all"
           ]
@@ -3726,9 +3722,7 @@
       {
         "allValue": "NULL",
         "current": {
-          "text": [
-            "All"
-          ],
+          "text": "All",
           "value": [
             "$__all"
           ]
@@ -3973,6 +3967,5 @@
   "timezone": "",
   "title": "PR metrics",
   "uid": "dadf1ef8-d081-4d14-a1f3-82c235fc7fc1",
-  "version": 1,
-  "weekStart": ""
+  "version": 1
 }
