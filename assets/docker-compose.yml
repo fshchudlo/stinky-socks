@@ -2,6 +2,7 @@ services:
   postgres:
     image: postgres
     container_name: "stinky-socks-postgres"
+    pull_policy: always
     restart: always
     ports:
       - "5432:5432"
@@ -22,7 +23,7 @@ services:
     pull_policy: always
     restart: always
     ports:
-      - 3000:3000
+      - "3333:3000"
     networks:
         - stinky_socks_network
     environment:
