@@ -26,12 +26,12 @@
   "devDependencies": {
     "@types/jest": "29.5.14",
     "@types/jsonwebtoken": "^9.0.9",
-    "@types/node": "22.15.29",
+    "@types/node": "22.15.30",
     "dayjs": "^1.11.13",
     "eslint": "9.28.0",
     "jest": "29.7.0",
     "ts-jest": "29.3.4",
     "typescript": "5.8.3",
-    "typescript-eslint": "8.33.1"
+    "typescript-eslint": "8.34.0"
   }
 }

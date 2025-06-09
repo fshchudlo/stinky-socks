@@ -17,8 +17,8 @@
     "test:update-snapshots": "jest --config ../../jest.config.ts --updateSnapshot"
   },
   "dependencies": {
-    "@types/express": "5.0.2",
-    "@types/express-session": "^1.18.1",
+    "@types/express": "5.0.3",
+    "@types/express-session": "^1.18.2",
     "@types/passport": "1.0.17",
     "@types/passport-github2": "1.2.9",
     "axios": "1.9.0",
