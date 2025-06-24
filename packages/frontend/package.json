@@ -24,7 +24,7 @@
     "axios": "1.10.0",
     "express": "5.1.0",
     "express-session": "1.18.1",
-    "express-rate-limit": "7.5.0",
+    "express-rate-limit": "7.5.1",
     "passport": "0.7.0",
     "passport-github2": "0.1.12"
   }
