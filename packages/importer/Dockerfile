@@ -2,8 +2,6 @@ FROM node:lts-alpine
 
 RUN adduser -S appuser
 
-USER appuser
-
 WORKDIR /app
 
 # Copy root package files
@@ -19,5 +17,9 @@ COPY . .
 # Build and test the importer package
 WORKDIR /app/packages/importer
 RUN npm run build && npm run test
+
+USER appuser
+
+EXPOSE 9100
 
 CMD ["npm", "start"]

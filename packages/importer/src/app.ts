@@ -1,4 +1,5 @@
 import "reflect-metadata";
+import "./metrics";
 
 import {MetricsDB} from "./MetricsDB/MetricsDB";
 import importTeamProjects from "./importTeamProjects";

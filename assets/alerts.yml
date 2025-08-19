@@ -1,0 +1,10 @@
+groups:
+  - name: Importer
+    rules:
+      - alert: ImporterHighMemory
+        expr: process_resident_memory_bytes > 100 * 1024 * 1024
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Importer app uses >100MB RAM"
