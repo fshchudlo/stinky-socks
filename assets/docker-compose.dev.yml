@@ -1,6 +1,5 @@
-version: '3.8'
 services:
-  stinky-socks:
+  stinky-socks-importer:
     depends_on:
       - postgres
     build:

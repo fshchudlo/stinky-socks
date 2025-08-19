@@ -5,7 +5,7 @@ const collectDefaultMetrics = client.collectDefaultMetrics;
 collectDefaultMetrics();
 
 const registry = new client.Registry();
-registry.setDefaultLabels({app: 'demo-app'});
+registry.setDefaultLabels({app: 'stinky-socks-importer'});
 collectDefaultMetrics({register: registry});
 
 http.createServer(async (req, res) => {

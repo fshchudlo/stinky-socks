@@ -2,9 +2,9 @@ groups:
   - name: Importer
     rules:
       - alert: ImporterHighMemory
-        expr: process_resident_memory_bytes > 100 * 1024 * 1024
+        expr: process_resident_memory_bytes{job="stinky-socks-importer"} > 500 * 1024 * 1024
         for: 1m
         labels:
           severity: warning
         annotations:
-          summary: "Importer app uses >100MB RAM"
+          summary: "Importer app uses >500MB RAM"

@@ -16,6 +16,19 @@ services:
     volumes:
       - stinky_socks_postgres_data:/var/lib/postgresql/data
   
+  loki:
+    image: grafana/loki
+    container_name: "stinky-socks-loki"
+    pull_policy: always
+    restart: always
+    ports:
+      - "3100:3100"
+    networks:
+      - stinky_socks_network
+    volumes:
+      - ./loki-config.yml:/etc/loki/local-config.yml:ro
+    command: -config.file=/etc/loki/local-config.yml
+
   # http://127.0.0.1:9090      
   prometheus:
     image: prom/prometheus
@@ -29,7 +42,7 @@ services:
     networks:
       - stinky_socks_network
     volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./prometheus-config.yml:/etc/prometheus/prometheus.yml:ro
       - ./alerts.yml:/etc/prometheus/alerts.yml:ro
     command: [ "--config.file=/etc/prometheus/prometheus.yml" ]
 
@@ -44,18 +57,26 @@ services:
     networks:
       - stinky_socks_network
     volumes:
-      - ./alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+      - ./alertmanager-config.yml:/etc/alertmanager/alertmanager.yml:ro
     command: [ "--config.file=/etc/alertmanager/alertmanager.yml" ]
-
-  loki:
-    image: grafana/loki
-    container_name: "stinky-socks-loki"
+  # http://localhost:12345/
+  alloy:
+    image: grafana/alloy
+    privileged: true
+    container_name: "stinky-socks-alloy"
     pull_policy: always
     restart: always
     ports:
-      - "3100:3100"
+      - "12345:12345"
+      - "4317:4317"
+      - "4318:4318"
     networks:
       - stinky_socks_network
+    volumes:
+      - ./config.alloy:/etc/alloy/config.alloy
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: run --server.http.listen-addr=0.0.0.0:12345 --storage.path=/var/lib/alloy/data /etc/alloy/config.alloy
 
   # http://127.0.0.1:3333
   grafana:
