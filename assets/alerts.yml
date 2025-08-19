@@ -1,0 +1,10 @@
+groups:
+  - name: Importer
+    rules:
+      - alert: ImporterHighMemory
+        expr: process_resident_memory_bytes{job="stinky-socks-importer"} > 500 * 1024 * 1024
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Importer app uses >500MB RAM"

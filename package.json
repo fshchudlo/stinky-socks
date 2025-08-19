@@ -17,7 +17,6 @@
     "build": "npm run build --workspace=packages",
     "test": "npm run test --workspace=packages",
     "lint": "eslint ./packages --fix",
-    
     "docker:init": "docker-compose -p stinky-socks -f assets/docker-compose.yml up -d",
     "docker:destroy": "docker-compose -p stinky-socks -f assets/docker-compose.yml down -v",
     "docker-import:start": "docker-compose -p stinky-socks -f assets/docker-compose.yml -f assets/docker-compose.dev.yml up -d --build && docker logs stinky-socks-importer --follow",
@@ -27,11 +26,14 @@
     "@types/jest": "30.0.0",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "24.3.0",
-    "dayjs": "^1.11.13",
     "eslint": "9.33.0",
     "jest": "30.0.5",
     "ts-jest": "29.4.1",
     "typescript": "5.9.2",
     "typescript-eslint": "8.40.0"
+  },
+  "dependencies": {
+    "dayjs": "^1.11.13",
+    "prom-client": "^15.1.3"
   }
 }

@@ -15,13 +15,78 @@ services:
     shm_size: 1g
     volumes:
       - stinky_socks_postgres_data:/var/lib/postgresql/data
+  
+  loki:
+    image: grafana/loki
+    container_name: "stinky-socks-loki"
+    pull_policy: always
+    restart: always
+    ports:
+      - "3100:3100"
+    networks:
+      - stinky_socks_network
+    volumes:
+      - ./loki-config.yml:/etc/loki/local-config.yml:ro
+    command: -config.file=/etc/loki/local-config.yml
 
-  # http://127.0.0.1:3000
+  # http://127.0.0.1:9090      
+  prometheus:
+    image: prom/prometheus
+    container_name: "stinky-socks-prometheus"
+    pull_policy: always
+    restart: always
+    depends_on:
+      - alertmanager
+    ports:
+      - "9090:9090"
+    networks:
+      - stinky_socks_network
+    volumes:
+      - ./prometheus-config.yml:/etc/prometheus/prometheus.yml:ro
+      - ./alerts.yml:/etc/prometheus/alerts.yml:ro
+    command: [ "--config.file=/etc/prometheus/prometheus.yml" ]
+
+#  http://localhost:9093/#/alerts
+  alertmanager:
+    image: prom/alertmanager
+    container_name: "stinky-socks-alertmanager"
+    pull_policy: always
+    restart: always
+    ports:
+      - "9093:9093"
+    networks:
+      - stinky_socks_network
+    volumes:
+      - ./alertmanager-config.yml:/etc/alertmanager/alertmanager.yml:ro
+    command: [ "--config.file=/etc/alertmanager/alertmanager.yml" ]
+  # http://localhost:12345/
+  alloy:
+    image: grafana/alloy
+    privileged: true
+    container_name: "stinky-socks-alloy"
+    pull_policy: always
+    restart: always
+    ports:
+      - "12345:12345"
+      - "4317:4317"
+      - "4318:4318"
+    networks:
+      - stinky_socks_network
+    volumes:
+      - ./config.alloy:/etc/alloy/config.alloy
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: run --server.http.listen-addr=0.0.0.0:12345 --storage.path=/var/lib/alloy/data /etc/alloy/config.alloy
+
+  # http://127.0.0.1:3333
   grafana:
     image: grafana/grafana
     container_name: "stinky-socks-grafana"
     pull_policy: always
     restart: always
+    depends_on:
+      - prometheus
+      - loki
     ports:
       - "3333:3000"
     networks:
@@ -30,6 +95,7 @@ services:
       - GF_SECURITY_ADMIN_USER=stinky-socks
       - GF_SECURITY_ADMIN_PASSWORD=CHANGE-ME!
       - GF_USERS_DEFAULT_THEME=system
+      - GF_INSTALL_PLUGINS=grafana-lokiexplore-app
     volumes:
       - ./grafana-provisioning:/etc/grafana/provisioning
       - ./grafana-dashboards:/var/lib/grafana/dashboards
