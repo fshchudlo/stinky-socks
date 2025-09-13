@@ -32,7 +32,7 @@
 - Run `npm run docker:init` to start preconfigured Postgres and Grafana.
 - Create `packages/importer/.env` file, copy variables from [docker-compose.dev.yml](assets/docker-compose.dev.yml) into it and
   fill with relevant values.
-- Specify repos you're interested in [publicProjectsImportConfig.ts](packages/importer/src/publicProjectsImportConfig.ts).
+- Specify repos you're interested in [publicProjectsImportConfig.ts](packages/importer/src/githubPublicProjectsImportConfig.ts).
 - Run ```npm run start``` to initiate the import of the data on your local machine
 
 ### Running unit tests

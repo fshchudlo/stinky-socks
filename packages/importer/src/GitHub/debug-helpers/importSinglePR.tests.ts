@@ -3,7 +3,7 @@ import {MetricsDB} from "../../MetricsDB/MetricsDB";
 import {ActorFactory} from "../../MetricsDB/ActorFactory";
 import {GitHubAPI} from "../api/GitHubAPI";
 import {GitHubPullRequest} from "../entities/GitHubPullRequest";
-import {publicProjectsImportConfig} from "../../publicProjectsImportConfig";
+import {githubPublicProjectsImportConfig} from "../../githubPublicProjectsImportConfig";
 import {PersonalTokensRotator} from "../api/PersonalTokensRotator";
 
 describe("Import single PR debug helper", () => {
@@ -11,7 +11,7 @@ describe("Import single PR debug helper", () => {
         await MetricsDB.initialize();
         await ActorFactory.preloadCacheByTeam("kubernetes");
 
-        const tokensRotator = new PersonalTokensRotator(publicProjectsImportConfig.gitHubApiTokens);
+        const tokensRotator = new PersonalTokensRotator(githubPublicProjectsImportConfig.apiTokens);
         const gitHubAPI = new GitHubAPI(tokensRotator);
 
         const [pullRequest, activities, files] = await Promise.all([
