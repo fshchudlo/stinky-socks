@@ -95,7 +95,7 @@ export class GitlabPullRequestsImporter {
             if (integrityErrors.length > 0) {
                 console.warn(`☣️ PullRequest ${pullRequest.web_url} has the following integrity errors:\n\t• ${integrityErrors.join("\n\t• ")}`);
             }
-            // await this.repository.save(pullRequestEntity);
+            await this.repository.save(pullRequestEntity);
         } catch (error) {
             console.error(`❌ Error while saving pull request ${pullRequest.web_url}: ${error}`);
             throw error;
