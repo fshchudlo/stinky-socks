@@ -6,7 +6,7 @@ import { AppConfig } from "./app.config";
 import { PersonalTokensRotator } from "./GitHub/api/PersonalTokensRotator";
 import { getAppInstallations, InstallationTokensEmitter } from "./GitHub/api/InstallationTokensEmitter";
 import { gitlabProjectsImportConfig } from "./gitlabProjectsImportConfig";
-import { GitlabAPI } from "./Gitlab/GitlabAPI";
+import { GitlabAPI } from "./Gitlab/api/GitlabAPI";
 import { GitlabPullRequestsImporter } from "./Gitlab/GitlabPullRequestsImporter";
 
 export default async function importTeamProjects() {

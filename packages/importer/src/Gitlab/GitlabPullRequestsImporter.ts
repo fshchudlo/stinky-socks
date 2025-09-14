@@ -1,7 +1,7 @@
 import { Repository } from "typeorm";
 import { PullRequest } from "../MetricsDB/entities/PullRequest";
 import { MetricsDB } from "../MetricsDB/MetricsDB";
-import { GitlabAPI } from "./GitlabAPI";
+import { GitlabAPI } from "./api/GitlabAPI";
 import {
     GitlabNamespaceModel,
     GitlabProjectModel,
@@ -75,7 +75,8 @@ export class GitlabPullRequestsImporter {
 
     private async savePullRequest(repository: GitlabProjectModel, pullRequest: GitlabPullRequestModel) {
         try {
-            const [activities, files] = await Promise.all([
+            const [commits, activities, changes] = await Promise.all([
+                this.gitlabAPI.getMergeRequestCommits(repository.id, pullRequest.iid),
                 this.gitlabAPI.getMergeRequestNotes(repository.id, pullRequest.iid),
                 this.gitlabAPI.getMergeRequestChanges(repository.id, pullRequest.iid)
             ]);
@@ -83,8 +84,9 @@ export class GitlabPullRequestsImporter {
                     teamName: repository.namespace.name,
                     pullRequest,
                     repository,
+                    commits,
                     activities,
-                    changes: files
+                    changes
                 })
             );
 

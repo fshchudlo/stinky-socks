@@ -2,6 +2,7 @@ import {
     GitlabFileDiffModel,
     GitlabProjectModel,
     GitlabPullRequestActivityModel,
+    GitlabPullRequestCommitModel,
     GitlabPullRequestModel
 } from "../GitlabAPI.contracts";
 
@@ -11,4 +12,5 @@ export type ImportParams = {
     repository: GitlabProjectModel,
     activities: GitlabPullRequestActivityModel[],
     changes: GitlabFileDiffModel[]
+    commits: GitlabPullRequestCommitModel[]
 }

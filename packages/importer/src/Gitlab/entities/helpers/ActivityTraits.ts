@@ -5,7 +5,7 @@ import {
 
 export const ActivityTraits = {
     isCommentedEvent(event: GitlabPullRequestActivityModel): event is GitlabPullRequestActivityModel {
-        return event.type === "DiscussionNote";
+        return event.type === "DiscussionNote" || event.type === "DiffNote";
     },
     isReviewedEvent(event: GitlabPullRequestActivityModel): event is GitlabPullRequestActivityModel {
         return ActivityTraits.isUnapprovedEvent(event)
@@ -27,12 +27,9 @@ export const ActivityTraits = {
     isReviewRequestRemovedEvent(event: GitlabPullRequestActivityModel): event is GitlabPullRequestReviewRequestedActivityModel {
         return event.type === null && (<GitlabPullRequestReviewRequestedActivityModel>event).removed_reviewers?.length > 0;
     },
-    isReadyForReviewEvent() {
-        console.warn("ActivityTraits.isReadyForReviewEvent was not implemented properly");
-        return false;
-    },
-    isCommitedEvent() {
-        console.warn("ActivityTraits.isCommitedEvent was not implemented properly");
-        return false;
+    isReadyForReviewEvent(event: GitlabPullRequestActivityModel): event is GitlabPullRequestActivityModel {
+        console.warn("ActivityTraits.isReadyForReviewEvent was not tested properly");
+
+        return event.type == null && event.body == "marked this merge request as ready";
     }
 };

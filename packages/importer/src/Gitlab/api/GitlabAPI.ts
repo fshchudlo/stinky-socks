@@ -4,8 +4,9 @@ import {
     GitlabNamespaceModel,
     GitlabProjectModel,
     GitlabPullRequestActivityModel,
+    GitlabPullRequestCommitModel,
     GitlabPullRequestModel
-} from "./GitlabAPI.contracts";
+} from "../GitlabAPI.contracts";
 import { createCache } from "cache-manager";
 
 const usersCache: ReturnType<typeof createCache> = createCache();
@@ -48,6 +49,10 @@ export class GitlabAPI {
         return await this.getFullList<GitlabPullRequestActivityModel>(`/projects/${projectId}/merge_requests/${mergeRequestIid}/notes`);
     }
 
+    async getMergeRequestCommits(projectId: number, mergeRequestIid: number) {
+        return await this.getFullList<GitlabPullRequestCommitModel>(`/projects/${projectId}/merge_requests/${mergeRequestIid}/commits`);
+    }
+
     async getMergeRequestChanges(projectId: number, mergeRequestIid: number) {
         return (await this.get(`/projects/${projectId}/merge_requests/${mergeRequestIid}/changes`)).data.changes as GitlabFileDiffModel[];
     }
@@ -55,6 +60,10 @@ export class GitlabAPI {
     async fetchUserData(username: string) {
         return await usersCache.wrap(`gitlab.api.users.${username}`, async () => {
             const res = await this.get("/users", { username });
+            if(res.data?.length != 1)
+            {
+                throw new Error(`Something is wrong with the user "${username}"`)
+            }
 
             return (await this.get(`/users/${res.data[0].id}`)).data;
         });
@@ -99,4 +108,5 @@ export class GitlabAPI {
         }
         throw new Error(`Error executing request for ${url} message: ${response.statusText}`);
     }
+
 }

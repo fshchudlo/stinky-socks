@@ -35,10 +35,17 @@ export type GitlabPullRequestModel = {
     web_url: string;
 };
 
+export type GitlabPullRequestCommitModel = {
+    committer_name: string;
+    message: string;
+    web_url: string;
+    created_at: string;
+};
+
 export type GitlabPullRequestActivityModel = GitlabPullRequestGenericActivityModel;
 
 export type  GitlabPullRequestGenericActivityModel = {
-    type: "DiscussionNote" | null;
+    type: "DiscussionNote" | "DiffNote" | null;
     author: GitlabUserModel;
     body: string;
 

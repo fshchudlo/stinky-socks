@@ -54,7 +54,7 @@ export class GitlabPullRequest extends PullRequest {
     private initializeDates(model: ImportParams) {
         this.sharedForReviewDate = calculatePrSharedForReviewDate(model);
         this.mergedDate = new Date(model.pullRequest.merged_at);
-        const commitTimestamps = model.activities.filter(ActivityTraits.isCommitedEvent).map((c) => new Date(c.created_at).getTime());
+        const commitTimestamps = model.commits.map((c) => new Date(c.created_at).getTime());
         if (commitTimestamps.length > 0) {
             this.initialCommitDate = new Date(Math.min(...commitTimestamps));
             this.lastCommitDate = new Date(Math.max(...commitTimestamps));
@@ -157,16 +157,16 @@ export class GitlabPullRequest extends PullRequest {
             });
         this.activities.push(...changesRequestedActivities);
 
-        // const commitActivities = model.activities.filter(ActivityTraits.isCommitedEvent).map(commit => {
-        //     return new GitlabPullRequestActivity(model.repository, model.pullRequest, commit.event, new Date(commit.committer.date), commit.committer.name, commit.message, commit.html_url);
-        // });
-        // this.activities.push(...commitActivities);
+        const commitActivities = model.commits.map(commit => {
+            return new GitlabPullRequestActivity(model.teamName, model.repository, model.pullRequest, "committed", new Date(commit.created_at), commit.committer_name, commit.message, commit.web_url);
+        });
+        this.activities.push(...commitActivities);
 
-        // const readyForReviewActivities = model.activities.filter(ActivityTraits.isReadyForReviewEvent).map(event => {
-        //     return new GitlabPullRequestActivity(model.repository, model.pullRequest, event.event, new Date(event.created_at), event.actor.login, null, null);
-        // });
-        // this.activities.push(...readyForReviewActivities);
-        //
+        const readyForReviewActivities = model.activities.filter(ActivityTraits.isReadyForReviewEvent).map(event => {
+            return new GitlabPullRequestActivity(model.teamName, model.repository, model.pullRequest, "ready_for_review", new Date(event.created_at), event.author.username, null, null);
+        });
+        this.activities.push(...readyForReviewActivities);
+
         this.activities.push(new GitlabPullRequestActivity(model.teamName, model.repository, model.pullRequest, "merged", new Date(model.pullRequest.merged_at), model.pullRequest.merged_by.username, null, null));
 
         return this;
