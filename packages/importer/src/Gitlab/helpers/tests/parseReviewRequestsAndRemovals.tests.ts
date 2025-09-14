@@ -48,4 +48,11 @@ describe("parseReviewRequestsAndRemovals", () => {
             removed: ["charlie", "dave"]
         });
     });
+    it("handles 'and' as the part of the user name", () => {
+        const note = "requested review from @andy and @alice and removed review request for @andrew and @mike";
+        expect(parseReviewRequestsAndRemovals(note)).toEqual({
+            added: ["andy", "alice"],
+            removed: ["andrew", "mike"]
+        });
+    });
 });
