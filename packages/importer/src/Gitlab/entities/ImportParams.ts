@@ -10,5 +10,5 @@ export type ImportParams = {
     pullRequest: GitlabPullRequestModel,
     repository: GitlabProjectModel,
     activities: GitlabPullRequestActivityModel[],
-    files: GitlabFileDiffModel[]
+    changes: GitlabFileDiffModel[]
 }

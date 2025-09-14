@@ -59,7 +59,8 @@ export type  GitlabPullRequestReviewRequestedActivityModel = {
 };
 
 export type  GitlabFileDiffModel = {
-    garbage: any;
+    new_path: string;
+    diff: string;
 };
 
 export type  GitlabUserModel = {

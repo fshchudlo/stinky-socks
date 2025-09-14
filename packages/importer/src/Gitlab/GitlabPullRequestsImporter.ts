@@ -84,7 +84,7 @@ export class GitlabPullRequestsImporter {
                     pullRequest,
                     repository,
                     activities,
-                    files
+                    changes: files
                 })
             );
 

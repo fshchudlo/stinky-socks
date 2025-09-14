@@ -17,7 +17,7 @@ export class GitlabPullRequest extends PullRequest {
 
         await this
             //.initializeDates(model)
-            //.initializeDiffStats(model)
+            .initializeDiffStats(model)
             .initializeParticipants(model);
 
         await this.initializeActivities(model);
@@ -61,14 +61,25 @@ export class GitlabPullRequest extends PullRequest {
     //     return this;
     // }
 
-    // private initializeDiffStats(model: ImportParams) {
-    //     this.diffRowsAdded = model.files.reduce((acc, file) => acc + file.additions, 0);
-    //     this.diffRowsDeleted = model.files.reduce((acc, file) => acc + file.deletions, 0);
-    //
-    //     this.testsWereTouched = model.files.some(file => file.filename.toLowerCase().includes("test"));
-    //     return this;
-    // }
-    //
+    private initializeDiffStats(model: ImportParams) {
+        this.diffRowsAdded = 0;
+        this.diffRowsDeleted = 0;
+        for (const change of model.changes) {
+            const lines = change.diff.split("\n");
+
+            for (const line of lines) {
+                if (line.startsWith("+") && !line.startsWith("+++")) {
+                    this.diffRowsAdded++;
+                } else if (line.startsWith("-") && !line.startsWith("---")) {
+                    this.diffRowsDeleted++;
+                }
+            }
+        }
+
+        this.testsWereTouched = model.changes.some(file => file.new_path.toLowerCase().includes("test"));
+        return this;
+    }
+
     private async initializeParticipants(model: ImportParams) {
         const allParticipants = model.pullRequest
             .reviewers.map(r => r)
