@@ -166,10 +166,7 @@ export class GitlabPullRequest extends PullRequest {
         // });
         // this.activities.push(...readyForReviewActivities);
         //
-        // const mergeActivities = model.activities.filter(ActivityTraits.isConsistentMergedEvent).map(merge => {
-        //     return new GitlabPullRequestActivity(model.repository, model.pullRequest, merge.event, new Date(merge.created_at), merge.actor.login, null, null);
-        // });
-        // this.activities.push(...mergeActivities);
+        this.activities.push(new GitlabPullRequestActivity(model.teamName, model.repository, model.pullRequest, "merged", new Date(model.pullRequest.merged_at), model.pullRequest.merged_by.username, null, null));
 
         return this;
     }
