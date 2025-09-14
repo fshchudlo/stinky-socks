@@ -122,8 +122,18 @@ export class GitlabPullRequestsImporter {
         if (added?.length == 0 && removed?.length == 0) {
             return activity;
         }
-        (<GitlabPullRequestReviewRequestedActivityModel>activity).added_reviewers = await Promise.all(added.map(u => this.gitlabAPI.fetchUserData(u)));
-        (<GitlabPullRequestReviewRequestedActivityModel>activity).removed_reviewers = await Promise.all(removed.map(u => this.gitlabAPI.fetchUserData(u)));
+        for(const addedUser of added)
+        {
+            const act = activity as GitlabPullRequestReviewRequestedActivityModel;
+            act.added_reviewers ??= [];
+            act.added_reviewers.push(await this.gitlabAPI.fetchUserData(addedUser));
+        }
+        for(const removedUser of removed)
+        {
+            const act = activity as GitlabPullRequestReviewRequestedActivityModel;
+            act.removed_reviewers ??= [];
+            act.removed_reviewers.push(await this.gitlabAPI.fetchUserData(removedUser));
+        }
         return activity;
     }
 
