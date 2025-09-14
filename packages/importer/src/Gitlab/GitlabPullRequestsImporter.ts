@@ -14,14 +14,18 @@ import { ImportParams } from "./entities/ImportParams";
 import { GitlabPullRequest } from "./entities/GitlabPullRequest";
 import { parseReviewRequestsAndRemovals } from "./helpers/parseReviewRequestsAndRemovals";
 
+type teamNameResolverFn = (project: GitlabProjectModel, pr: GitlabPullRequestModel) => string;
+
 export class GitlabPullRequestsImporter {
     private readonly gitlabAPI: GitlabAPI;
     private readonly project: GitlabNamespaceModel;
     private readonly repository: Repository<PullRequest>;
+    private readonly teamNameResolverFn: teamNameResolverFn;
 
-    constructor(gitlabAPI: GitlabAPI, project: GitlabNamespaceModel) {
+    constructor(gitlabAPI: GitlabAPI, project: GitlabNamespaceModel, teamNameResolverFn: teamNameResolverFn) {
         this.gitlabAPI = gitlabAPI;
         this.project = project;
+        this.teamNameResolverFn = teamNameResolverFn;
         this.repository = MetricsDB.getRepository(PullRequest);
     }
 
@@ -82,7 +86,7 @@ export class GitlabPullRequestsImporter {
                 this.gitlabAPI.getMergeRequestChanges(repository.id, pullRequest.iid)
             ]);
             const pullRequestEntity = await new GitlabPullRequest().init(await this.normalizeData({
-                    teamName: repository.namespace.name,
+                    teamName: this.teamNameResolverFn ? this.teamNameResolverFn(repository, pullRequest) : repository.namespace.name,
                     pullRequest,
                     repository,
                     commits,
@@ -122,14 +126,12 @@ export class GitlabPullRequestsImporter {
         if (added?.length == 0 && removed?.length == 0) {
             return activity;
         }
-        for(const addedUser of added)
-        {
+        for (const addedUser of added) {
             const act = activity as GitlabPullRequestReviewRequestedActivityModel;
             act.added_reviewers ??= [];
             act.added_reviewers.push(await this.gitlabAPI.fetchUserData(addedUser));
         }
-        for(const removedUser of removed)
-        {
+        for (const removedUser of removed) {
             const act = activity as GitlabPullRequestReviewRequestedActivityModel;
             act.removed_reviewers ??= [];
             act.removed_reviewers.push(await this.gitlabAPI.fetchUserData(removedUser));
