@@ -27,7 +27,7 @@ export class GitHubPullRequestsImporter {
     async importPullRequests() {
         const repositories = this.project.repositoriesSelector ?
             await this.project.repositoriesSelector(this.gitHubAPI) :
-            (await this.gitHubAPI.fetchAllRepositories(this.project.owner)).map(repo => repo.name);
+            (await this.gitHubAPI.getAllRepositories(this.project.owner)).map(repo => repo.name);
 
         for (const repositoryName of repositories) {
             console.group(`🔁 Importing pull requests for the '${repositoryName}' repository`);

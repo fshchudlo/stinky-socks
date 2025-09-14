@@ -56,7 +56,7 @@ const clickHouseTeam: TeamImportSettings = {
 
 
 const tokens = (process.env.GITHUB_PUBLIC_API_TOKENS as string)?.split(' ')||[];
-export const publicProjectsImportConfig = {
-    gitHubApiTokens: tokens,
+export const githubPublicProjectsImportConfig = {
+    apiTokens: tokens,
     teams: [phpTeam, clickHouseTeam, kubernetesTeam, grafanaTeam, angularTeam, reactTeam]
 };

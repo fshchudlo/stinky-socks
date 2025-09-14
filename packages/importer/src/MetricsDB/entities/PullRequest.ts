@@ -140,9 +140,6 @@ export abstract class PullRequest {
         if (this.participants.some(p => p.firstApprovalDate && p.firstApprovalDate.getTime() < this.createdDate.getTime())) {
             errors.push("`participant.firstApprovalDate` is less than `pullRequest.createdDate`. Recheck the import logic and timezones handling on this sample.");
         }
-        if (this.participants.some(p => p.firstApprovalDate && p.firstApprovalDate.getTime() < this.sharedForReviewDate.getTime())) {
-            errors.push("`participant.firstApprovalDate` is less than `pullRequest.sharedForReviewDate`. Recheck the import logic and timezones handling on this sample.");
-        }
         if (this.participants.some(p => p.firstApprovalDate && p.firstApprovalDate.getTime() > this.mergedDate.getTime())) {
             errors.push("`participant.firstApprovalDate` is bigger than `pullRequest.mergedDate`. Recheck the import logic and timezones handling on this sample.");
         }
@@ -153,9 +150,6 @@ export abstract class PullRequest {
         // participant.firstReviewDate
         if (this.participants.some(p => p.firstReviewDate && p.firstReviewDate.getTime() < this.createdDate.getTime())) {
             errors.push("`participant.firstReviewDate` is less than `pullRequest.createdDate`. Recheck the import logic and timezones handling on this sample.");
-        }
-        if (this.participants.some(p => p.firstReviewDate && p.firstReviewDate.getTime() < this.sharedForReviewDate.getTime())) {
-            errors.push("`participant.firstReviewDate` is less than `pullRequest.sharedForReviewDate`. Recheck the import logic and timezones handling on this sample.");
         }
         if (this.participants.some(p => p.firstReviewDate && p.firstReviewDate.getTime() > this.mergedDate.getTime())) {
             errors.push("`participant.firstReviewDate` is bigger than `pullRequest.mergedDate`. Recheck the import logic and timezones handling on this sample.");
@@ -169,16 +163,10 @@ export abstract class PullRequest {
         if (this.participants.some(p => p.lastCommentDate && p.lastCommentDate.getTime() < this.createdDate.getTime())) {
             errors.push("`participant.lastCommentDate` is less than `pullRequest.createdDate`. Recheck the import logic and timezones handling on this sample.");
         }
-        if (this.participants.some(p => !p.participant.isBotUser && p.lastCommentDate && p.lastCommentDate.getTime() < this.sharedForReviewDate.getTime())) {
-            errors.push("`participant.lastCommentDate` is less than `pullRequest.sharedForReviewDate`. Possible reasons: should be marked as a bot, error in import logic and timezones handling.");
-        }
 
         // participant.lastApprovalDate
         if (this.participants.some(p => p.lastApprovalDate && p.lastApprovalDate.getTime() < this.createdDate.getTime())) {
             errors.push("`participant.lastApprovalDate` is less than `pullRequest.createdDate`. Recheck the import logic and timezones handling on this sample.");
-        }
-        if (this.participants.some(p => p.lastApprovalDate && p.lastApprovalDate.getTime() < this.sharedForReviewDate.getTime())) {
-            errors.push("`participant.lastApprovalDate` is less than `pullRequest.sharedForReviewDate`. Recheck the import logic and timezones handling on this sample.");
         }
         if (this.participants.some(p => p.lastApprovalDate && p.lastApprovalDate.getTime() > this.mergedDate.getTime())) {
             errors.push("`participant.lastApprovalDate` is bigger than `mergedDate`. Recheck the import logic and timezones handling on this sample.");

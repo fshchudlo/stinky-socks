@@ -27,8 +27,8 @@ export class GitHubAPI {
     async triggerTokenRateLimitVerification(): Promise<void> {
         await this.get(`/rate_limit`);
     }
-    async fetchAllRepositories(owner: string): Promise<any[]> {
-        const repositories = await this.getFullList(`/orgs/${owner}/repos`);
+    async getAllRepositories(owner: string): Promise<any[]> {
+        const repositories = await this.getFullList<any>(`/orgs/${owner}/repos`);
         return repositories.filter(repo => !repo.archived && !repo.disabled);
     }
 
@@ -78,7 +78,7 @@ export class GitHubAPI {
         throw new Error(`Error executing request for ${url} message: ${response.statusText}`);
     }
 
-    private async getFullList(url: string, params: any = undefined): Promise<any[]> {
+    private async getFullList<T>(url: string, params: any = undefined): Promise<T[]> {
         const pageSize = params?.per_page ?? 100;
         const requestParams = {
             page: params?.page ?? 1,
@@ -86,7 +86,7 @@ export class GitHubAPI {
             ...params
         };
 
-        const result: any[] = [];
+        const result: T[] = [];
         while (true) {
             const response = await this.get(url, requestParams);
 
