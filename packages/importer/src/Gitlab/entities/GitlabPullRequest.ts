@@ -124,19 +124,32 @@ export class GitlabPullRequest extends PullRequest {
         this.activities.push(...commentActivities);
 
 
+        const approvedActivities = model.activities
+            .filter(ActivityTraits.isApprovedEvent)
+            .map(review => {
+                return new GitlabPullRequestActivity(model.teamName, model.repository, model.pullRequest, "approved", new Date(review.created_at), review.author.username, review.body, null);
+            });
+        this.activities.push(...approvedActivities);
+
+        const unapprovedActivities = model.activities
+            .filter(ActivityTraits.isUnapprovedEvent)
+            .map(review => {
+                return new GitlabPullRequestActivity(model.teamName, model.repository, model.pullRequest, "dismissed", new Date(review.created_at), review.author.username, review.body, null);
+            });
+        this.activities.push(...unapprovedActivities);
+
+        const changesRequestedActivities = model.activities
+            .filter(ActivityTraits.isRequestedChangesEvent)
+            .map(review => {
+                return new GitlabPullRequestActivity(model.teamName, model.repository, model.pullRequest, "changes_requested", new Date(review.created_at), review.author.username, review.body, null);
+            });
+        this.activities.push(...changesRequestedActivities);
+
         // const commitActivities = model.activities.filter(ActivityTraits.isCommitedEvent).map(commit => {
         //     return new GitlabPullRequestActivity(model.repository, model.pullRequest, commit.event, new Date(commit.committer.date), commit.committer.name, commit.message, commit.html_url);
         // });
         // this.activities.push(...commitActivities);
 
-
-        // const reviewActivities = model.activities
-        //     .filter(ActivityTraits.isReviewedEvent)
-        //     .map(review => {
-        //         return new GitlabPullRequestActivity(model.repository, model.pullRequest, review.state == "commented" ? review.event : review.state, new Date(review.submitted_at), review.user!.login, review.body, review.html_url);
-        //     });
-        // this.activities.push(...reviewActivities);
-        //
         // const readyForReviewActivities = model.activities.filter(ActivityTraits.isReadyForReviewEvent).map(event => {
         //     return new GitlabPullRequestActivity(model.repository, model.pullRequest, event.event, new Date(event.created_at), event.actor.login, null, null);
         // });

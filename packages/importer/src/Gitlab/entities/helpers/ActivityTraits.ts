@@ -8,9 +8,15 @@ export const ActivityTraits = {
         return event.type === "DiscussionNote";
     },
     isReviewedEvent(event: GitlabPullRequestActivityModel): event is GitlabPullRequestActivityModel {
-        const reviewEvents = ["unapproved this merge request", "requested changes"];
-        return (event.type === null && reviewEvents.includes(event.body))
+        return ActivityTraits.isUnapprovedEvent(event)
+            || ActivityTraits.isRequestedChangesEvent(event)
             || ActivityTraits.isApprovedEvent(event);
+    },
+    isRequestedChangesEvent(event: GitlabPullRequestActivityModel): event is GitlabPullRequestActivityModel {
+        return event.type === null && event.body === "requested changes";
+    },
+    isUnapprovedEvent(event: GitlabPullRequestActivityModel): event is GitlabPullRequestActivityModel {
+        return event.type === null && event.body === "unapproved this merge request";
     },
     isApprovedEvent(event: GitlabPullRequestActivityModel): event is GitlabPullRequestActivityModel {
         return event.type === null && event.body === "approved this merge request";
