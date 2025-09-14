@@ -5,7 +5,9 @@ import { GitlabAPI } from "./GitlabAPI";
 import {
     GitlabNamespaceModel,
     GitlabProjectModel,
+    GitlabPullRequestActivityModel,
     GitlabPullRequestModel,
+    GitlabPullRequestReviewRequestedActivityModel,
     GitlabUserModel
 } from "./GitlabAPI.contracts";
 import { ImportParams } from "./entities/ImportParams";
@@ -78,6 +80,7 @@ export class GitlabPullRequestsImporter {
                 this.gitlabAPI.getMergeRequestChanges(repository.id, pullRequest.iid)
             ]);
             const pullRequestEntity = await new GitlabPullRequest().init(await this.normalizeData({
+                    teamName: repository.namespace.name,
                     pullRequest,
                     repository,
                     activities,
@@ -97,25 +100,49 @@ export class GitlabPullRequestsImporter {
     }
 
     private async normalizeData(params: ImportParams) {
-        params.pullRequest.author = await this.gitlabAPI.fetchUserData(params.pullRequest.author.id);
-        params.pullRequest.merged_by = await this.gitlabAPI.fetchUserData(params.pullRequest.merged_by.id);
+        params.pullRequest.author = await this.gitlabAPI.fetchUserData(params.pullRequest.author.username);
+        params.pullRequest.merged_by = await this.gitlabAPI.fetchUserData(params.pullRequest.merged_by.username);
 
         await this.normalizeUserArray(params.pullRequest.reviewers);
         await this.normalizeUserArray(params.pullRequest.assignees);
 
         for (const activity of params.activities) {
-            activity.author = await this.gitlabAPI.fetchUserData(activity.author.id);
-            if (activity.resolved_by) {
-                activity.resolved_by = await this.gitlabAPI.fetchUserData(activity.resolved_by.id);
-            }
+            activity.author = await this.gitlabAPI.fetchUserData(activity.author.username);
+            await this.normalizeReviewRequestNote(activity);
         }
 
         return params;
     }
 
+    private async normalizeReviewRequestNote(activity: GitlabPullRequestActivityModel) {
+        const { added, removed } = this.parseReviewRequestsAndRemovals(activity.body);
+        (<GitlabPullRequestReviewRequestedActivityModel>activity).added_reviewers = await Promise.all(added.map(u => this.gitlabAPI.fetchUserData(u)));
+        (<GitlabPullRequestReviewRequestedActivityModel>activity).removed_reviewers = await Promise.all(removed.map(u => this.gitlabAPI.fetchUserData(u)));
+        return activity;
+    }
+
+    private parseReviewRequestsAndRemovals(body: string) {
+        const added: string[] = [];
+        const removed: string[] = [];
+
+        const addMatch = body.match(/requested review from (.+?)( and|$)/);
+        if (addMatch) {
+            const users = addMatch[1].split(",").map(u => u.trim().replace(/^@/, ""));
+            added.push(...users);
+        }
+
+        const removeMatch = body.match(/removed review request for (.+)$/);
+        if (removeMatch) {
+            const users = removeMatch[1].split(",").map(u => u.trim().replace(/^@/, ""));
+            removed.push(...users);
+        }
+
+        return { added, removed };
+    }
+
     private async normalizeUserArray(users: GitlabUserModel[]) {
         for (let i = 0; i < users.length; i++) {
-            users[i] = await this.gitlabAPI.fetchUserData(users[i].id);
+            users[i] = await this.gitlabAPI.fetchUserData(users[i].username);
         }
     }
 }

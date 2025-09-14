@@ -8,6 +8,7 @@ import { GitlabPullRequestParticipant } from "./GitlabPullRequestParticipant";
 import { GitlabUserModel } from "../GitlabAPI.contracts";
 import { ActivityTraits } from "./helpers/ActivityTraits";
 import { GitlabPullRequestActivity } from "./GitlabPullRequestActivity";
+import { calculateRequestedReviewersCount } from "./helpers/calculateRequestedReviewersCount";
 
 
 export class GitlabPullRequest extends PullRequest {
@@ -25,14 +26,14 @@ export class GitlabPullRequest extends PullRequest {
     }
 
     private async initializeBaseProperties(model: ImportParams) {
-        this.teamName = model.repository.namespace.name;
+        this.teamName = model.teamName;
         this.projectName = model.repository.namespace.name;
         this.repositoryName = model.repository.name;
         this.pullRequestNumber = model.pullRequest.id;
         this.viewURL = model.pullRequest.web_url;
         this.targetBranch = model.pullRequest.target_branch;
 
-        // this.requestedReviewersCount = calculateRequestedReviewersCount(model);
+        this.requestedReviewersCount = calculateRequestedReviewersCount(model);
         this.authorCommentsCount = getCommentsTimestamps(getActivitiesOf(model.activities, model.pullRequest.author.username)).length;
 
         this.authorRole = ActorRole.MEMBER;
@@ -41,7 +42,7 @@ export class GitlabPullRequest extends PullRequest {
 
         const authorLogin = model.pullRequest.author.username;
         this.author = await ActorFactory.fetch({
-            teamName: model.repository.namespace.name,
+            teamName: model.teamName,
             login: authorLogin,
             isBotUser: model.pullRequest.author.bot
         });
@@ -88,12 +89,13 @@ export class GitlabPullRequest extends PullRequest {
             Array.from(uniqueParticipants)
                 .map(async participant => {
                     const actor = await ActorFactory.fetch({
-                        teamName: model.repository.namespace.name,
+                        teamName: model.teamName,
                         login: participant.username,
                         isBotUser: participant.bot
                     });
 
                     return new GitlabPullRequestParticipant(
+                        model.teamName,
                         model.repository,
                         model.pullRequest,
                         getActivitiesOf(model.activities, participant.username),
@@ -108,7 +110,16 @@ export class GitlabPullRequest extends PullRequest {
         this.activities = [];
 
         const commentActivities = model.activities.filter(ActivityTraits.isCommentedEvent).map(comment => {
-            return new GitlabPullRequestActivity(model.repository, model.pullRequest, "commented", new Date(comment.created_at), comment.author.username, comment.body, null);
+            return new GitlabPullRequestActivity(
+                model.teamName,
+                model.repository,
+                model.pullRequest,
+                "commented",
+                new Date(comment.created_at),
+                comment.author.username,
+                comment.body,
+                null
+            );
         });
         this.activities.push(...commentActivities);
 

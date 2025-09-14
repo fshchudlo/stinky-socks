@@ -35,15 +35,27 @@ export type GitlabPullRequestModel = {
     web_url: string;
 };
 
-export type  GitlabPullRequestActivityModel = {
-    type: "DiscussionNote";
+export type GitlabPullRequestActivityModel = GitlabPullRequestGenericActivityModel;
+
+export type  GitlabPullRequestGenericActivityModel = {
+    type: "DiscussionNote" | null;
     author: GitlabUserModel;
     body: string;
 
     created_at: string;
     system: boolean;
+};
 
-    resolved_by?: GitlabUserModel;
+export type  GitlabPullRequestReviewRequestedActivityModel = {
+    type: null;
+    author: GitlabUserModel;
+    body: string;
+
+    added_reviewers: GitlabUserModel[];
+    removed_reviewers: GitlabUserModel[];
+
+    created_at: string;
+    system: boolean;
 };
 
 export type  GitlabFileDiffModel = {

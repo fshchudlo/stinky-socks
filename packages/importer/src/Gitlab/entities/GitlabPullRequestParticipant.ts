@@ -5,16 +5,16 @@ import { getCommentsTimestamps } from "./helpers/getCommentsTimestamps";
 import { ActivityTraits } from "./helpers/ActivityTraits";
 
 export class GitlabPullRequestParticipant extends PullRequestParticipant {
-    constructor(repository: GitlabProjectModel, pullRequestData: GitlabPullRequestModel, participantActivities: GitlabPullRequestActivityModel[], participantUser: Actor) {
+    constructor(teamName: string, repository: GitlabProjectModel, pullRequestData: GitlabPullRequestModel, participantActivities: GitlabPullRequestActivityModel[], participantUser: Actor) {
         super();
-        this.initializeBaseProperties(repository, pullRequestData, participantUser)
+        this.initializeBaseProperties(teamName, repository, pullRequestData, participantUser)
             .setCommentStats(participantActivities)
             .setReviewStats(participantActivities)
             .setApprovalStats(participantActivities);
     }
 
-    private initializeBaseProperties(repository: GitlabProjectModel, pullRequestData: GitlabPullRequestModel, participantUser: Actor) {
-        this.teamName = repository.namespace.name;
+    private initializeBaseProperties(teamName: string, repository: GitlabProjectModel, pullRequestData: GitlabPullRequestModel, participantUser: Actor) {
+        this.teamName = teamName;
         this.projectName = repository.namespace.name;
         this.repositoryName = repository.name;
         this.pullRequestNumber = pullRequestData.id;

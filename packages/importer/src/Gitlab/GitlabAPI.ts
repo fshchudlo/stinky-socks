@@ -51,12 +51,14 @@ export class GitlabAPI {
     async getMergeRequestChanges(projectId: number, mergeRequestIid: number) {
         return (await this.get(`/projects/${projectId}/merge_requests/${mergeRequestIid}/changes`)).data.changes as GitlabFileDiffModel[];
     }
-    async fetchUserData(userId: number) {
-        return await usersCache.wrap(`gitlab.api.users.${userId}`, async () => {
-            return (await this.get(`/users/${userId}`)).data;
+
+    async fetchUserData(username: string) {
+        return await usersCache.wrap(`gitlab.api.users.${username}`, async () => {
+            const res = await this.get("/users", { username });
+
+            return (await this.get(`/users/${res.data[0].id}`)).data;
         });
     }
-
 
     private async getFullList<T>(url: string, params: Record<string, any> = {}): Promise<T[]> {
         let pageNumber = 1;
