@@ -26,5 +26,13 @@ export const ActivityTraits = {
     },
     isReviewRequestRemovedEvent(event: GitlabPullRequestActivityModel): event is GitlabPullRequestReviewRequestedActivityModel {
         return event.type === null && (<GitlabPullRequestReviewRequestedActivityModel>event).removed_reviewers?.length > 0;
+    },
+    isReadyForReviewEvent() {
+        console.warn("ActivityTraits.isReadyForReviewEvent was not implemented properly");
+        return false;
+    },
+    isCommitedEvent() {
+        console.warn("ActivityTraits.isCommitedEvent was not implemented properly");
+        return false;
     }
 };

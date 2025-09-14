@@ -9,6 +9,7 @@ import { GitlabUserModel } from "../GitlabAPI.contracts";
 import { ActivityTraits } from "./helpers/ActivityTraits";
 import { GitlabPullRequestActivity } from "./GitlabPullRequestActivity";
 import { calculateRequestedReviewersCount } from "./helpers/calculateRequestedReviewersCount";
+import calculatePrSharedForReviewDate from "./helpers/calculatePrSharedForReviewDate";
 
 
 export class GitlabPullRequest extends PullRequest {
@@ -16,7 +17,7 @@ export class GitlabPullRequest extends PullRequest {
         await this.initializeBaseProperties(model);
 
         await this
-            //.initializeDates(model)
+            .initializeDates(model)
             .initializeDiffStats(model)
             .initializeParticipants(model);
 
@@ -50,16 +51,16 @@ export class GitlabPullRequest extends PullRequest {
         return this;
     }
 
-    // private initializeDates(model: ImportParams) {
-    //     this.sharedForReviewDate = calculatePrSharedForReviewDate(model);
-    //     this.mergedDate = new Date(model.pullRequest.merged_at);
-    //     const commitTimestamps = model.activities.filter(ActivityTraits.isCommitedEvent).map((c) => new Date(c.author.date).getTime());
-    //     if (commitTimestamps.length > 0) {
-    //         this.initialCommitDate = new Date(Math.min(...commitTimestamps));
-    //         this.lastCommitDate = new Date(Math.max(...commitTimestamps));
-    //     }
-    //     return this;
-    // }
+    private initializeDates(model: ImportParams) {
+        this.sharedForReviewDate = calculatePrSharedForReviewDate(model);
+        this.mergedDate = new Date(model.pullRequest.merged_at);
+        const commitTimestamps = model.activities.filter(ActivityTraits.isCommitedEvent).map((c) => new Date(c.created_at).getTime());
+        if (commitTimestamps.length > 0) {
+            this.initialCommitDate = new Date(Math.min(...commitTimestamps));
+            this.lastCommitDate = new Date(Math.max(...commitTimestamps));
+        }
+        return this;
+    }
 
     private initializeDiffStats(model: ImportParams) {
         this.diffRowsAdded = 0;

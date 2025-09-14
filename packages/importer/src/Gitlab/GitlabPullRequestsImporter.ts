@@ -116,6 +116,9 @@ export class GitlabPullRequestsImporter {
 
     private async normalizeReviewRequestNote(activity: GitlabPullRequestActivityModel) {
         const { added, removed } = this.parseReviewRequestsAndRemovals(activity.body);
+        if (added.length == 0 && removed.length == 0) {
+            return activity;
+        }
         (<GitlabPullRequestReviewRequestedActivityModel>activity).added_reviewers = await Promise.all(added.map(u => this.gitlabAPI.fetchUserData(u)));
         (<GitlabPullRequestReviewRequestedActivityModel>activity).removed_reviewers = await Promise.all(removed.map(u => this.gitlabAPI.fetchUserData(u)));
         return activity;
