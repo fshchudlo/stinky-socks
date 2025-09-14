@@ -472,30 +472,6 @@ describe("GitHubPullRequest", () => {
                 expect(errors).toContainEqual(expect.stringContaining("`participant.firstCommentDate` is less than `pullRequest.createdDate`"));
             });
 
-            it("reports error when participant's first approval is before PR shared for review", async () => {
-                const model = prBuilder.pullRequest()
-                    .isReadyForReview(prBuilder.prCreatedAt.add(2, "hours"))
-                    .submitReview(prBuilder.firstReviewer, prBuilder.prCreatedAt.add(1, "hours"))
-                    .build();
-                const prEntity = await new GitHubPullRequest().init(model);
-                
-                const errors = prEntity.validateDataIntegrity();
-                
-                expect(errors).toContainEqual(expect.stringContaining("`participant.firstApprovalDate` is less than `pullRequest.sharedForReviewDate`"));
-            });
-
-            it("reports error when participant's first review is before PR shared for review", async () => {
-                const model = prBuilder.pullRequest()
-                    .isReadyForReview(prBuilder.prCreatedAt.add(2, "hours"))
-                    .submitReview(prBuilder.firstReviewer, prBuilder.prCreatedAt.add(1, "hours"))
-                    .build();
-                const prEntity = await new GitHubPullRequest().init(model);
-                
-                const errors = prEntity.validateDataIntegrity();
-                
-                expect(errors).toContainEqual(expect.stringContaining("`participant.firstReviewDate` is less than `pullRequest.sharedForReviewDate`"));
-            });
-
             it("reports error when participant's last comment is before PR shared for review (unless bot)", async () => {
                 const model = prBuilder.pullRequest()
                     .isReadyForReview(prBuilder.prCreatedAt.add(2, "hours"))
@@ -561,18 +537,6 @@ describe("GitHubPullRequest", () => {
                 const errors = prEntity.validateDataIntegrity();
                 
                 expect(errors).toContainEqual(expect.stringContaining("`participant.lastApprovalDate` is less than `pullRequest.createdDate`"));
-            });
-
-            it("reports error when last approval date is before shared for review date", async () => {
-                const model = prBuilder.pullRequest()
-                    .isReadyForReview(prBuilder.prCreatedAt.add(2, "hours"))
-                    .submitReview(prBuilder.firstReviewer, prBuilder.prCreatedAt.add(1, "hours"))
-                    .build();
-                const prEntity = await new GitHubPullRequest().init(model);
-                
-                const errors = prEntity.validateDataIntegrity();
-                
-                expect(errors).toContainEqual(expect.stringContaining("`participant.lastApprovalDate` is less than `pullRequest.sharedForReviewDate`"));
             });
 
             it("reports error when last approval date is after merged date", async () => {

@@ -12,6 +12,7 @@ import {
 } from "./GitlabAPI.contracts";
 import { ImportParams } from "./entities/ImportParams";
 import { GitlabPullRequest } from "./entities/GitlabPullRequest";
+import { parseReviewRequestsAndRemovals } from "./helpers/parseReviewRequestsAndRemovals";
 
 export class GitlabPullRequestsImporter {
     private readonly gitlabAPI: GitlabAPI;
@@ -117,32 +118,13 @@ export class GitlabPullRequestsImporter {
     }
 
     private async normalizeReviewRequestNote(activity: GitlabPullRequestActivityModel) {
-        const { added, removed } = this.parseReviewRequestsAndRemovals(activity.body);
-        if (added.length == 0 && removed.length == 0) {
+        const { added, removed } = parseReviewRequestsAndRemovals(activity.body);
+        if (added?.length == 0 && removed?.length == 0) {
             return activity;
         }
         (<GitlabPullRequestReviewRequestedActivityModel>activity).added_reviewers = await Promise.all(added.map(u => this.gitlabAPI.fetchUserData(u)));
         (<GitlabPullRequestReviewRequestedActivityModel>activity).removed_reviewers = await Promise.all(removed.map(u => this.gitlabAPI.fetchUserData(u)));
         return activity;
-    }
-
-    private parseReviewRequestsAndRemovals(body: string) {
-        const added: string[] = [];
-        const removed: string[] = [];
-
-        const addMatch = body.match(/requested review from (.+?)( and|$)/);
-        if (addMatch) {
-            const users = addMatch[1].split(",").map(u => u.trim().replace(/^@/, ""));
-            added.push(...users);
-        }
-
-        const removeMatch = body.match(/removed review request for (.+)$/);
-        if (removeMatch) {
-            const users = removeMatch[1].split(",").map(u => u.trim().replace(/^@/, ""));
-            removed.push(...users);
-        }
-
-        return { added, removed };
     }
 
     private async normalizeUserArray(users: GitlabUserModel[]) {
@@ -151,3 +133,4 @@ export class GitlabPullRequestsImporter {
         }
     }
 }
+

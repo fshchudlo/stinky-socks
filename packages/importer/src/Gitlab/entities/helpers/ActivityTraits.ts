@@ -28,8 +28,6 @@ export const ActivityTraits = {
         return event.type === null && (<GitlabPullRequestReviewRequestedActivityModel>event).removed_reviewers?.length > 0;
     },
     isReadyForReviewEvent(event: GitlabPullRequestActivityModel): event is GitlabPullRequestActivityModel {
-        console.warn("ActivityTraits.isReadyForReviewEvent was not tested properly");
-
-        return event.type == null && event.body == "marked this merge request as ready";
+        return event.type == null && event.body == "marked this merge request as **ready**";
     }
 };
