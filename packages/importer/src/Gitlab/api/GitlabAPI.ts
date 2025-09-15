@@ -45,6 +45,11 @@ export class GitlabAPI {
         })).data as GitlabPullRequestModel[];
     }
 
+    async getMergeRequest(projectId: number, mergeRequestId: number) {
+        const url = `/projects/${projectId}/merge_requests/${mergeRequestId}`;
+        return (await this.get(url)).data as GitlabPullRequestModel;
+    }
+
     async getMergeRequestNotes(projectId: number, mergeRequestIid: number) {
         return await this.getFullList<GitlabPullRequestActivityModel>(`/projects/${projectId}/merge_requests/${mergeRequestIid}/notes`);
     }
@@ -53,6 +58,9 @@ export class GitlabAPI {
         return await this.getFullList<GitlabPullRequestCommitModel>(`/projects/${projectId}/merge_requests/${mergeRequestIid}/commits`);
     }
 
+    /*
+    * ⚠️ This api could limit number of changes returned for the really huge PR-s
+    * */
     async getMergeRequestChanges(projectId: number, mergeRequestIid: number) {
         return (await this.get(`/projects/${projectId}/merge_requests/${mergeRequestIid}/changes`)).data.changes as GitlabFileDiffModel[];
     }

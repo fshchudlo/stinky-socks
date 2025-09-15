@@ -10,6 +10,7 @@ import { ActivityTraits } from "./helpers/ActivityTraits";
 import { GitlabPullRequestActivity } from "./GitlabPullRequestActivity";
 import { calculateRequestedReviewersCount } from "./helpers/calculateRequestedReviewersCount";
 import calculatePrSharedForReviewDate from "./helpers/calculatePrSharedForReviewDate";
+import calculatePRDiffSize from "./helpers/calculatePRDiffSize";
 
 
 export class GitlabPullRequest extends PullRequest {
@@ -30,7 +31,7 @@ export class GitlabPullRequest extends PullRequest {
         this.teamName = model.teamName;
         this.projectName = model.repository.namespace.name;
         this.repositoryName = model.repository.name;
-        this.pullRequestNumber = model.pullRequest.id;
+        this.pullRequestNumber = model.pullRequest.iid;
         this.viewURL = model.pullRequest.web_url;
         this.targetBranch = model.pullRequest.target_branch;
 
@@ -63,19 +64,9 @@ export class GitlabPullRequest extends PullRequest {
     }
 
     private initializeDiffStats(model: ImportParams) {
-        this.diffRowsAdded = 0;
-        this.diffRowsDeleted = 0;
-        for (const change of model.changes) {
-            const lines = change.diff.split("\n");
-
-            for (const line of lines) {
-                if (line.startsWith("+") && !line.startsWith("+++")) {
-                    this.diffRowsAdded++;
-                } else if (line.startsWith("-") && !line.startsWith("---")) {
-                    this.diffRowsDeleted++;
-                }
-            }
-        }
+        const { diffRowsAdded, diffRowsDeleted } = calculatePRDiffSize(model.changes);
+        this.diffRowsAdded = diffRowsAdded;
+        this.diffRowsDeleted = diffRowsDeleted;
 
         this.testsWereTouched = model.changes.some(file => file.new_path.toLowerCase().includes("test"));
         return this;

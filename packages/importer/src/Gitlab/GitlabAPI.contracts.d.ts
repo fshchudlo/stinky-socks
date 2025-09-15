@@ -19,7 +19,6 @@ export type GitlabProjectModel = {
 };
 
 export type GitlabPullRequestModel = {
-    id: number;
     iid: number;
     target_branch: string;
 

@@ -17,7 +17,7 @@ export class GitlabPullRequestParticipant extends PullRequestParticipant {
         this.teamName = teamName;
         this.projectName = repository.namespace.name;
         this.repositoryName = repository.name;
-        this.pullRequestNumber = pullRequestData.id;
+        this.pullRequestNumber = pullRequestData.iid;
         this.participant = participantUser;
         this.participantIdForPrimaryKeyHack = this.participant.id;
         return this;

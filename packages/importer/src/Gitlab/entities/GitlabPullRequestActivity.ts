@@ -14,7 +14,7 @@ export class GitlabPullRequestActivity extends PullRequestActivity {
         this.teamName = teamName;
         this.projectName = repository.namespace.name;
         this.repositoryName = repository.name;
-        this.pullRequestNumber = pullRequestData.id;
+        this.pullRequestNumber = pullRequestData.iid;
 
         this.what = what;
         this.when = when;
