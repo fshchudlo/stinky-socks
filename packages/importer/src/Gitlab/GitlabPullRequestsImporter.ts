@@ -2,17 +2,9 @@ import { Repository } from "typeorm";
 import { PullRequest } from "../MetricsDB/entities/PullRequest";
 import { MetricsDB } from "../MetricsDB/MetricsDB";
 import { GitlabAPI } from "./api/GitlabAPI";
-import {
-    GitlabNamespaceModel,
-    GitlabProjectModel,
-    GitlabPullRequestActivityModel,
-    GitlabPullRequestModel,
-    GitlabPullRequestReviewRequestedActivityModel,
-    GitlabUserModel
-} from "./GitlabAPI.contracts";
-import { ImportParams } from "./entities/ImportParams";
+import { GitlabNamespaceModel, GitlabProjectModel, GitlabPullRequestModel } from "./GitlabAPI.contracts";
 import { GitlabPullRequest } from "./entities/GitlabPullRequest";
-import { parseReviewRequestsAndRemovals } from "./helpers/parseReviewRequestsAndRemovals";
+import normalizeGitlabPayload from "./entities/helpers/normalizeGitlabPayload";
 
 type teamNameResolverFn = (project: GitlabProjectModel, pr: GitlabPullRequestModel) => string;
 
@@ -85,14 +77,14 @@ export class GitlabPullRequestsImporter {
                 this.gitlabAPI.getMergeRequestNotes(repository.id, pullRequest.iid),
                 this.gitlabAPI.getMergeRequestChanges(repository.id, pullRequest.iid)
             ]);
-            const pullRequestEntity = await new GitlabPullRequest().init(await this.normalizeData({
+            const pullRequestEntity = await new GitlabPullRequest().init(await normalizeGitlabPayload({
                     teamName: this.teamNameResolverFn ? this.teamNameResolverFn(repository, pullRequest) : repository.namespace.name,
                     pullRequest,
                     repository,
                     commits,
                     activities,
                     changes
-                })
+                }, this.gitlabAPI)
             );
 
             const integrityErrors = pullRequestEntity.validateDataIntegrity();
@@ -103,45 +95,6 @@ export class GitlabPullRequestsImporter {
         } catch (error) {
             console.error(`❌ Error while saving pull request ${pullRequest.web_url}: ${error}`);
             throw error;
-        }
-    }
-
-    private async normalizeData(params: ImportParams) {
-        params.pullRequest.author = await this.gitlabAPI.fetchUserData(params.pullRequest.author.username);
-        params.pullRequest.merged_by = await this.gitlabAPI.fetchUserData(params.pullRequest.merged_by.username);
-
-        await this.normalizeUserArray(params.pullRequest.reviewers);
-        await this.normalizeUserArray(params.pullRequest.assignees);
-
-        for (const activity of params.activities) {
-            activity.author = await this.gitlabAPI.fetchUserData(activity.author.username);
-            await this.normalizeReviewRequestNote(activity);
-        }
-
-        return params;
-    }
-
-    private async normalizeReviewRequestNote(activity: GitlabPullRequestActivityModel) {
-        const { added, removed } = parseReviewRequestsAndRemovals(activity.body);
-        if (added?.length == 0 && removed?.length == 0) {
-            return activity;
-        }
-        for (const addedUser of added) {
-            const act = activity as GitlabPullRequestReviewRequestedActivityModel;
-            act.added_reviewers ??= [];
-            act.added_reviewers.push(await this.gitlabAPI.fetchUserData(addedUser));
-        }
-        for (const removedUser of removed) {
-            const act = activity as GitlabPullRequestReviewRequestedActivityModel;
-            act.removed_reviewers ??= [];
-            act.removed_reviewers.push(await this.gitlabAPI.fetchUserData(removedUser));
-        }
-        return activity;
-    }
-
-    private async normalizeUserArray(users: GitlabUserModel[]) {
-        for (let i = 0; i < users.length; i++) {
-            users[i] = await this.gitlabAPI.fetchUserData(users[i].username);
         }
     }
 }

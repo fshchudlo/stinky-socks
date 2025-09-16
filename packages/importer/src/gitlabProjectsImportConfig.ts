@@ -5,7 +5,7 @@ export const gitlabProjectsImportConfig = {
     url: process.env.GITLAB_INSTANCE_URL as string,
     apiToken: process.env.GITLAB_API_TOKEN as string,
     namespaceSearch: (process.env.GITLAB_NAMESPACES_SEARCH || undefined) as string | undefined,
-    teamResolver: (project: GitlabProjectModel, pr: GitlabPullRequestModel): string => {
+    resolveTeamName: (project: GitlabProjectModel, pr: GitlabPullRequestModel): string => {
         {
             const monitoringTeamUserIds = [980, 25, 142, 318, 581, 66, 210];
             if (monitoringTeamUserIds.includes(pr.author.id)) {

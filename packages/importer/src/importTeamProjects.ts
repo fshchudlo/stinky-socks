@@ -93,7 +93,7 @@ async function importGitlabProjects() {
     for (const gitlabProject of projects || []) {
         console.group(`🔁 Importing Gitlab pull requests for the '${gitlabProject.name}' project`);
 
-        await new GitlabPullRequestsImporter(gitlabAPI, gitlabProject, gitlabProjectsImportConfig.teamResolver).importPullRequests();
+        await new GitlabPullRequestsImporter(gitlabAPI, gitlabProject, gitlabProjectsImportConfig.resolveTeamName).importPullRequests();
 
         console.log(`🔁 Import of Gitlab pull requests for the '${gitlabProject.name}' project completed`);
         console.groupEnd();
