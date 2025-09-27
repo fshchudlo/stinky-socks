@@ -1,4 +1,67 @@
 {
+  "__inputs": [
+    {
+      "name": "DS_STINKY-SOCKS-DB",
+      "label": "stinky-socks-db",
+      "description": "",
+      "type": "datasource",
+      "pluginId": "grafana-postgresql-datasource",
+      "pluginName": "PostgreSQL"
+    },
+    {
+      "name": "VAR_MIN_PRS_COUNT_SAMPLE_SIZE",
+      "type": "constant",
+      "label": "min_prs_count_sample_size",
+      "value": "10",
+      "description": ""
+    },
+    {
+      "name": "VAR_RANKED_SAMPLES_SIZE",
+      "type": "constant",
+      "label": "ranked_samples_size",
+      "value": "10",
+      "description": ""
+    }
+  ],
+  "__elements": {},
+  "__requires": [
+    {
+      "type": "panel",
+      "id": "barchart",
+      "name": "Bar chart",
+      "version": ""
+    },
+    {
+      "type": "grafana",
+      "id": "grafana",
+      "name": "Grafana",
+      "version": "12.2.0"
+    },
+    {
+      "type": "datasource",
+      "id": "grafana-postgresql-datasource",
+      "name": "PostgreSQL",
+      "version": "12.2.0"
+    },
+    {
+      "type": "panel",
+      "id": "stat",
+      "name": "Stat",
+      "version": ""
+    },
+    {
+      "type": "panel",
+      "id": "table",
+      "name": "Table",
+      "version": ""
+    },
+    {
+      "type": "panel",
+      "id": "timeseries",
+      "name": "Time series",
+      "version": ""
+    }
+  ],
   "annotations": {
     "list": [
       {
@@ -24,13 +87,13 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 1,
-  "id": 2,
+  "id": null,
   "links": [],
   "panels": [
     {
       "datasource": {
-        "type": "postgres",
-        "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
+        "type": "grafana-postgresql-datasource",
+        "uid": "${DS_STINKY-SOCKS-DB}"
       },
       "fieldConfig": {
         "defaults": {
@@ -44,7 +107,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": 0
               }
             ]
           },
@@ -76,13 +140,13 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "12.0.0+security-01",
+      "pluginVersion": "12.2.0",
       "targets": [
         {
           "dataset": "`stinky-socks`",
           "datasource": {
-            "type": "postgres",
-            "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
+            "type": "grafana-postgresql-datasource",
+            "uid": "${DS_STINKY-SOCKS-DB}"
           },
           "editorMode": "code",
           "format": "table",
@@ -135,7 +199,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": 0
               }
             ]
           },
@@ -167,7 +232,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "12.0.0+security-01",
+      "pluginVersion": "12.2.0",
       "targets": [
         {
           "datasource": {
@@ -198,7 +263,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": 0
               }
             ]
           },
@@ -230,7 +296,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "12.0.0+security-01",
+      "pluginVersion": "12.2.0",
       "targets": [
         {
           "datasource": {
@@ -261,7 +327,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": 0
               }
             ]
           },
@@ -293,7 +360,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "12.0.0+security-01",
+      "pluginVersion": "12.2.0",
       "targets": [
         {
           "datasource": {
@@ -324,7 +391,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": 0
               }
             ]
           },
@@ -356,7 +424,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "12.0.0+security-01",
+      "pluginVersion": "12.2.0",
       "targets": [
         {
           "datasource": {
@@ -387,7 +455,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": 0
               }
             ]
           },
@@ -419,7 +488,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "12.0.0+security-01",
+      "pluginVersion": "12.2.0",
       "targets": [
         {
           "datasource": {
@@ -450,7 +519,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": 0
               }
             ]
           },
@@ -482,7 +552,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "12.0.0+security-01",
+      "pluginVersion": "12.2.0",
       "targets": [
         {
           "datasource": {
@@ -512,7 +582,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": 0
               },
               {
                 "color": "#EAB839",
@@ -552,7 +623,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "12.0.0+security-01",
+      "pluginVersion": "12.2.0",
       "targets": [
         {
           "datasource": {
@@ -581,8 +652,8 @@
     },
     {
       "datasource": {
-        "type": "postgres",
-        "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
+        "type": "grafana-postgresql-datasource",
+        "uid": "${DS_STINKY-SOCKS-DB}"
       },
       "description": "",
       "fieldConfig": {
@@ -596,7 +667,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": 0
               }
             ]
           },
@@ -628,12 +700,12 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "12.0.0+security-01",
+      "pluginVersion": "12.2.0",
       "targets": [
         {
           "datasource": {
-            "type": "postgres",
-            "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
+            "type": "grafana-postgresql-datasource",
+            "uid": "${DS_STINKY-SOCKS-DB}"
           },
           "editorMode": "code",
           "format": "table",
@@ -665,7 +737,7 @@
     {
       "datasource": {
         "type": "grafana-postgresql-datasource",
-        "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
+        "uid": "${DS_STINKY-SOCKS-DB}"
       },
       "description": "From the first commit to PR raised",
       "fieldConfig": {
@@ -679,7 +751,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": 0
               }
             ]
           },
@@ -711,12 +784,12 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "12.0.0+security-01",
+      "pluginVersion": "12.2.0",
       "targets": [
         {
           "datasource": {
-            "type": "postgres",
-            "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
+            "type": "grafana-postgresql-datasource",
+            "uid": "${DS_STINKY-SOCKS-DB}"
           },
           "editorMode": "code",
           "format": "table",
@@ -747,8 +820,8 @@
     },
     {
       "datasource": {
-        "type": "postgres",
-        "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
+        "type": "grafana-postgresql-datasource",
+        "uid": "${DS_STINKY-SOCKS-DB}"
       },
       "description": "From PR being raised to first comment/review/approval",
       "fieldConfig": {
@@ -762,7 +835,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": 0
               }
             ]
           },
@@ -794,12 +868,12 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "12.0.0+security-01",
+      "pluginVersion": "12.2.0",
       "targets": [
         {
           "datasource": {
-            "type": "postgres",
-            "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
+            "type": "grafana-postgresql-datasource",
+            "uid": "${DS_STINKY-SOCKS-DB}"
           },
           "editorMode": "code",
           "format": "table",
@@ -830,8 +904,8 @@
     },
     {
       "datasource": {
-        "type": "postgres",
-        "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
+        "type": "grafana-postgresql-datasource",
+        "uid": "${DS_STINKY-SOCKS-DB}"
       },
       "description": "Time from the first reaction to PR merge",
       "fieldConfig": {
@@ -845,7 +919,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": 0
               }
             ]
           },
@@ -877,12 +952,12 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "12.0.0+security-01",
+      "pluginVersion": "12.2.0",
       "targets": [
         {
           "datasource": {
-            "type": "postgres",
-            "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
+            "type": "grafana-postgresql-datasource",
+            "uid": "${DS_STINKY-SOCKS-DB}"
           },
           "editorMode": "code",
           "format": "table",
@@ -913,8 +988,8 @@
     },
     {
       "datasource": {
-        "type": "postgres",
-        "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
+        "type": "grafana-postgresql-datasource",
+        "uid": "${DS_STINKY-SOCKS-DB}"
       },
       "description": "Time from last approve to PR merge",
       "fieldConfig": {
@@ -928,7 +1003,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": 0
               }
             ]
           },
@@ -960,12 +1036,12 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "12.0.0+security-01",
+      "pluginVersion": "12.2.0",
       "targets": [
         {
           "datasource": {
-            "type": "postgres",
-            "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
+            "type": "grafana-postgresql-datasource",
+            "uid": "${DS_STINKY-SOCKS-DB}"
           },
           "editorMode": "code",
           "format": "table",
@@ -996,8 +1072,8 @@
     },
     {
       "datasource": {
-        "type": "postgres",
-        "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
+        "type": "grafana-postgresql-datasource",
+        "uid": "${DS_STINKY-SOCKS-DB}"
       },
       "description": "",
       "fieldConfig": {
@@ -1031,6 +1107,7 @@
               "type": "linear"
             },
             "showPoints": "auto",
+            "showValues": false,
             "spanNulls": false,
             "stacking": {
               "group": "A",
@@ -1045,7 +1122,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": 0
               }
             ]
           },
@@ -1212,14 +1290,14 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "12.0.0+security-01",
+      "pluginVersion": "12.2.0",
       "repeat": "display_flow_stats_for",
       "repeatDirection": "v",
       "targets": [
         {
           "datasource": {
-            "type": "postgres",
-            "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
+            "type": "grafana-postgresql-datasource",
+            "uid": "${DS_STINKY-SOCKS-DB}"
           },
           "editorMode": "code",
           "format": "table",
@@ -1251,7 +1329,7 @@
     {
       "datasource": {
         "type": "grafana-postgresql-datasource",
-        "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
+        "uid": "${DS_STINKY-SOCKS-DB}"
       },
       "fieldConfig": {
         "defaults": {
@@ -1339,7 +1417,7 @@
                 "id": "custom.hideFrom",
                 "value": {
                   "legend": false,
-                  "tooltip": false,
+                  "tooltip": true,
                   "viz": true
                 }
               }
@@ -1374,8 +1452,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "postgres",
-            "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
+            "type": "grafana-postgresql-datasource",
+            "uid": "${DS_STINKY-SOCKS-DB}"
           },
           "editorMode": "code",
           "format": "table",
@@ -1416,8 +1494,8 @@
       "panels": [
         {
           "datasource": {
-            "type": "postgres",
-            "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
+            "type": "grafana-postgresql-datasource",
+            "uid": "${DS_STINKY-SOCKS-DB}"
           },
           "fieldConfig": {
             "defaults": {
@@ -1523,8 +1601,8 @@
           "targets": [
             {
               "datasource": {
-                "type": "postgres",
-                "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
+                "type": "grafana-postgresql-datasource",
+                "uid": "${DS_STINKY-SOCKS-DB}"
               },
               "editorMode": "code",
               "format": "table",
@@ -1555,8 +1633,8 @@
         },
         {
           "datasource": {
-            "type": "postgres",
-            "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
+            "type": "grafana-postgresql-datasource",
+            "uid": "${DS_STINKY-SOCKS-DB}"
           },
           "fieldConfig": {
             "defaults": {
@@ -1619,7 +1697,7 @@
                     "id": "custom.hideFrom",
                     "value": {
                       "legend": false,
-                      "tooltip": false,
+                      "tooltip": true,
                       "viz": true
                     }
                   }
@@ -1660,8 +1738,8 @@
           "targets": [
             {
               "datasource": {
-                "type": "postgres",
-                "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
+                "type": "grafana-postgresql-datasource",
+                "uid": "${DS_STINKY-SOCKS-DB}"
               },
               "editorMode": "code",
               "format": "table",
@@ -1692,8 +1770,8 @@
         },
         {
           "datasource": {
-            "type": "postgres",
-            "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
+            "type": "grafana-postgresql-datasource",
+            "uid": "${DS_STINKY-SOCKS-DB}"
           },
           "description": "",
           "fieldConfig": {
@@ -1770,8 +1848,8 @@
           "targets": [
             {
               "datasource": {
-                "type": "postgres",
-                "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
+                "type": "grafana-postgresql-datasource",
+                "uid": "${DS_STINKY-SOCKS-DB}"
               },
               "editorMode": "code",
               "format": "table",
@@ -1814,7 +1892,7 @@
         {
           "datasource": {
             "type": "grafana-postgresql-datasource",
-            "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
+            "uid": "${DS_STINKY-SOCKS-DB}"
           },
           "fieldConfig": {
             "defaults": {
@@ -1876,7 +1954,7 @@
                     "id": "custom.hideFrom",
                     "value": {
                       "legend": false,
-                      "tooltip": false,
+                      "tooltip": true,
                       "viz": true
                     }
                   }
@@ -1892,7 +1970,7 @@
                     "id": "custom.hideFrom",
                     "value": {
                       "legend": false,
-                      "tooltip": false,
+                      "tooltip": true,
                       "viz": true
                     }
                   },
@@ -1937,8 +2015,8 @@
           "targets": [
             {
               "datasource": {
-                "type": "postgres",
-                "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
+                "type": "grafana-postgresql-datasource",
+                "uid": "${DS_STINKY-SOCKS-DB}"
               },
               "editorMode": "code",
               "format": "table",
@@ -1983,8 +2061,8 @@
       "panels": [
         {
           "datasource": {
-            "type": "postgres",
-            "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
+            "type": "grafana-postgresql-datasource",
+            "uid": "${DS_STINKY-SOCKS-DB}"
           },
           "fieldConfig": {
             "defaults": {
@@ -2061,8 +2139,8 @@
             {
               "dataset": "`stinky-socks`",
               "datasource": {
-                "type": "postgres",
-                "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
+                "type": "grafana-postgresql-datasource",
+                "uid": "${DS_STINKY-SOCKS-DB}"
               },
               "editorMode": "code",
               "format": "table",
@@ -2100,8 +2178,8 @@
         },
         {
           "datasource": {
-            "type": "postgres",
-            "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
+            "type": "grafana-postgresql-datasource",
+            "uid": "${DS_STINKY-SOCKS-DB}"
           },
           "description": "",
           "fieldConfig": {
@@ -2154,7 +2232,7 @@
                     "id": "custom.hideFrom",
                     "value": {
                       "legend": false,
-                      "tooltip": false,
+                      "tooltip": true,
                       "viz": true
                     }
                   }
@@ -2195,8 +2273,8 @@
           "targets": [
             {
               "datasource": {
-                "type": "postgres",
-                "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
+                "type": "grafana-postgresql-datasource",
+                "uid": "${DS_STINKY-SOCKS-DB}"
               },
               "editorMode": "code",
               "format": "table",
@@ -2227,8 +2305,8 @@
         },
         {
           "datasource": {
-            "type": "postgres",
-            "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
+            "type": "grafana-postgresql-datasource",
+            "uid": "${DS_STINKY-SOCKS-DB}"
           },
           "fieldConfig": {
             "defaults": {
@@ -2280,7 +2358,7 @@
                     "id": "custom.hideFrom",
                     "value": {
                       "legend": false,
-                      "tooltip": false,
+                      "tooltip": true,
                       "viz": true
                     }
                   }
@@ -2322,8 +2400,8 @@
             {
               "dataset": "`stinky-socks`",
               "datasource": {
-                "type": "postgres",
-                "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
+                "type": "grafana-postgresql-datasource",
+                "uid": "${DS_STINKY-SOCKS-DB}"
               },
               "editorMode": "code",
               "format": "table",
@@ -2361,8 +2439,8 @@
         },
         {
           "datasource": {
-            "type": "postgres",
-            "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
+            "type": "grafana-postgresql-datasource",
+            "uid": "${DS_STINKY-SOCKS-DB}"
           },
           "fieldConfig": {
             "defaults": {
@@ -2413,7 +2491,7 @@
                     "id": "custom.hideFrom",
                     "value": {
                       "legend": false,
-                      "tooltip": false,
+                      "tooltip": true,
                       "viz": true
                     }
                   },
@@ -2459,8 +2537,8 @@
             {
               "dataset": "`stinky-socks`",
               "datasource": {
-                "type": "postgres",
-                "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
+                "type": "grafana-postgresql-datasource",
+                "uid": "${DS_STINKY-SOCKS-DB}"
               },
               "editorMode": "code",
               "format": "table",
@@ -2498,8 +2576,8 @@
         },
         {
           "datasource": {
-            "type": "postgres",
-            "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
+            "type": "grafana-postgresql-datasource",
+            "uid": "${DS_STINKY-SOCKS-DB}"
           },
           "fieldConfig": {
             "defaults": {
@@ -2551,7 +2629,7 @@
                     "id": "custom.hideFrom",
                     "value": {
                       "legend": false,
-                      "tooltip": false,
+                      "tooltip": true,
                       "viz": true
                     }
                   }
@@ -2593,8 +2671,8 @@
             {
               "dataset": "`stinky-socks`",
               "datasource": {
-                "type": "postgres",
-                "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
+                "type": "grafana-postgresql-datasource",
+                "uid": "${DS_STINKY-SOCKS-DB}"
               },
               "editorMode": "code",
               "format": "table",
@@ -2632,8 +2710,8 @@
         },
         {
           "datasource": {
-            "type": "postgres",
-            "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
+            "type": "grafana-postgresql-datasource",
+            "uid": "${DS_STINKY-SOCKS-DB}"
           },
           "fieldConfig": {
             "defaults": {
@@ -2685,7 +2763,7 @@
                     "id": "custom.hideFrom",
                     "value": {
                       "legend": false,
-                      "tooltip": false,
+                      "tooltip": true,
                       "viz": true
                     }
                   }
@@ -2727,8 +2805,8 @@
             {
               "dataset": "`stinky-socks`",
               "datasource": {
-                "type": "postgres",
-                "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
+                "type": "grafana-postgresql-datasource",
+                "uid": "${DS_STINKY-SOCKS-DB}"
               },
               "editorMode": "code",
               "format": "table",
@@ -2766,8 +2844,8 @@
         },
         {
           "datasource": {
-            "type": "postgres",
-            "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
+            "type": "grafana-postgresql-datasource",
+            "uid": "${DS_STINKY-SOCKS-DB}"
           },
           "fieldConfig": {
             "defaults": {
@@ -2838,7 +2916,7 @@
                     "id": "custom.hideFrom",
                     "value": {
                       "legend": false,
-                      "tooltip": false,
+                      "tooltip": true,
                       "viz": true
                     }
                   }
@@ -2880,8 +2958,8 @@
           "targets": [
             {
               "datasource": {
-                "type": "postgres",
-                "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
+                "type": "grafana-postgresql-datasource",
+                "uid": "${DS_STINKY-SOCKS-DB}"
               },
               "editorMode": "code",
               "format": "table",
@@ -2912,8 +2990,8 @@
         },
         {
           "datasource": {
-            "type": "postgres",
-            "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
+            "type": "grafana-postgresql-datasource",
+            "uid": "${DS_STINKY-SOCKS-DB}"
           },
           "fieldConfig": {
             "defaults": {
@@ -2985,7 +3063,7 @@
                     "id": "custom.hideFrom",
                     "value": {
                       "legend": false,
-                      "tooltip": false,
+                      "tooltip": true,
                       "viz": true
                     }
                   }
@@ -3027,8 +3105,8 @@
           "targets": [
             {
               "datasource": {
-                "type": "postgres",
-                "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
+                "type": "grafana-postgresql-datasource",
+                "uid": "${DS_STINKY-SOCKS-DB}"
               },
               "editorMode": "code",
               "format": "table",
@@ -3059,8 +3137,8 @@
         },
         {
           "datasource": {
-            "type": "postgres",
-            "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
+            "type": "grafana-postgresql-datasource",
+            "uid": "${DS_STINKY-SOCKS-DB}"
           },
           "fieldConfig": {
             "defaults": {
@@ -3157,8 +3235,8 @@
           "targets": [
             {
               "datasource": {
-                "type": "postgres",
-                "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
+                "type": "grafana-postgresql-datasource",
+                "uid": "${DS_STINKY-SOCKS-DB}"
               },
               "editorMode": "code",
               "format": "table",
@@ -3189,8 +3267,8 @@
         },
         {
           "datasource": {
-            "type": "postgres",
-            "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
+            "type": "grafana-postgresql-datasource",
+            "uid": "${DS_STINKY-SOCKS-DB}"
           },
           "fieldConfig": {
             "defaults": {
@@ -3262,7 +3340,7 @@
                     "id": "custom.hideFrom",
                     "value": {
                       "legend": false,
-                      "tooltip": false,
+                      "tooltip": true,
                       "viz": true
                     }
                   }
@@ -3304,8 +3382,8 @@
           "targets": [
             {
               "datasource": {
-                "type": "postgres",
-                "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
+                "type": "grafana-postgresql-datasource",
+                "uid": "${DS_STINKY-SOCKS-DB}"
               },
               "editorMode": "code",
               "format": "table",
@@ -3350,8 +3428,8 @@
       "panels": [
         {
           "datasource": {
-            "type": "postgres",
-            "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
+            "type": "grafana-postgresql-datasource",
+            "uid": "${DS_STINKY-SOCKS-DB}"
           },
           "fieldConfig": {
             "defaults": {
@@ -3475,8 +3553,8 @@
           "targets": [
             {
               "datasource": {
-                "type": "postgres",
-                "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
+                "type": "grafana-postgresql-datasource",
+                "uid": "${DS_STINKY-SOCKS-DB}"
               },
               "editorMode": "code",
               "format": "table",
@@ -3516,8 +3594,8 @@
         },
         {
           "datasource": {
-            "type": "postgres",
-            "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
+            "type": "grafana-postgresql-datasource",
+            "uid": "${DS_STINKY-SOCKS-DB}"
           },
           "fieldConfig": {
             "defaults": {
@@ -3606,8 +3684,8 @@
           "targets": [
             {
               "datasource": {
-                "type": "postgres",
-                "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
+                "type": "grafana-postgresql-datasource",
+                "uid": "${DS_STINKY-SOCKS-DB}"
               },
               "editorMode": "code",
               "format": "table",
@@ -3641,23 +3719,17 @@
       "type": "row"
     }
   ],
-  "preload": false,
   "refresh": "",
-  "schemaVersion": 41,
+  "schemaVersion": 42,
   "tags": [],
   "templating": {
     "list": [
       {
         "allValue": "NULL",
-        "current": {
-          "text": "All",
-          "value": [
-            "$__all"
-          ]
-        },
+        "current": {},
         "datasource": {
-          "type": "postgres",
-          "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
+          "type": "grafana-postgresql-datasource",
+          "uid": "${DS_STINKY-SOCKS-DB}"
         },
         "definition": "SELECT DISTINCT team_name \nFROM pull_request\nWHERE pull_request.integrity_errors IS NULL\nAND $__timeFilter(LEAST(initial_commit_date, shared_for_review_date)) \nORDER BY team_name",
         "includeAll": true,
@@ -3672,15 +3744,10 @@
       },
       {
         "allValue": "NULL",
-        "current": {
-          "text": "All",
-          "value": [
-            "$__all"
-          ]
-        },
+        "current": {},
         "datasource": {
-          "type": "postgres",
-          "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
+          "type": "grafana-postgresql-datasource",
+          "uid": "${DS_STINKY-SOCKS-DB}"
         },
         "definition": "SELECT DISTINCT (repository_name) \nFROM pull_request \nWHERE \n    pull_request.integrity_errors IS NULL\n    AND $__timeFilter(LEAST(initial_commit_date, shared_for_review_date)) \n    AND (COALESCE($team_name) IS NULL OR team_name IN ($team_name))    \nORDER BY repository_name",
         "includeAll": true,
@@ -3696,15 +3763,10 @@
       },
       {
         "allValue": "NULL",
-        "current": {
-          "text": "All",
-          "value": [
-            "$__all"
-          ]
-        },
+        "current": {},
         "datasource": {
           "type": "grafana-postgresql-datasource",
-          "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
+          "uid": "${DS_STINKY-SOCKS-DB}"
         },
         "definition": "SELECT \n    DISTINCT author_role\nFROM pull_request \nWHERE pull_request.integrity_errors IS NULL\n    AND $__timeFilter(LEAST(initial_commit_date, shared_for_review_date)) \n    AND (COALESCE($team_name) IS NULL OR pull_request.team_name IN ($team_name))    \n    AND (COALESCE($repository_name) IS NULL OR repository_name IN ($repository_name))\nUNION\nSELECT \n    DISTINCT author.team_role\nFROM pull_request AS pr\n      INNER JOIN actor AS shadowed_author ON shadowed_author.id = pr.author_id\n      INNER JOIN actor AS author ON COALESCE(shadowed_author.merged_with_id, shadowed_author.id)=author.id\nWHERE author.team_role IS NOT NULL \n    AND pr.integrity_errors IS NULL\n    AND $__timeFilter(LEAST(initial_commit_date, shared_for_review_date)) \n    AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))    \n    AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n",
         "description": "",
@@ -3721,15 +3783,10 @@
       },
       {
         "allValue": "NULL",
-        "current": {
-          "text": "All",
-          "value": [
-            "$__all"
-          ]
-        },
+        "current": {},
         "datasource": {
-          "type": "postgres",
-          "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
+          "type": "grafana-postgresql-datasource",
+          "uid": "${DS_STINKY-SOCKS-DB}"
         },
         "definition": "SELECT \nDISTINCT \nauthor.id as __value, \nCASE \n    WHEN author.is_former_participant THEN CONCAT(CASE WHEN $show_real_names THEN author.login ELSE author.nickname END, ' (former participant)')\n    WHEN author.is_bot_user THEN CONCAT(author.login, ' (bot)')\n    ELSE CASE WHEN $show_real_names THEN author.login ELSE author.nickname END\nEND AS __text \nFROM pull_request AS pr\n    INNER JOIN actor AS shadowed_author ON shadowed_author.id = pr.author_id\n    INNER JOIN actor AS author ON COALESCE(shadowed_author.merged_with_id, shadowed_author.id)=author.id\nWHERE pr.integrity_errors IS NULL\n    AND $__timeFilter(LEAST(initial_commit_date, shared_for_review_date)) \n    AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))    \n    AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n    AND (COALESCE($pr_author_role) IS NULL OR COALESCE(author.team_role, pr.author_role) IN ($pr_author_role))\nORDER BY 2",
         "includeAll": true,
@@ -3936,26 +3993,42 @@
         "type": "custom"
       },
       {
-        "current": {
-          "text": "10",
-          "value": "10"
-        },
         "hide": 2,
         "name": "min_prs_count_sample_size",
-        "query": "10",
+        "query": "${VAR_MIN_PRS_COUNT_SAMPLE_SIZE}",
         "skipUrlSync": true,
-        "type": "constant"
+        "type": "constant",
+        "current": {
+          "value": "${VAR_MIN_PRS_COUNT_SAMPLE_SIZE}",
+          "text": "${VAR_MIN_PRS_COUNT_SAMPLE_SIZE}",
+          "selected": false
+        },
+        "options": [
+          {
+            "value": "${VAR_MIN_PRS_COUNT_SAMPLE_SIZE}",
+            "text": "${VAR_MIN_PRS_COUNT_SAMPLE_SIZE}",
+            "selected": false
+          }
+        ]
       },
       {
-        "current": {
-          "text": "10",
-          "value": "10"
-        },
         "hide": 2,
         "name": "ranked_samples_size",
-        "query": "10",
+        "query": "${VAR_RANKED_SAMPLES_SIZE}",
         "skipUrlSync": true,
-        "type": "constant"
+        "type": "constant",
+        "current": {
+          "value": "${VAR_RANKED_SAMPLES_SIZE}",
+          "text": "${VAR_RANKED_SAMPLES_SIZE}",
+          "selected": false
+        },
+        "options": [
+          {
+            "value": "${VAR_RANKED_SAMPLES_SIZE}",
+            "text": "${VAR_RANKED_SAMPLES_SIZE}",
+            "selected": false
+          }
+        ]
       }
     ]
   },
@@ -3967,5 +4040,6 @@
   "timezone": "",
   "title": "PR metrics",
   "uid": "dadf1ef8-d081-4d14-a1f3-82c235fc7fc1",
-  "version": 1
+  "version": 1,
+  "weekStart": ""
 }
