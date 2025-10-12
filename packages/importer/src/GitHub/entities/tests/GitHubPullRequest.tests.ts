@@ -36,7 +36,7 @@ describe("GitHubPullRequest", () => {
                 .build();
 
             const prEntity = await new GitHubPullRequest().init(model);
-            
+
             expect(prEntity.teamName).toBe("Test team");
             expect(prEntity.projectName).toBe("TestOwner");
             expect(prEntity.repositoryName).toBe("TestRepo");
@@ -47,7 +47,7 @@ describe("GitHubPullRequest", () => {
                 .build();
 
             const prEntity = await new GitHubPullRequest().init(model);
-            
+
             expect(prEntity.pullRequestNumber).toBe(1);
             expect(prEntity.targetBranch).toBe("main");
             expect(prEntity.viewURL).toBe("https://github.com/TestOwner/TestRepo/pull/1");
@@ -237,7 +237,7 @@ describe("GitHubPullRequest", () => {
                 .build();
 
             const prEntity = await new GitHubPullRequest().init(model);
-            expect(prEntity.participants.map(p=>p.participant.login)).toEqual([prBuilder.firstReviewer.login]);
+            expect(prEntity.participants.map(p => p.participant.login)).toEqual([prBuilder.firstReviewer.login]);
         });
 
         it("are those who are assignees", async () => {
@@ -246,7 +246,7 @@ describe("GitHubPullRequest", () => {
                 .build();
 
             const prEntity = await new GitHubPullRequest().init(model);
-            expect(prEntity.participants.map(p=>p.participant.login)).toEqual([prBuilder.firstReviewer.login]);
+            expect(prEntity.participants.map(p => p.participant.login)).toEqual([prBuilder.firstReviewer.login]);
         });
 
         it("are those who merged the PR", async () => {
@@ -255,7 +255,7 @@ describe("GitHubPullRequest", () => {
                 .build();
 
             const prEntity = await new GitHubPullRequest().init(model);
-            expect(prEntity.participants.map(p=>p.participant.login)).toEqual([prBuilder.firstReviewer.login]);
+            expect(prEntity.participants.map(p => p.participant.login)).toEqual([prBuilder.firstReviewer.login]);
         });
 
         it("are those who commented the PR", async () => {
@@ -264,7 +264,7 @@ describe("GitHubPullRequest", () => {
                 .build();
 
             const prEntity = await new GitHubPullRequest().init(model);
-            expect(prEntity.participants.map(p=>p.participant.login)).toEqual([prBuilder.firstReviewer.login]);
+            expect(prEntity.participants.map(p => p.participant.login)).toEqual([prBuilder.firstReviewer.login]);
         });
 
         it("are those who line-commented the PR", async () => {
@@ -273,7 +273,7 @@ describe("GitHubPullRequest", () => {
                 .build();
 
             const prEntity = await new GitHubPullRequest().init(model);
-            expect(prEntity.participants.map(p=>p.participant.login)).toEqual([prBuilder.firstReviewer.login]);
+            expect(prEntity.participants.map(p => p.participant.login)).toEqual([prBuilder.firstReviewer.login]);
         });
 
         it("are those who reviewed the PR", async () => {
@@ -282,7 +282,7 @@ describe("GitHubPullRequest", () => {
                 .build();
 
             const prEntity = await new GitHubPullRequest().init(model);
-            expect(prEntity.participants.map(p=>p.participant.login)).toEqual([prBuilder.firstReviewer.login]);
+            expect(prEntity.participants.map(p => p.participant.login)).toEqual([prBuilder.firstReviewer.login]);
         });
 
         it("author is never a participant", async () => {
@@ -296,7 +296,7 @@ describe("GitHubPullRequest", () => {
                 .build();
 
             const prEntity = await new GitHubPullRequest().init(model);
-            expect(prEntity.participants.map(p=>p.participant.login)).toHaveLength(0);
+            expect(prEntity.participants.map(p => p.participant.login)).toHaveLength(0);
         });
     });
 
@@ -308,7 +308,7 @@ describe("GitHubPullRequest", () => {
 
             const prEntity = await new GitHubPullRequest().init(model);
             const activity = prEntity.activities[0];
-            
+
             expect(activity.what).toBe("commented");
             expect(activity.who).toBe(prBuilder.firstReviewer.login);
         });
@@ -320,7 +320,7 @@ describe("GitHubPullRequest", () => {
 
             const prEntity = await new GitHubPullRequest().init(model);
             const activity = prEntity.activities[0];
-            
+
             expect(activity.what).toBe("commented");
             expect(activity.who).toBe(prBuilder.firstReviewer.login);
         });
@@ -332,7 +332,7 @@ describe("GitHubPullRequest", () => {
 
             const prEntity = await new GitHubPullRequest().init(model);
             const activity = prEntity.activities[0];
-            
+
             expect(activity.what).toBe("approved");
             expect(activity.who).toBe(prBuilder.firstReviewer.login);
         });
@@ -344,7 +344,7 @@ describe("GitHubPullRequest", () => {
 
             const prEntity = await new GitHubPullRequest().init(model);
             const activity = prEntity.activities[0];
-            
+
             expect(activity.what).toBe("ready_for_review");
             expect(activity.who).toBe(prBuilder.prAuthor.login);
         });
@@ -356,7 +356,7 @@ describe("GitHubPullRequest", () => {
 
             const prEntity = await new GitHubPullRequest().init(model);
             const activity = prEntity.activities[0];
-            
+
             expect(activity.what).toBe("merged");
             expect(activity.who).toBe(prBuilder.firstReviewer.login);
         });
@@ -367,9 +367,9 @@ describe("GitHubPullRequest", () => {
             it("reports error when PR has no commits", async () => {
                 const model = prBuilder.pullRequest().build();
                 const prEntity = await new GitHubPullRequest().init(model);
-                
+
                 const errors = prEntity.validateDataIntegrity();
-                
+
                 expect(errors).toContainEqual(expect.stringContaining("Is that possible that pull request has no commits?"));
             });
 
@@ -377,13 +377,13 @@ describe("GitHubPullRequest", () => {
                 const model = prBuilder.pullRequest()
                     .addCommit(prBuilder.prCreatedAt.subtract(3, "hours"))
                     .build();
-                
+
                 // Force initialCommitDate to be after lastCommitDate
                 const prEntity = await new GitHubPullRequest().init(model);
                 prEntity.initialCommitDate = new Date(prEntity.lastCommitDate!.getTime() + 1000);
-                
+
                 const errors = prEntity.validateDataIntegrity();
-                
+
                 expect(errors).toContainEqual(expect.stringContaining("`initialCommitDate` is bigger than `lastCommitDate`"));
             });
 
@@ -393,9 +393,9 @@ describe("GitHubPullRequest", () => {
                     .merge(prBuilder.firstReviewer, prBuilder.prCreatedAt.add(3, "hours"))
                     .build();
                 const prEntity = await new GitHubPullRequest().init(model);
-                
+
                 const errors = prEntity.validateDataIntegrity();
-                
+
                 expect(errors).toContainEqual(expect.stringContaining("`lastCommitDate` is bigger than `mergedDate`"));
             });
         });
@@ -406,9 +406,9 @@ describe("GitHubPullRequest", () => {
                     .build();
                 model.pullRequest.updated_at = prBuilder.prCreatedAt.subtract(1, "day").toISOString();
                 const prEntity = await new GitHubPullRequest().init(model);
-                
+
                 const errors = prEntity.validateDataIntegrity();
-                
+
                 expect(errors).toContainEqual(expect.stringContaining("`createdDate` is bigger than `updatedDate`"));
             });
 
@@ -417,9 +417,9 @@ describe("GitHubPullRequest", () => {
                     .isReadyForReview(prBuilder.prCreatedAt.subtract(1, "hour"))
                     .build();
                 const prEntity = await new GitHubPullRequest().init(model);
-                
+
                 const errors = prEntity.validateDataIntegrity();
-                
+
                 expect(errors).toContainEqual(expect.stringContaining("`createdDate` is bigger than `sharedForReviewDate`"));
             });
 
@@ -429,9 +429,9 @@ describe("GitHubPullRequest", () => {
                     .merge(prBuilder.firstReviewer, prBuilder.prCreatedAt.add(3, "hours"))
                     .build();
                 const prEntity = await new GitHubPullRequest().init(model);
-                
+
                 const errors = prEntity.validateDataIntegrity();
-                
+
                 expect(errors).toContainEqual(expect.stringContaining("`sharedForReviewDate` is bigger than `mergedDate`"));
             });
 
@@ -440,9 +440,9 @@ describe("GitHubPullRequest", () => {
                     .merge(prBuilder.firstReviewer, prBuilder.prCreatedAt.subtract(1, "hour"))
                     .build();
                 const prEntity = await new GitHubPullRequest().init(model);
-                
+
                 const errors = prEntity.validateDataIntegrity();
-                
+
                 expect(errors).toContainEqual(expect.stringContaining("`createdDate` is bigger than `mergedDate`"));
             });
 
@@ -452,10 +452,51 @@ describe("GitHubPullRequest", () => {
                     .merge(prBuilder.firstReviewer, prBuilder.prCreatedAt.add(3, "hours"))
                     .build();
                 const prEntity = await new GitHubPullRequest().init(model);
-                
+
                 const errors = prEntity.validateDataIntegrity();
-                
+
                 expect(errors).toContainEqual(expect.stringContaining("`initialCommitDate` is bigger than `mergedDate`"));
+            });
+        });
+
+        describe("hasOtherHumanApproval", () => {
+            it("equals false if there is 𝐧𝐨 reviewer who approved", async () => {
+                const model = prBuilder.pullRequest()
+                    .build();
+
+                const prEntity = await new GitHubPullRequest().init(model);
+
+                expect(prEntity.hasOtherHumanApproval).toBe(false);
+            });
+
+            it("equals false if there is 𝐧𝐨 𝐡𝐮𝐦𝐚𝐧 reviewer who approved", async () => {
+                const model = prBuilder.pullRequest()
+                    .submitReview(prBuilder.botReviewer, prBuilder.prCreatedAt.add(2, "hours"))
+                    .build();
+
+                const prEntity = await new GitHubPullRequest().init(model);
+
+                expect(prEntity.hasOtherHumanApproval).toBe(false);
+            });
+
+            it("equals false if PR is only approved by author", async () => {
+                const model = prBuilder.pullRequest()
+                    .submitReview(prBuilder.prAuthor, prBuilder.prCreatedAt.add(2, "hours"))
+                    .build();
+
+                const prEntity = await new GitHubPullRequest().init(model);
+
+                expect(prEntity.hasOtherHumanApproval).toBe(false);
+            });
+
+            it("equals true if there is a human reviewer who approved", async () => {
+                const model = prBuilder.pullRequest()
+                    .submitReview(prBuilder.firstReviewer, prBuilder.prCreatedAt.add(2, "hours"))
+                    .build();
+
+                const prEntity = await new GitHubPullRequest().init(model);
+
+                expect(prEntity.hasOtherHumanApproval).toBe(true);
             });
         });
 
@@ -465,9 +506,9 @@ describe("GitHubPullRequest", () => {
                     .addComment(prBuilder.firstReviewer, prBuilder.prCreatedAt.subtract(1, "hour"))
                     .build();
                 const prEntity = await new GitHubPullRequest().init(model);
-                
+
                 const errors = prEntity.validateDataIntegrity();
-                
+
                 expect(errors).toContainEqual(expect.stringContaining("`participant.firstCommentDate` is less than `pullRequest.createdDate`"));
             });
 
@@ -478,9 +519,9 @@ describe("GitHubPullRequest", () => {
                 const prEntity = await new GitHubPullRequest().init(model);
                 const participant = prEntity.participants[0];
                 participant.firstCommentDate = new Date(participant.lastCommentDate!.getTime() + 1000);
-                
+
                 const errors = prEntity.validateDataIntegrity();
-                
+
                 expect(errors).toContainEqual(expect.stringContaining("`participant.firstCommentDate` is bigger than `participant.lastCommentDate`"));
             });
 
@@ -491,9 +532,9 @@ describe("GitHubPullRequest", () => {
                 const prEntity = await new GitHubPullRequest().init(model);
                 const participant = prEntity.participants[0];
                 participant.firstApprovalDate = new Date(participant.lastApprovalDate!.getTime() + 1000);
-                
+
                 const errors = prEntity.validateDataIntegrity();
-                
+
                 expect(errors).toContainEqual(expect.stringContaining("`participant.firstApprovalDate` is bigger than `participant.lastApprovalDate`"));
             });
 
@@ -502,9 +543,9 @@ describe("GitHubPullRequest", () => {
                     .submitReview(prBuilder.firstReviewer, prBuilder.prCreatedAt.subtract(1, "hour"))
                     .build();
                 const prEntity = await new GitHubPullRequest().init(model);
-                
+
                 const errors = prEntity.validateDataIntegrity();
-                
+
                 expect(errors).toContainEqual(expect.stringContaining("`participant.lastApprovalDate` is less than `pullRequest.createdDate`"));
             });
 
@@ -514,9 +555,9 @@ describe("GitHubPullRequest", () => {
                     .submitReview(prBuilder.firstReviewer, prBuilder.prCreatedAt.add(3, "hours"))
                     .build();
                 const prEntity = await new GitHubPullRequest().init(model);
-                
+
                 const errors = prEntity.validateDataIntegrity();
-                
+
                 expect(errors).toContainEqual(expect.stringContaining("`participant.lastApprovalDate` is bigger than `mergedDate`"));
             });
 
@@ -527,9 +568,9 @@ describe("GitHubPullRequest", () => {
                 const prEntity = await new GitHubPullRequest().init(model);
                 const participant = prEntity.participants[0];
                 participant.firstReviewDate = new Date(participant.lastApprovalDate!.getTime() + 1000);
-                
+
                 const errors = prEntity.validateDataIntegrity();
-                
+
                 expect(errors).toContainEqual(expect.stringContaining("`participant.firstReviewDate` is bigger than `participant.lastApprovalDate`"));
             });
         });
@@ -539,9 +580,9 @@ describe("GitHubPullRequest", () => {
                 const model = prBuilder.pullRequest().build();
                 const prEntity = await new GitHubPullRequest().init(model);
                 prEntity.requestedReviewersCount = -1;
-                
+
                 const errors = prEntity.validateDataIntegrity();
-                
+
                 expect(errors).toContainEqual(expect.stringContaining("`requestedReviewersCount` is less than 0"));
             });
         });
@@ -556,9 +597,9 @@ describe("GitHubPullRequest", () => {
                 .merge(prBuilder.firstReviewer, prBuilder.prCreatedAt.add(3, "hours"))
                 .build();
             const prEntity = await new GitHubPullRequest().init(model);
-            
+
             const errors = prEntity.validateDataIntegrity();
-            
+
             expect(errors).toHaveLength(0);
         });
     });

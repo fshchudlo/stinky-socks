@@ -57,6 +57,9 @@ export abstract class PullRequest {
     @Column()
     testsWereTouched: boolean;
 
+    @Column()
+    hasOtherHumanApproval: boolean;
+
     @Column({ type: "varchar" })
     authorRole: ActorRole;
 
@@ -80,6 +83,11 @@ export abstract class PullRequest {
 
     public calculateAggregations() {
         this.participants.forEach(p => p.calculateAggregations());
+
+        this.hasOtherHumanApproval = this.participants
+            .filter(p => !p.participant.isBotUser)
+            .filter(p => p.participant.id != this.author.id)
+            .filter(p => !!p.firstApprovalDate).length > 0;
         return this;
     }
 

@@ -36,6 +36,13 @@ export class TestGitHubImportModelBuilder {
         html_url: "https://github.com/second.reviewer"
     };
 
+    botReviewer: GitHubUserModel = {
+        id: 444,
+        login: "bot.reviewer",
+        type: "Bot",
+        html_url: "https://github.com/bot.reviewer"
+    };
+
     build(): ImportParams {
         return this.model;
     }
