@@ -37,7 +37,7 @@ export class GitlabPullRequestsImporter {
     }
 
     private async importRepositoryPullRequests(gitlabRepository: GitlabProjectModel) {
-        const importedPRsCount = await MetricsDB.getPRsCount(gitlabRepository.namespace.name, gitlabRepository.namespace.name, gitlabRepository.name);
+        const importedPRsCount = await MetricsDB.getPRsCount(gitlabRepository.namespace.name, gitlabRepository.name, null);
         const lastUpdateDateOfStoredPRs: Date | null = await MetricsDB.getPRsMaxDate("updatedDate", gitlabRepository.namespace.name, gitlabRepository.namespace.name, gitlabRepository.name);
 
         const pageSize = 100;

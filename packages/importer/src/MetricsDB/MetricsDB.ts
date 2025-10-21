@@ -34,14 +34,16 @@ class MetricsDataSource extends DataSource {
             .getRawOne())?.maxDate || null;
     }
 
-    async getPRsCount(teamName: string, projectName: string, repositoryName: string): Promise<number> {
-        return (await this.getRepository(PullRequest)
+    async getPRsCount(projectName: string, repositoryName: string, teamName: string | null): Promise<number> {
+        let query = this.getRepository(PullRequest)
             .createQueryBuilder("pr")
             .select(`COUNT(*)`, "prsCount")
-            .where("pr.teamName = :teamName", { teamName })
-            .andWhere("pr.projectName = :projectName", { projectName })
-            .andWhere("pr.repositoryName = :repositoryName", { repositoryName })
-            .getRawOne())?.prsCount;
+            .where("pr.projectName = :projectName", { projectName })
+            .andWhere("pr.repositoryName = :repositoryName", { repositoryName });
+
+        query = teamName ? query.andWhere("pr.teamName = :teamName", { teamName }) : query;
+
+        return (await query.getRawOne())?.prsCount;
     }
 }
 

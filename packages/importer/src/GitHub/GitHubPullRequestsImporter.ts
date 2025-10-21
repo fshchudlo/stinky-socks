@@ -42,7 +42,7 @@ export class GitHubPullRequestsImporter {
     }
 
     private async importRepositoryPullRequests(repositoryName: string) {
-        const importedPRsCount = await MetricsDB.getPRsCount(this.teamName, this.project.owner, repositoryName);
+        const importedPRsCount = await MetricsDB.getPRsCount(this.project.owner, repositoryName, this.teamName);
         const lastUpdateDateOfStoredPRs: Date | null = await MetricsDB.getPRsMaxDate("updatedDate", this.teamName, this.project.owner, repositoryName);
 
         const pageSize = 100;
