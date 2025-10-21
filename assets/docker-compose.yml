@@ -95,7 +95,7 @@ services:
       - GF_SECURITY_ADMIN_USER=stinky-socks
       - GF_SECURITY_ADMIN_PASSWORD=CHANGE-ME!
       - GF_USERS_DEFAULT_THEME=system
-      - GF_INSTALL_PLUGINS=grafana-lokiexplore-app
+      - GF_INSTALL_PLUGINS=grafana-lokiexplore-app,marcusolsson-treemap-panel
     volumes:
       - ./grafana-provisioning:/etc/grafana/provisioning
       - ./grafana-dashboards:/var/lib/grafana/dashboards
