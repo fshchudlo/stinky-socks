@@ -14,7 +14,7 @@ services:
       POSTGRES_PASSWORD: "CHANGE-ME!"
     shm_size: 1g
     volumes:
-      - stinky_socks_postgres_data:/var/lib/postgresql/data
+      - stinky_socks_postgres_data:/var/lib/postgresql
   
   loki:
     image: grafana/loki
