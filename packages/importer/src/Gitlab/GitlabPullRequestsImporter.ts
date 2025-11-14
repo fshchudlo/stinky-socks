@@ -5,8 +5,7 @@ import { GitlabAPI } from "./api/GitlabAPI";
 import { GitlabNamespaceModel, GitlabProjectModel, GitlabPullRequestModel } from "./GitlabAPI.contracts";
 import { GitlabPullRequest } from "./entities/GitlabPullRequest";
 import normalizeGitlabPayload from "./entities/helpers/normalizeGitlabPayload";
-
-type teamNameResolverFn = (project: GitlabProjectModel, pr: GitlabPullRequestModel) => string;
+import { teamNameResolverFn } from "./entities/ImportParams";
 
 export class GitlabPullRequestsImporter {
     private readonly gitlabAPI: GitlabAPI;
@@ -78,7 +77,8 @@ export class GitlabPullRequestsImporter {
                 this.gitlabAPI.getMergeRequestChanges(repository.id, pullRequest.iid)
             ]);
             const pullRequestEntity = await new GitlabPullRequest().init(await normalizeGitlabPayload({
-                    teamName: this.teamNameResolverFn ? this.teamNameResolverFn(repository, pullRequest) : repository.namespace.name,
+                    teamName: this.teamNameResolverFn ? this.teamNameResolverFn(repository, pullRequest.author.id) : repository.namespace.name,
+                    teamNameResolverFn:this.teamNameResolverFn,
                     pullRequest,
                     repository,
                     commits,

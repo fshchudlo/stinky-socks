@@ -91,8 +91,10 @@ export class GitlabPullRequest extends PullRequest {
         this.participants = await Promise.all(
             Array.from(uniqueParticipants)
                 .map(async participant => {
+                    const actorTeamName = model.teamNameResolverFn(model.repository, participant.id);
+
                     const actor = await ActorFactory.fetch({
-                        teamName: model.teamName,
+                        teamName: actorTeamName,
                         login: participant.username,
                         isBotUser: participant.bot
                     });
