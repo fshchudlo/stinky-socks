@@ -25,13 +25,13 @@
   "dependencies": {
     "axios": "1.13.2",
     "axios-retry": "4.5.0",
-    "cache-manager": "7.2.5",
+    "cache-manager": "7.2.6",
     "dotenv": "17.2.3",
-    "jsonwebtoken": "^9.0.2",
+    "jsonwebtoken": "^9.0.3",
     "pg": "8.16.3",
     "reflect-metadata": "0.2.2",
     "ts-node": "10.9.2",
-    "typeorm": "0.3.27",
+    "typeorm": "0.3.28",
     "typeorm-naming-strategies": "4.1.0"
   }
 }
