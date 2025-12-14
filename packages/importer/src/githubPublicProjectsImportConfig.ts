@@ -22,30 +22,6 @@ const kubernetesTeam: TeamImportSettings = {
     }]
 };
 
-const angularTeam: TeamImportSettings = {
-    teamName: "Angular",
-    gitHubProjects: [{
-        owner: "angular",
-        repositoriesSelector: async () => Promise.resolve(["angular"])
-    }]
-};
-
-const reactTeam: TeamImportSettings = {
-    teamName: "React",
-    gitHubProjects: [{
-        owner: "facebook",
-        repositoriesSelector: async () => Promise.resolve(["react"])
-    }]
-};
-
-const phpTeam: TeamImportSettings = {
-    teamName: "PHP",
-    gitHubProjects: [{
-        owner: "php",
-        repositoriesSelector: async () => Promise.resolve(["php-src"])
-    }]
-};
-
 const clickHouseTeam: TeamImportSettings = {
     teamName: "ClickHouse",
     gitHubProjects: [{
@@ -54,9 +30,16 @@ const clickHouseTeam: TeamImportSettings = {
     }]
 };
 
+const vmTeam: TeamImportSettings = {
+    teamName: " VictoriaMetrics",
+    gitHubProjects: [{
+        owner: "VictoriaMetrics"
+    }]
+};
+
 
 const tokens = (process.env.GITHUB_PUBLIC_API_TOKENS as string)?.split(' ')||[];
 export const githubPublicProjectsImportConfig = {
     apiTokens: tokens,
-    teams: [phpTeam, clickHouseTeam, kubernetesTeam, grafanaTeam, angularTeam, reactTeam]
+    teams: [vmTeam, clickHouseTeam, kubernetesTeam, grafanaTeam]
 };
