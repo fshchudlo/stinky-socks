@@ -82,6 +82,11 @@ async function importGitHubPullRequests(team: TeamImportSettings, gitHubAPI: Git
 
 
 async function importGitlabProjects() {
+    if (!gitlabProjectsImportConfig.apiToken) {
+        console.log(`gitlabProjectsImportConfig.apiToken is not set. Skipping the import.`);
+        return;
+    }
+
     console.log(`🔁 Importing Gitlab pull requests`);
 
     const gitlabAPI = new GitlabAPI(gitlabProjectsImportConfig.url, gitlabProjectsImportConfig.apiToken);
