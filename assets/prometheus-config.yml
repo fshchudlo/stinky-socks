@@ -1,10 +1,48 @@
 global:
   scrape_interval: 15s
+  evaluation_interval: 15s
 
 scrape_configs:
   - job_name: stinky-socks-importer
     static_configs:
       - targets: ["stinky-socks-importer:9100"]
+    relabel_configs:
+      - target_label: container_name
+        replacement: 'stinky-socks-importer'
+  - job_name: 'postgres'
+    static_configs:
+      - targets: ['postgres-exporter:9187']
+    relabel_configs:
+      - target_label: container_name
+        replacement: 'postgres'
+
+  - job_name: 'grafana'
+    static_configs:
+      - targets: ['grafana:3000']
+    relabel_configs:
+      - target_label: container_name
+        replacement: 'grafana'
+
+  - job_name: 'alloy'
+    static_configs:
+      - targets: ['alloy:12345']
+    relabel_configs:
+      - target_label: container_name
+        replacement: 'alloy'
+
+  - job_name: 'loki'
+    static_configs:
+      - targets: ['loki:3100']
+    relabel_configs:
+      - target_label: container_name
+        replacement: 'loki'
+
+  - job_name: 'alertmanager'
+    static_configs:
+      - targets: ['alertmanager:9093']
+    relabel_configs:
+      - target_label: container_name
+        replacement: 'alertmanager'
 
 alerting:
   alertmanagers:
