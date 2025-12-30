@@ -4,17 +4,17 @@
 
 ### Running the import
 
-- Specify repos you're interested in [publicProjectsImportConfig.ts](src/publicProjectsImportConfig.ts).
-- Specify GitHub tokens for import configs in the way you prefer (e.g. via environment variables).
-- Run the ```npm run docker-import:start``` command to start preconfigured Postgres and Grafana, build and run the importer and
-  listen for its logs.
+- Specify repos you're interested in [publicProjectsImportConfig.ts](packages/importer/src/githubPublicProjectsImportConfig.ts).
+- Specify GitHub tokens for import configs.
+- Run the ```npm run docker-import:start``` command to start preconfigured dependencies like Postgres and Grafana.
+- Build and run the importer and listen for its logs.
 
 > 💡 People use tools in diverse ways, and the importer logic may not always account for every scenario. Time zones, Git
 > history rewrites, and occasional quirks in GitHub APIs (like missing commit data for pull requests, as
 > in
 > [this example](https://github.com/grafana/grafana/pull/637)) can all impact data consistency.
 >
-> To manage this, the [PullRequest.ts](src/MetricsDB/entities/PullRequest.ts) class includes a `validateDataIntegrity`
+> To manage this, the [PullRequest.ts](packages/importer/src/MetricsDB/entities/PullRequest.ts) class includes a `validateDataIntegrity`
 > method.
 > Validation errors are logged during
 > import, and while invalid pull requests are stored in the database, they’re excluded from Grafana panels.
@@ -29,10 +29,10 @@
 
 - Install [Node.js and npm](https://nodejs.org) on your machine
 - Run `npm i` from the repo root directory
-- Run `npm run docker:init` to start preconfigured Postgres and Grafana.
+- Run `npm run docker:init` to start preconfigured dependencies like Postgres and Grafana.
 - Create `packages/importer/.env` file, copy variables from [docker-compose.dev.yml](assets/docker-compose.dev.yml) into it and
   fill with relevant values.
-- Specify repos you're interested in [publicProjectsImportConfig.ts](packages/importer/src/githubPublicProjectsImportConfig.ts).
+- Specify repos you're interested in [githubPublicProjectsImportConfig.ts](packages/importer/src/githubPublicProjectsImportConfig.ts).
 - Run ```npm run start``` to initiate the import of the data on your local machine
 
 ### Running unit tests

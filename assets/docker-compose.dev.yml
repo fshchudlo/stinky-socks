@@ -16,12 +16,18 @@ services:
       - NODE_ENV=production
       - DB_HOST=postgres
       - DB_PORT=5432
-      - DB_PASSWORD=CHANGE-ME!
-      - DB_USERNAME=stinky-socks
-      - DB_NAME=stinky-socks
-      - STINKY_SOCKS_GITHUB_APP_ID=${STINKY_SOCKS_GITHUB_APP_ID}
-      - STINKY_SOCKS_GITHUB_APP_PRIVATE_KEY=${STINKY_SOCKS_GITHUB_APP_PRIVATE_KEY}
+      - DB_PASSWORD=${POSTGRES_PASSWORD}
+      - DB_USERNAME=${POSTGRES_USER_NAME}
+      - DB_NAME=${POSTGRES_DB}
+
+      # Use this section to import metrics from the public Github repos
       - GITHUB_PUBLIC_API_TOKENS=${GITHUB_PUBLIC_API_TOKENS}
+
+      # Use this section to import metrics from the Gitlab on-prem installation
       - GITLAB_INSTANCE_URL=${GITLAB_INSTANCE_URL}
       - GITLAB_API_TOKEN=${GITLAB_API_TOKEN}
       - GITLAB_NAMESPACES_SEARCH=${GITLAB_NAMESPACES_SEARCH}
+
+      # Use this section to import metrics from the Github enterprise repos not available publicly
+      - STINKY_SOCKS_GITHUB_APP_ID=${STINKY_SOCKS_GITHUB_APP_ID}
+      - STINKY_SOCKS_GITHUB_APP_PRIVATE_KEY=${STINKY_SOCKS_GITHUB_APP_PRIVATE_KEY}
