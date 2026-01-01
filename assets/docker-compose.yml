@@ -18,7 +18,7 @@ services:
   
   postgres-exporter:
     image: wrouesnel/postgres_exporter:latest
-    container_name: "postgres-exporter"
+    container_name: "stinky-socks-postgres-exporter"
     environment:
       DATA_SOURCE_NAME: "postgresql://${POSTGRES_USER_NAME}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?sslmode=disable"
     ports:
