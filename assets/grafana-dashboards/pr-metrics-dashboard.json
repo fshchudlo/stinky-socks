@@ -24,7 +24,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 1,
-  "id": 2,
+  "id": 1,
   "links": [],
   "panels": [
     {
@@ -76,7 +76,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "12.0.5",
+      "pluginVersion": "12.0.8",
       "targets": [
         {
           "dataset": "`stinky-socks`",
@@ -167,7 +167,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "12.0.5",
+      "pluginVersion": "12.0.8",
       "targets": [
         {
           "datasource": {
@@ -230,7 +230,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "12.0.5",
+      "pluginVersion": "12.0.8",
       "targets": [
         {
           "datasource": {
@@ -300,7 +300,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "12.0.5",
+      "pluginVersion": "12.0.8",
       "targets": [
         {
           "datasource": {
@@ -363,7 +363,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "12.0.5",
+      "pluginVersion": "12.0.8",
       "targets": [
         {
           "datasource": {
@@ -426,7 +426,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "12.0.5",
+      "pluginVersion": "12.0.8",
       "targets": [
         {
           "datasource": {
@@ -489,7 +489,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "12.0.5",
+      "pluginVersion": "12.0.8",
       "targets": [
         {
           "datasource": {
@@ -552,7 +552,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "12.0.5",
+      "pluginVersion": "12.0.8",
       "targets": [
         {
           "datasource": {
@@ -623,7 +623,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "12.0.5",
+      "pluginVersion": "12.0.8",
       "targets": [
         {
           "datasource": {
@@ -699,7 +699,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "12.0.5",
+      "pluginVersion": "12.0.8",
       "targets": [
         {
           "datasource": {
@@ -782,7 +782,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "12.0.5",
+      "pluginVersion": "12.0.8",
       "targets": [
         {
           "datasource": {
@@ -865,7 +865,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "12.0.5",
+      "pluginVersion": "12.0.8",
       "targets": [
         {
           "datasource": {
@@ -948,7 +948,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "12.0.5",
+      "pluginVersion": "12.0.8",
       "targets": [
         {
           "datasource": {
@@ -1031,7 +1031,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "12.0.5",
+      "pluginVersion": "12.0.8",
       "targets": [
         {
           "datasource": {
@@ -3798,7 +3798,7 @@
         "name": "team_name",
         "options": [],
         "query": "SELECT DISTINCT team_name \nFROM pull_request\nWHERE pull_request.integrity_errors IS NULL\nAND $__timeFilter(LEAST(initial_commit_date, shared_for_review_date)) \nORDER BY team_name",
-        "refresh": 1,
+        "refresh": 2,
         "regex": "",
         "type": "query"
       },
@@ -3846,7 +3846,7 @@
         "name": "pr_author_role",
         "options": [],
         "query": "SELECT \n    DISTINCT author_role\nFROM pull_request \nWHERE pull_request.integrity_errors IS NULL\n    AND $__timeFilter(LEAST(initial_commit_date, shared_for_review_date)) \n    AND (COALESCE($team_name) IS NULL OR pull_request.team_name IN ($team_name))    \n    AND (COALESCE($repository_name) IS NULL OR repository_name IN ($repository_name))\nUNION\nSELECT \n    DISTINCT author.team_role\nFROM pull_request AS pr\n      INNER JOIN actor AS shadowed_author ON shadowed_author.id = pr.author_id\n      INNER JOIN actor AS author ON COALESCE(shadowed_author.merged_with_id, shadowed_author.id)=author.id\nWHERE author.team_role IS NOT NULL \n    AND pr.integrity_errors IS NULL\n    AND $__timeFilter(LEAST(initial_commit_date, shared_for_review_date)) \n    AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))    \n    AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n",
-        "refresh": 1,
+        "refresh": 2,
         "regex": "",
         "sort": 1,
         "type": "query"
