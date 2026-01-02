@@ -1429,7 +1429,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "12.0.5",
+      "pluginVersion": "12.0.8",
       "targets": [
         {
           "datasource": {
@@ -1575,13 +1575,13 @@
         "stacking": "normal",
         "tooltip": {
           "hideZeros": false,
-          "mode": "single",
+          "mode": "multi",
           "sort": "none"
         },
         "xTickLabelRotation": 0,
         "xTickLabelSpacing": 0
       },
-      "pluginVersion": "12.0.5",
+      "pluginVersion": "12.0.8",
       "targets": [
         {
           "datasource": {
@@ -1681,7 +1681,7 @@
                 "id": "custom.hideFrom",
                 "value": {
                   "legend": false,
-                  "tooltip": true,
+                  "tooltip": false,
                   "viz": true
                 }
               }
@@ -1712,13 +1712,13 @@
         "stacking": "none",
         "tooltip": {
           "hideZeros": false,
-          "mode": "single",
+          "mode": "multi",
           "sort": "none"
         },
         "xTickLabelRotation": 0,
         "xTickLabelSpacing": 0
       },
-      "pluginVersion": "12.0.5",
+      "pluginVersion": "12.0.8",
       "targets": [
         {
           "datasource": {
@@ -1902,7 +1902,7 @@
         "xTickLabelRotation": 0,
         "xTickLabelSpacing": 0
       },
-      "pluginVersion": "12.0.5",
+      "pluginVersion": "12.0.8",
       "targets": [
         {
           "datasource": {
@@ -2028,7 +2028,7 @@
                 "id": "custom.hideFrom",
                 "value": {
                   "legend": false,
-                  "tooltip": true,
+                  "tooltip": false,
                   "viz": true
                 }
               },
@@ -2069,7 +2069,7 @@
         "xTickLabelRotation": 0,
         "xTickLabelSpacing": 0
       },
-      "pluginVersion": "12.0.5",
+      "pluginVersion": "12.0.8",
       "targets": [
         {
           "datasource": {
@@ -2104,7 +2104,7 @@
       "type": "barchart"
     },
     {
-      "collapsed": true,
+      "collapsed": false,
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -2112,1363 +2112,1366 @@
         "y": 133
       },
       "id": 22,
-      "panels": [
-        {
-          "datasource": {
-            "type": "postgres",
-            "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
-          },
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "fixedColor": "light-blue",
-                "mode": "fixed"
-              },
-              "custom": {
-                "axisBorderShow": false,
-                "axisCenteredZero": false,
-                "axisColorMode": "text",
-                "axisLabel": "",
-                "axisPlacement": "auto",
-                "fillOpacity": 80,
-                "gradientMode": "none",
-                "hideFrom": {
-                  "legend": false,
-                  "tooltip": false,
-                  "viz": false
-                },
-                "lineWidth": 1,
-                "scaleDistribution": {
-                  "type": "linear"
-                },
-                "thresholdsStyle": {
-                  "mode": "off"
-                }
-              },
-              "decimals": 0,
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green"
-                  }
-                ]
-              },
-              "unit": "locale"
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 19,
-            "w": 12,
-            "x": 0,
-            "y": 245
-          },
-          "id": 1,
-          "options": {
-            "barRadius": 0,
-            "barWidth": 0.8,
-            "fullHighlight": false,
-            "groupWidth": 0.7,
-            "legend": {
-              "calcs": [],
-              "displayMode": "list",
-              "placement": "bottom",
-              "showLegend": true
-            },
-            "orientation": "horizontal",
-            "showValue": "auto",
-            "stacking": "none",
-            "tooltip": {
-              "hideZeros": false,
-              "mode": "multi",
-              "sort": "none"
-            },
-            "xTickLabelRotation": 0,
-            "xTickLabelSpacing": 0
-          },
-          "pluginVersion": "12.0.5",
-          "targets": [
-            {
-              "dataset": "`stinky-socks`",
-              "datasource": {
-                "type": "postgres",
-                "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
-              },
-              "editorMode": "code",
-              "format": "table",
-              "rawQuery": true,
-              "rawSql": "WITH data AS (\n   SELECT \n      CASE WHEN '$group_by_field'='author' \n         THEN\n            CASE \n            WHEN author.is_former_participant THEN CONCAT(CASE WHEN $show_real_names THEN author.login ELSE author.nickname END, ' (former participant)')\n            WHEN author.is_bot_user THEN CONCAT(author.login, ' (bot)')\n            ELSE CASE WHEN $show_real_names THEN author.login ELSE author.nickname END\n            END\n         ELSE pr.repository_name \n      END as grouping_field,\n      COUNT(*) as prs_count\n   FROM pull_request AS pr\n      INNER JOIN actor AS shadowed_author ON shadowed_author.id = pr.author_id\n      INNER JOIN actor AS author ON COALESCE(shadowed_author.merged_with_id, shadowed_author.id)=author.id\n   WHERE pr.integrity_errors IS NULL\n      AND $__timeFilter(LEAST(initial_commit_date, shared_for_review_date)) \n      AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n      AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n      AND (COALESCE($pr_author_role) IS NULL OR COALESCE(author.team_role, pr.author_role) IN ($pr_author_role))\n      AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n      AND ($include_bots_activities OR NOT author.is_bot_user)\n      AND ($include_self_reviews OR pr.has_other_human_approval)\n   GROUP BY 1\n),\nranked_data AS (\n    SELECT \n        grouping_field,\n        prs_count,\n        ROW_NUMBER() OVER (ORDER BY prs_count DESC) AS rank_desc,\n        ROW_NUMBER() OVER (ORDER BY prs_count ASC) AS rank_asc\n    FROM data\n    WHERE prs_count>$min_prs_count_sample_size\n)\nSELECT \n grouping_field AS \"${group_by_field}\",\n prs_count AS \"PRs count\"\nFROM ranked_data\nWHERE rank_desc <= $ranked_samples_size OR rank_asc <= $ranked_samples_size\nORDER BY prs_count;",
-              "refId": "A",
-              "sql": {
-                "columns": [
-                  {
-                    "parameters": [
-                      {
-                        "name": "author",
-                        "type": "functionParameter"
-                      }
-                    ],
-                    "type": "function"
-                  }
-                ],
-                "groupBy": [
-                  {
-                    "property": {
-                      "name": "author",
-                      "type": "string"
-                    },
-                    "type": "groupBy"
-                  }
-                ],
-                "limit": 50
-              },
-              "table": "pull_request"
-            }
-          ],
-          "title": "Total PRs count",
-          "type": "barchart"
-        },
-        {
-          "datasource": {
-            "type": "postgres",
-            "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
-          },
-          "description": "",
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "fixedColor": "light-blue",
-                "mode": "fixed"
-              },
-              "custom": {
-                "axisBorderShow": false,
-                "axisCenteredZero": false,
-                "axisColorMode": "text",
-                "axisLabel": "",
-                "axisPlacement": "auto",
-                "fillOpacity": 80,
-                "gradientMode": "none",
-                "hideFrom": {
-                  "legend": false,
-                  "tooltip": false,
-                  "viz": false
-                },
-                "lineWidth": 1,
-                "scaleDistribution": {
-                  "type": "linear"
-                },
-                "thresholdsStyle": {
-                  "mode": "off"
-                }
-              },
-              "decimals": 0,
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green"
-                  }
-                ]
-              },
-              "unit": "locale"
-            },
-            "overrides": [
-              {
-                "matcher": {
-                  "id": "byName",
-                  "options": "PRs count"
-                },
-                "properties": [
-                  {
-                    "id": "custom.hideFrom",
-                    "value": {
-                      "legend": false,
-                      "tooltip": true,
-                      "viz": true
-                    }
-                  }
-                ]
-              }
-            ]
-          },
-          "gridPos": {
-            "h": 19,
-            "w": 12,
-            "x": 12,
-            "y": 245
-          },
-          "id": 35,
-          "options": {
-            "barRadius": 0,
-            "barWidth": 0.8,
-            "fullHighlight": false,
-            "groupWidth": 0.7,
-            "legend": {
-              "calcs": [],
-              "displayMode": "list",
-              "placement": "bottom",
-              "showLegend": true
-            },
-            "orientation": "horizontal",
-            "showValue": "auto",
-            "stacking": "normal",
-            "tooltip": {
-              "hideZeros": false,
-              "mode": "multi",
-              "sort": "none"
-            },
-            "xTickLabelRotation": 0,
-            "xTickLabelSpacing": 0
-          },
-          "pluginVersion": "12.0.5",
-          "targets": [
-            {
-              "datasource": {
-                "type": "postgres",
-                "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
-              },
-              "editorMode": "code",
-              "format": "table",
-              "rawQuery": true,
-              "rawSql": "WITH data AS (\n   SELECT \n      CASE WHEN '$group_by_field'='author' \n         THEN\n            CASE \n            WHEN author.is_former_participant THEN CONCAT(CASE WHEN $show_real_names THEN author.login ELSE author.nickname END, ' (former participant)')\n            WHEN author.is_bot_user THEN CONCAT(author.login, ' (bot)')\n            ELSE CASE WHEN $show_real_names THEN author.login ELSE author.nickname END\n            END\n         ELSE pr.repository_name \n      END as grouping_field,\n      SUM(diff_rows_added+diff_rows_deleted) as total_diff,\n   COUNT(*) AS prs_count\n   FROM pull_request AS pr\n      INNER JOIN actor AS shadowed_author ON shadowed_author.id = pr.author_id\n      INNER JOIN actor AS author ON COALESCE(shadowed_author.merged_with_id, shadowed_author.id)=author.id\n   WHERE pr.integrity_errors IS NULL\n      AND $__timeFilter(LEAST(initial_commit_date, shared_for_review_date)) \n      AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n      AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n      AND (COALESCE($pr_author_role) IS NULL OR COALESCE(author.team_role, pr.author_role) IN ($pr_author_role))\n      AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n      AND ($include_bots_activities OR NOT author.is_bot_user)\n      AND ($include_self_reviews OR pr.has_other_human_approval)\n   GROUP BY 1\n),\nranked_data AS (\n    SELECT \n        grouping_field,\n        prs_count,\n        total_diff,\n        ROW_NUMBER() OVER (ORDER BY total_diff DESC) AS rank_desc,\n        ROW_NUMBER() OVER (ORDER BY total_diff ASC) AS rank_asc\n    FROM data\n    WHERE prs_count>$min_prs_count_sample_size\n)\nSELECT \n grouping_field AS \"${group_by_field}\",\n total_diff AS \"Total diff\",\n prs_count AS \"PRs count\"\nFROM ranked_data\nWHERE rank_desc <= $ranked_samples_size OR rank_asc <= $ranked_samples_size\nORDER BY \"Total diff\";",
-              "refId": "A",
-              "sql": {
-                "columns": [
-                  {
-                    "parameters": [],
-                    "type": "function"
-                  }
-                ],
-                "groupBy": [
-                  {
-                    "property": {
-                      "type": "string"
-                    },
-                    "type": "groupBy"
-                  }
-                ],
-                "limit": 50
-              }
-            }
-          ],
-          "title": "Total changes",
-          "type": "barchart"
-        },
-        {
-          "datasource": {
-            "type": "postgres",
-            "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
-          },
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "fixedColor": "light-blue",
-                "mode": "fixed"
-              },
-              "custom": {
-                "axisBorderShow": false,
-                "axisCenteredZero": false,
-                "axisColorMode": "text",
-                "axisLabel": "",
-                "axisPlacement": "auto",
-                "fillOpacity": 80,
-                "gradientMode": "none",
-                "hideFrom": {
-                  "legend": false,
-                  "tooltip": false,
-                  "viz": false
-                },
-                "lineWidth": 1,
-                "scaleDistribution": {
-                  "type": "linear"
-                },
-                "thresholdsStyle": {
-                  "mode": "off"
-                }
-              },
-              "decimals": 0,
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green"
-                  }
-                ]
-              },
-              "unit": "locale"
-            },
-            "overrides": [
-              {
-                "matcher": {
-                  "id": "byName",
-                  "options": "PRs count"
-                },
-                "properties": [
-                  {
-                    "id": "custom.hideFrom",
-                    "value": {
-                      "legend": false,
-                      "tooltip": true,
-                      "viz": true
-                    }
-                  }
-                ]
-              }
-            ]
-          },
-          "gridPos": {
-            "h": 18,
-            "w": 12,
-            "x": 0,
-            "y": 264
-          },
-          "id": 2,
-          "options": {
-            "barRadius": 0,
-            "barWidth": 0.8,
-            "fullHighlight": false,
-            "groupWidth": 0.7,
-            "legend": {
-              "calcs": [],
-              "displayMode": "list",
-              "placement": "bottom",
-              "showLegend": true
-            },
-            "orientation": "horizontal",
-            "showValue": "auto",
-            "stacking": "none",
-            "tooltip": {
-              "hideZeros": false,
-              "mode": "multi",
-              "sort": "none"
-            },
-            "xTickLabelRotation": 0,
-            "xTickLabelSpacing": 0
-          },
-          "pluginVersion": "12.0.5",
-          "targets": [
-            {
-              "dataset": "`stinky-socks`",
-              "datasource": {
-                "type": "postgres",
-                "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
-              },
-              "editorMode": "code",
-              "format": "table",
-              "rawQuery": true,
-              "rawSql": "WITH data AS (\n   SELECT \n      CASE WHEN '$group_by_field'='author' \n         THEN\n            CASE \n            WHEN author.is_former_participant THEN CONCAT(CASE WHEN $show_real_names THEN author.login ELSE author.nickname END, ' (former participant)')\n            WHEN author.is_bot_user THEN CONCAT(author.login, ' (bot)')\n            ELSE CASE WHEN $show_real_names THEN author.login ELSE author.nickname END\n            END\n         ELSE pr.repository_name \n      END as grouping_field,\n      PERCENTILE_CONT($percentile) WITHIN GROUP (ORDER BY diff_rows_added+diff_rows_deleted) as diff_size,\n      COUNT(*) AS prs_count\n   FROM pull_request AS pr\n      INNER JOIN actor AS shadowed_author ON shadowed_author.id = pr.author_id\n      INNER JOIN actor AS author ON COALESCE(shadowed_author.merged_with_id, shadowed_author.id)=author.id\n   WHERE pr.integrity_errors IS NULL\n      AND diff_rows_added+diff_rows_deleted!=0\n      AND $__timeFilter(LEAST(initial_commit_date, shared_for_review_date)) \n      AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n      AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n      AND (COALESCE($pr_author_role) IS NULL OR COALESCE(author.team_role, pr.author_role) IN ($pr_author_role))\n      AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n      AND ($include_bots_activities OR NOT author.is_bot_user)\n      AND ($include_self_reviews OR pr.has_other_human_approval)\n   GROUP BY 1\n),\nranked_data AS (\n    SELECT \n        grouping_field,\n        prs_count,\n        diff_size,\n        ROW_NUMBER() OVER (ORDER BY diff_size DESC) AS rank_desc,\n        ROW_NUMBER() OVER (ORDER BY diff_size ASC) AS rank_asc\n    FROM data\n    WHERE prs_count>$min_prs_count_sample_size\n)\nSELECT \n grouping_field AS \"${group_by_field}\",\n diff_size AS \"Diff size\",\n prs_count AS \"PRs count\"\nFROM ranked_data\nWHERE rank_desc <= $ranked_samples_size OR rank_asc <= $ranked_samples_size\nORDER BY \"Diff size\";",
-              "refId": "A",
-              "sql": {
-                "columns": [
-                  {
-                    "parameters": [
-                      {
-                        "name": "author",
-                        "type": "functionParameter"
-                      }
-                    ],
-                    "type": "function"
-                  }
-                ],
-                "groupBy": [
-                  {
-                    "property": {
-                      "name": "author",
-                      "type": "string"
-                    },
-                    "type": "groupBy"
-                  }
-                ],
-                "limit": 50
-              },
-              "table": "pull_request"
-            }
-          ],
-          "title": "PR diff size",
-          "type": "barchart"
-        },
-        {
-          "datasource": {
-            "type": "postgres",
-            "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
-          },
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "fixedColor": "light-blue",
-                "mode": "fixed"
-              },
-              "custom": {
-                "axisBorderShow": false,
-                "axisCenteredZero": false,
-                "axisColorMode": "text",
-                "axisLabel": "",
-                "axisPlacement": "auto",
-                "fillOpacity": 80,
-                "gradientMode": "none",
-                "hideFrom": {
-                  "legend": false,
-                  "tooltip": false,
-                  "viz": false
-                },
-                "lineWidth": 1,
-                "scaleDistribution": {
-                  "type": "linear"
-                },
-                "thresholdsStyle": {
-                  "mode": "off"
-                }
-              },
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green"
-                  }
-                ]
-              },
-              "unit": "s"
-            },
-            "overrides": [
-              {
-                "matcher": {
-                  "id": "byName",
-                  "options": "PRs count"
-                },
-                "properties": [
-                  {
-                    "id": "custom.hideFrom",
-                    "value": {
-                      "legend": false,
-                      "tooltip": true,
-                      "viz": true
-                    }
-                  },
-                  {
-                    "id": "unit",
-                    "value": "locale"
-                  }
-                ]
-              }
-            ]
-          },
-          "gridPos": {
-            "h": 18,
-            "w": 12,
-            "x": 12,
-            "y": 264
-          },
-          "id": 13,
-          "options": {
-            "barRadius": 0,
-            "barWidth": 0.8,
-            "fullHighlight": false,
-            "groupWidth": 0.7,
-            "legend": {
-              "calcs": [],
-              "displayMode": "list",
-              "placement": "bottom",
-              "showLegend": true
-            },
-            "orientation": "horizontal",
-            "showValue": "auto",
-            "stacking": "none",
-            "tooltip": {
-              "hideZeros": false,
-              "mode": "multi",
-              "sort": "none"
-            },
-            "xTickLabelRotation": 0,
-            "xTickLabelSpacing": 0
-          },
-          "pluginVersion": "12.0.5",
-          "targets": [
-            {
-              "dataset": "`stinky-socks`",
-              "datasource": {
-                "type": "postgres",
-                "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
-              },
-              "editorMode": "code",
-              "format": "table",
-              "rawQuery": true,
-              "rawSql": "WITH data AS (\n   SELECT \n      CASE WHEN '$group_by_field'='author' \n         THEN\n            CASE \n            WHEN author.is_former_participant THEN CONCAT(CASE WHEN $show_real_names THEN author.login ELSE author.nickname END, ' (former participant)')\n            WHEN author.is_bot_user THEN CONCAT(author.login, ' (bot)')\n            ELSE CASE WHEN $show_real_names THEN author.login ELSE author.nickname END\n            END\n         ELSE pr.repository_name \n      END as grouping_field,\n      AVG(EXTRACT(EPOCH FROM (merged_date-shared_for_review_date))) AS approval_speed,\n      COUNT(*) AS prs_count\n   FROM pull_request AS pr\n      INNER JOIN actor AS shadowed_author ON shadowed_author.id = pr.author_id\n      INNER JOIN actor AS author ON COALESCE(shadowed_author.merged_with_id, shadowed_author.id)=author.id\n   WHERE pr.integrity_errors IS NULL\n      AND diff_rows_added+diff_rows_deleted!=0\n      AND $__timeFilter(LEAST(initial_commit_date, shared_for_review_date)) \n      AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n      AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n      AND (COALESCE($pr_author_role) IS NULL OR COALESCE(author.team_role, pr.author_role) IN ($pr_author_role))\n      AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n      AND ($include_bots_activities OR NOT author.is_bot_user)\n      AND ($include_self_reviews OR pr.has_other_human_approval)\n   GROUP BY 1\n),\nranked_data AS (\n    SELECT \n        grouping_field,\n        prs_count,\n        approval_speed,\n        ROW_NUMBER() OVER (ORDER BY approval_speed DESC) AS rank_desc,\n        ROW_NUMBER() OVER (ORDER BY approval_speed ASC) AS rank_asc\n    FROM data\n    WHERE prs_count>$min_prs_count_sample_size\n)\nSELECT \n grouping_field AS \"${group_by_field}\",\n approval_speed AS \"Approval speed\",\n prs_count AS \"PRs count\"\nFROM ranked_data\nWHERE rank_desc <= $ranked_samples_size OR rank_asc <= $ranked_samples_size\nORDER BY \"Approval speed\";",
-              "refId": "A",
-              "sql": {
-                "columns": [
-                  {
-                    "parameters": [
-                      {
-                        "name": "author",
-                        "type": "functionParameter"
-                      }
-                    ],
-                    "type": "function"
-                  }
-                ],
-                "groupBy": [
-                  {
-                    "property": {
-                      "name": "author",
-                      "type": "string"
-                    },
-                    "type": "groupBy"
-                  }
-                ],
-                "limit": 50
-              },
-              "table": "pull_request"
-            }
-          ],
-          "title": "Usually got approval in",
-          "type": "barchart"
-        },
-        {
-          "datasource": {
-            "type": "postgres",
-            "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
-          },
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "fixedColor": "light-blue",
-                "mode": "fixed"
-              },
-              "custom": {
-                "axisBorderShow": false,
-                "axisCenteredZero": false,
-                "axisColorMode": "text",
-                "axisLabel": "",
-                "axisPlacement": "auto",
-                "fillOpacity": 80,
-                "gradientMode": "none",
-                "hideFrom": {
-                  "legend": false,
-                  "tooltip": false,
-                  "viz": false
-                },
-                "lineWidth": 1,
-                "scaleDistribution": {
-                  "type": "linear"
-                },
-                "thresholdsStyle": {
-                  "mode": "off"
-                }
-              },
-              "decimals": 2,
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green"
-                  }
-                ]
-              },
-              "unit": "locale"
-            },
-            "overrides": [
-              {
-                "matcher": {
-                  "id": "byName",
-                  "options": "PRs count"
-                },
-                "properties": [
-                  {
-                    "id": "custom.hideFrom",
-                    "value": {
-                      "legend": false,
-                      "tooltip": true,
-                      "viz": true
-                    }
-                  }
-                ]
-              }
-            ]
-          },
-          "gridPos": {
-            "h": 18,
-            "w": 12,
-            "x": 0,
-            "y": 282
-          },
-          "id": 14,
-          "options": {
-            "barRadius": 0,
-            "barWidth": 0.8,
-            "fullHighlight": false,
-            "groupWidth": 0.7,
-            "legend": {
-              "calcs": [],
-              "displayMode": "list",
-              "placement": "bottom",
-              "showLegend": true
-            },
-            "orientation": "horizontal",
-            "showValue": "auto",
-            "stacking": "none",
-            "tooltip": {
-              "hideZeros": false,
-              "mode": "multi",
-              "sort": "none"
-            },
-            "xTickLabelRotation": 0,
-            "xTickLabelSpacing": 0
-          },
-          "pluginVersion": "12.0.5",
-          "targets": [
-            {
-              "dataset": "`stinky-socks`",
-              "datasource": {
-                "type": "postgres",
-                "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
-              },
-              "editorMode": "code",
-              "format": "table",
-              "rawQuery": true,
-              "rawSql": "WITH data AS (\n   SELECT \n      CASE WHEN '$group_by_field'='author' \n         THEN\n            CASE \n            WHEN author.is_former_participant THEN CONCAT(CASE WHEN $show_real_names THEN author.login ELSE author.nickname END, ' (former participant)')\n            WHEN author.is_bot_user THEN CONCAT(author.login, ' (bot)')\n            ELSE CASE WHEN $show_real_names THEN author.login ELSE author.nickname END\n            END\n         ELSE pr.repository_name \n      END as grouping_field,\n      AVG(requested_reviewers_count) AS reviewers_count,\n      COUNT(*) AS prs_count\n   FROM pull_request AS pr\n      INNER JOIN actor AS shadowed_author ON shadowed_author.id = pr.author_id\n      INNER JOIN actor AS author ON COALESCE(shadowed_author.merged_with_id, shadowed_author.id)=author.id\n   WHERE pr.integrity_errors IS NULL\n      AND diff_rows_added+diff_rows_deleted!=0\n      AND $__timeFilter(LEAST(initial_commit_date, shared_for_review_date)) \n      AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n      AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n      AND (COALESCE($pr_author_role) IS NULL OR COALESCE(author.team_role, pr.author_role) IN ($pr_author_role))\n      AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n      AND ($include_bots_activities OR NOT author.is_bot_user)\n      AND ($include_self_reviews OR pr.has_other_human_approval)\n   GROUP BY 1\n),\nranked_data AS (\n    SELECT \n        grouping_field,\n        prs_count,\n        reviewers_count,\n        ROW_NUMBER() OVER (ORDER BY reviewers_count DESC) AS rank_desc,\n        ROW_NUMBER() OVER (ORDER BY reviewers_count ASC) AS rank_asc\n    FROM data\n    WHERE prs_count>$min_prs_count_sample_size\n)\nSELECT \n grouping_field AS \"${group_by_field}\",\n reviewers_count AS \"Reviewers count\",\n prs_count AS \"PRs count\"\nFROM ranked_data\nWHERE rank_desc <= $ranked_samples_size OR rank_asc <= $ranked_samples_size\nORDER BY \"Reviewers count\";",
-              "refId": "A",
-              "sql": {
-                "columns": [
-                  {
-                    "parameters": [
-                      {
-                        "name": "author",
-                        "type": "functionParameter"
-                      }
-                    ],
-                    "type": "function"
-                  }
-                ],
-                "groupBy": [
-                  {
-                    "property": {
-                      "name": "author",
-                      "type": "string"
-                    },
-                    "type": "groupBy"
-                  }
-                ],
-                "limit": 50
-              },
-              "table": "pull_request"
-            }
-          ],
-          "title": "Average reviewers count",
-          "type": "barchart"
-        },
-        {
-          "datasource": {
-            "type": "postgres",
-            "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
-          },
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "fixedColor": "light-blue",
-                "mode": "fixed"
-              },
-              "custom": {
-                "axisBorderShow": false,
-                "axisCenteredZero": false,
-                "axisColorMode": "text",
-                "axisLabel": "",
-                "axisPlacement": "auto",
-                "fillOpacity": 80,
-                "gradientMode": "none",
-                "hideFrom": {
-                  "legend": false,
-                  "tooltip": false,
-                  "viz": false
-                },
-                "lineWidth": 1,
-                "scaleDistribution": {
-                  "type": "linear"
-                },
-                "thresholdsStyle": {
-                  "mode": "off"
-                }
-              },
-              "decimals": 2,
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green"
-                  }
-                ]
-              },
-              "unit": "locale"
-            },
-            "overrides": [
-              {
-                "matcher": {
-                  "id": "byName",
-                  "options": "PRs count"
-                },
-                "properties": [
-                  {
-                    "id": "custom.hideFrom",
-                    "value": {
-                      "legend": false,
-                      "tooltip": true,
-                      "viz": true
-                    }
-                  }
-                ]
-              }
-            ]
-          },
-          "gridPos": {
-            "h": 18,
-            "w": 12,
-            "x": 12,
-            "y": 282
-          },
-          "id": 20,
-          "options": {
-            "barRadius": 0,
-            "barWidth": 0.8,
-            "fullHighlight": false,
-            "groupWidth": 0.7,
-            "legend": {
-              "calcs": [],
-              "displayMode": "list",
-              "placement": "bottom",
-              "showLegend": true
-            },
-            "orientation": "horizontal",
-            "showValue": "auto",
-            "stacking": "none",
-            "tooltip": {
-              "hideZeros": false,
-              "mode": "multi",
-              "sort": "none"
-            },
-            "xTickLabelRotation": 0,
-            "xTickLabelSpacing": 0
-          },
-          "pluginVersion": "12.0.5",
-          "targets": [
-            {
-              "dataset": "`stinky-socks`",
-              "datasource": {
-                "type": "postgres",
-                "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
-              },
-              "editorMode": "code",
-              "format": "table",
-              "rawQuery": true,
-              "rawSql": "WITH aggregations AS\n(SELECT pr.team_name,\n         pr.project_name,\n         pr.repository_name,\n         pr.pull_request_number,\n         SUM(CASE WHEN participant.is_bot_user THEN 0 ELSE pr_participant.comments_count END) AS participants_comments_count,\n         MIN(CASE\n                  WHEN participant.is_bot_user OR pr_participant.first_reaction_date > pr.merged_date OR\n                     pr_participant.first_reaction_date < pr.shared_for_review_date THEN NULL\n                  ELSE pr_participant.first_reaction_date END) AS first_reaction_date,\n         MAX(CASE WHEN participant.is_bot_user THEN NULL ELSE pr_participant.last_approval_date END) AS last_approval_date,\n         CASE WHEN pr.last_commit_date > pr.shared_for_review_date THEN pr.last_commit_date ELSE NULL END AS last_commit_date\n   FROM pull_request AS pr\n            LEFT JOIN pull_request_participant AS pr_participant ON pr.team_name = pr_participant.team_name AND pr.project_name = pr_participant.project_name AND pr.repository_name = pr_participant.repository_name AND pr.pull_request_number = pr_participant.pull_request_number\n            LEFT JOIN actor AS shadowed_participant ON shadowed_participant.id = pr_participant.participant_id\n            LEFT JOIN actor AS participant ON COALESCE(shadowed_participant.merged_with_id, shadowed_participant.id) = participant.id\n   GROUP BY pr.team_name, pr.project_name, pr.repository_name, pr.pull_request_number,\n            pr.last_commit_date, pr.shared_for_review_date\n),\ndata AS (\n   SELECT \n      CASE WHEN '$group_by_field'='author' \n         THEN\n            CASE \n            WHEN author.is_former_participant THEN CONCAT(CASE WHEN $show_real_names THEN author.login ELSE author.nickname END, ' (former participant)')\n            WHEN author.is_bot_user THEN CONCAT(author.login, ' (bot)')\n            ELSE CASE WHEN $show_real_names THEN author.login ELSE author.nickname END\n            END\n         ELSE pr.repository_name \n      END as grouping_field,\n      AVG(participants_comments_count) AS participants_comments_count,\n      COUNT(*) AS prs_count\n   FROM pull_request AS pr\n      INNER JOIN aggregations AS pr_aggregations\n                   ON pr.team_name = pr_aggregations.team_name AND pr.project_name = pr_aggregations.project_name\n                       AND pr.repository_name = pr_aggregations.repository_name\n                       AND pr.pull_request_number = pr_aggregations.pull_request_number\n      INNER JOIN actor AS shadowed_author ON shadowed_author.id = pr.author_id\n      INNER JOIN actor AS author ON COALESCE(shadowed_author.merged_with_id, shadowed_author.id)=author.id\n   WHERE pr.integrity_errors IS NULL\n      AND diff_rows_added+diff_rows_deleted!=0\n      AND $__timeFilter(LEAST(initial_commit_date, shared_for_review_date)) \n      AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n      AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n      AND (COALESCE($pr_author_role) IS NULL OR COALESCE(author.team_role, pr.author_role) IN ($pr_author_role))\n      AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n      AND ($include_bots_activities OR NOT author.is_bot_user)\n      AND ($include_self_reviews OR pr.has_other_human_approval)\n   GROUP BY 1\n),\nranked_data AS (\n    SELECT \n        grouping_field,\n        prs_count,\n        participants_comments_count,\n        ROW_NUMBER() OVER (ORDER BY participants_comments_count DESC) AS rank_desc,\n        ROW_NUMBER() OVER (ORDER BY participants_comments_count ASC) AS rank_asc\n    FROM data\n    WHERE prs_count>$min_prs_count_sample_size\n)\nSELECT \n grouping_field AS \"${group_by_field}\",\n participants_comments_count AS \"Participants comments count\",\n prs_count AS \"PRs count\"\nFROM ranked_data\nWHERE rank_desc <= $ranked_samples_size OR rank_asc <= $ranked_samples_size\nORDER BY \"Participants comments count\";",
-              "refId": "A",
-              "sql": {
-                "columns": [
-                  {
-                    "parameters": [
-                      {
-                        "name": "author",
-                        "type": "functionParameter"
-                      }
-                    ],
-                    "type": "function"
-                  }
-                ],
-                "groupBy": [
-                  {
-                    "property": {
-                      "name": "author",
-                      "type": "string"
-                    },
-                    "type": "groupBy"
-                  }
-                ],
-                "limit": 50
-              },
-              "table": "pull_request"
-            }
-          ],
-          "title": "Average comments count",
-          "type": "barchart"
-        },
-        {
-          "datasource": {
-            "type": "postgres",
-            "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
-          },
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "fixedColor": "blue",
-                "mode": "fixed"
-              },
-              "custom": {
-                "axisBorderShow": false,
-                "axisCenteredZero": false,
-                "axisColorMode": "text",
-                "axisLabel": "",
-                "axisPlacement": "auto",
-                "fillOpacity": 80,
-                "gradientMode": "none",
-                "hideFrom": {
-                  "legend": false,
-                  "tooltip": false,
-                  "viz": false
-                },
-                "lineWidth": 1,
-                "scaleDistribution": {
-                  "type": "linear"
-                },
-                "thresholdsStyle": {
-                  "mode": "off"
-                }
-              },
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green"
-                  },
-                  {
-                    "color": "#EAB839",
-                    "value": 1800
-                  },
-                  {
-                    "color": "red",
-                    "value": 3600
-                  }
-                ]
-              },
-              "unit": "locale"
-            },
-            "overrides": [
-              {
-                "matcher": {
-                  "id": "byName",
-                  "options": "Approval speed"
-                },
-                "properties": [
-                  {
-                    "id": "unit",
-                    "value": "s"
-                  }
-                ]
-              },
-              {
-                "matcher": {
-                  "id": "byName",
-                  "options": "PRs count"
-                },
-                "properties": [
-                  {
-                    "id": "custom.hideFrom",
-                    "value": {
-                      "legend": false,
-                      "tooltip": true,
-                      "viz": true
-                    }
-                  }
-                ]
-              }
-            ]
-          },
-          "gridPos": {
-            "h": 10,
-            "w": 12,
-            "x": 0,
-            "y": 300
-          },
-          "id": 18,
-          "options": {
-            "barRadius": 0,
-            "barWidth": 0.95,
-            "fullHighlight": false,
-            "groupWidth": 0.7,
-            "legend": {
-              "calcs": [],
-              "displayMode": "list",
-              "placement": "bottom",
-              "showLegend": true
-            },
-            "orientation": "auto",
-            "showValue": "auto",
-            "stacking": "none",
-            "tooltip": {
-              "hideZeros": false,
-              "mode": "multi",
-              "sort": "none"
-            },
-            "xField": "Diff size",
-            "xTickLabelRotation": 0,
-            "xTickLabelSpacing": 0
-          },
-          "pluginVersion": "12.0.5",
-          "targets": [
-            {
-              "datasource": {
-                "type": "postgres",
-                "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
-              },
-              "editorMode": "code",
-              "format": "table",
-              "rawQuery": true,
-              "rawSql": "SELECT\n   CASE\n      WHEN diff_rows_added+diff_rows_deleted<500 THEN 100 * round((diff_rows_added+diff_rows_deleted) / 100)\n      WHEN diff_rows_added+diff_rows_deleted<5000 THEN 1000 * round((diff_rows_added+diff_rows_deleted) / 1000)\n      WHEN diff_rows_added+diff_rows_deleted<50000 THEN 10000 * round((diff_rows_added+diff_rows_deleted) / 10000)\n      ELSE 50000 * round((diff_rows_added+diff_rows_deleted) / 50000)\n   END as \"Diff size\",\n   PERCENTILE_CONT($percentile) WITHIN GROUP (ORDER BY EXTRACT(EPOCH FROM (merged_date-shared_for_review_date))) AS \"Approval speed\",\n   COUNT(*) AS \"PRs count\"\nFROM pull_request AS pr\n   INNER JOIN actor AS shadowed_author ON shadowed_author.id = pr.author_id\n   INNER JOIN actor AS author ON COALESCE(shadowed_author.merged_with_id, shadowed_author.id)=author.id\nWHERE pr.integrity_errors IS NULL\n   AND diff_rows_added+diff_rows_deleted!=0\n   AND $__timeFilter(LEAST(initial_commit_date, shared_for_review_date)) \n   AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n   AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n   AND (COALESCE($pr_author_role) IS NULL OR COALESCE(author.team_role, pr.author_role) IN ($pr_author_role))\n   AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n   AND ($include_bots_activities OR NOT author.is_bot_user)\n   AND ($include_self_reviews OR pr.has_other_human_approval)\nGROUP BY 1\nORDER BY \"Diff size\"",
-              "refId": "A",
-              "sql": {
-                "columns": [
-                  {
-                    "parameters": [],
-                    "type": "function"
-                  }
-                ],
-                "groupBy": [
-                  {
-                    "property": {
-                      "type": "string"
-                    },
-                    "type": "groupBy"
-                  }
-                ],
-                "limit": 50
-              }
-            }
-          ],
-          "title": "Approval time per PR size",
-          "type": "barchart"
-        },
-        {
-          "datasource": {
-            "type": "postgres",
-            "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
-          },
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "fixedColor": "blue",
-                "mode": "fixed"
-              },
-              "custom": {
-                "axisBorderShow": false,
-                "axisCenteredZero": false,
-                "axisColorMode": "text",
-                "axisLabel": "",
-                "axisPlacement": "auto",
-                "fillOpacity": 80,
-                "gradientMode": "none",
-                "hideFrom": {
-                  "legend": false,
-                  "tooltip": false,
-                  "viz": false
-                },
-                "lineWidth": 1,
-                "scaleDistribution": {
-                  "type": "linear"
-                },
-                "thresholdsStyle": {
-                  "mode": "off"
-                }
-              },
-              "decimals": 2,
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green"
-                  },
-                  {
-                    "color": "#EAB839",
-                    "value": 1800
-                  },
-                  {
-                    "color": "red",
-                    "value": 3600
-                  }
-                ]
-              },
-              "unit": "locale"
-            },
-            "overrides": [
-              {
-                "matcher": {
-                  "id": "byName",
-                  "options": "Approval speed"
-                },
-                "properties": [
-                  {
-                    "id": "unit",
-                    "value": "s"
-                  }
-                ]
-              },
-              {
-                "matcher": {
-                  "id": "byName",
-                  "options": "PRs count"
-                },
-                "properties": [
-                  {
-                    "id": "custom.hideFrom",
-                    "value": {
-                      "legend": false,
-                      "tooltip": true,
-                      "viz": true
-                    }
-                  }
-                ]
-              }
-            ]
-          },
-          "gridPos": {
-            "h": 10,
-            "w": 12,
-            "x": 12,
-            "y": 300
-          },
-          "id": 19,
-          "options": {
-            "barRadius": 0,
-            "barWidth": 0.95,
-            "fullHighlight": false,
-            "groupWidth": 0.7,
-            "legend": {
-              "calcs": [],
-              "displayMode": "list",
-              "placement": "bottom",
-              "showLegend": true
-            },
-            "orientation": "auto",
-            "showValue": "auto",
-            "stacking": "none",
-            "tooltip": {
-              "hideZeros": false,
-              "mode": "single",
-              "sort": "none"
-            },
-            "xField": "Reviewers count",
-            "xTickLabelRotation": 0,
-            "xTickLabelSpacing": 0
-          },
-          "pluginVersion": "12.0.5",
-          "targets": [
-            {
-              "datasource": {
-                "type": "postgres",
-                "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
-              },
-              "editorMode": "code",
-              "format": "table",
-              "rawQuery": true,
-              "rawSql": "SELECT\n   requested_reviewers_count  AS \"Reviewers count\",\n   PERCENTILE_CONT($percentile) WITHIN GROUP (ORDER BY EXTRACT(EPOCH FROM (merged_date-shared_for_review_date))) AS \"Approval speed\",\n   COUNT(*) AS \"PRs count\"\nFROM pull_request AS pr\n   INNER JOIN actor AS shadowed_author ON shadowed_author.id = pr.author_id\n   INNER JOIN actor AS author ON COALESCE(shadowed_author.merged_with_id, shadowed_author.id)=author.id\nWHERE pr.integrity_errors IS NULL\n   AND $__timeFilter(LEAST(initial_commit_date, shared_for_review_date)) \n   AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n   AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n   AND (COALESCE($pr_author_role) IS NULL OR COALESCE(author.team_role, pr.author_role) IN ($pr_author_role))\n   AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n   AND ($include_bots_activities OR NOT author.is_bot_user)\n   AND ($include_self_reviews OR pr.has_other_human_approval)\nGROUP BY requested_reviewers_count\nORDER BY requested_reviewers_count",
-              "refId": "A",
-              "sql": {
-                "columns": [
-                  {
-                    "parameters": [],
-                    "type": "function"
-                  }
-                ],
-                "groupBy": [
-                  {
-                    "property": {
-                      "type": "string"
-                    },
-                    "type": "groupBy"
-                  }
-                ],
-                "limit": 50
-              }
-            }
-          ],
-          "title": "Approval time per reviewers count",
-          "type": "barchart"
-        },
-        {
-          "datasource": {
-            "type": "postgres",
-            "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
-          },
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "fixedColor": "blue",
-                "mode": "fixed"
-              },
-              "custom": {
-                "axisBorderShow": false,
-                "axisCenteredZero": false,
-                "axisColorMode": "text",
-                "axisLabel": "",
-                "axisPlacement": "auto",
-                "fillOpacity": 80,
-                "gradientMode": "none",
-                "hideFrom": {
-                  "legend": false,
-                  "tooltip": false,
-                  "viz": false
-                },
-                "lineWidth": 1,
-                "scaleDistribution": {
-                  "type": "linear"
-                },
-                "thresholdsStyle": {
-                  "mode": "off"
-                }
-              },
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green"
-                  },
-                  {
-                    "color": "#EAB839",
-                    "value": 1800
-                  },
-                  {
-                    "color": "red",
-                    "value": 3600
-                  }
-                ]
-              },
-              "unit": "locale"
-            },
-            "overrides": [
-              {
-                "matcher": {
-                  "id": "byName",
-                  "options": "Approval speed"
-                },
-                "properties": [
-                  {
-                    "id": "unit",
-                    "value": "s"
-                  }
-                ]
-              }
-            ]
-          },
-          "gridPos": {
-            "h": 10,
-            "w": 12,
-            "x": 0,
-            "y": 310
-          },
-          "id": 30,
-          "options": {
-            "barRadius": 0,
-            "barWidth": 0.95,
-            "fullHighlight": false,
-            "groupWidth": 0.7,
-            "legend": {
-              "calcs": [],
-              "displayMode": "list",
-              "placement": "bottom",
-              "showLegend": true
-            },
-            "orientation": "auto",
-            "showValue": "auto",
-            "stacking": "none",
-            "tooltip": {
-              "hideZeros": false,
-              "mode": "single",
-              "sort": "none"
-            },
-            "xField": "Diff size",
-            "xTickLabelRotation": 0,
-            "xTickLabelSpacing": 0
-          },
-          "pluginVersion": "12.0.5",
-          "targets": [
-            {
-              "datasource": {
-                "type": "postgres",
-                "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
-              },
-              "editorMode": "code",
-              "format": "table",
-              "rawQuery": true,
-              "rawSql": "WITH aggregations AS\n(SELECT pr.team_name,\n         pr.project_name,\n         pr.repository_name,\n         pr.pull_request_number,\n         SUM(CASE WHEN participant.is_bot_user THEN 0 ELSE pr_participant.comments_count END) AS participants_comments_count,\n         MIN(CASE\n                  WHEN participant.is_bot_user OR pr_participant.first_reaction_date > pr.merged_date OR\n                     pr_participant.first_reaction_date < pr.shared_for_review_date THEN NULL\n                  ELSE pr_participant.first_reaction_date END) AS first_reaction_date,\n         MAX(CASE WHEN participant.is_bot_user THEN NULL ELSE pr_participant.last_approval_date END) AS last_approval_date,\n         CASE WHEN pr.last_commit_date > pr.shared_for_review_date THEN pr.last_commit_date ELSE NULL END AS last_commit_date\n   FROM pull_request AS pr\n            LEFT JOIN pull_request_participant AS pr_participant ON pr.team_name = pr_participant.team_name AND pr.project_name = pr_participant.project_name AND pr.repository_name = pr_participant.repository_name AND pr.pull_request_number = pr_participant.pull_request_number\n            LEFT JOIN actor AS shadowed_participant ON shadowed_participant.id = pr_participant.participant_id\n            LEFT JOIN actor AS participant ON COALESCE(shadowed_participant.merged_with_id, shadowed_participant.id) = participant.id\n   GROUP BY pr.team_name, pr.project_name, pr.repository_name, pr.pull_request_number,\n            pr.last_commit_date, pr.shared_for_review_date\n)\nSELECT\n   CASE\n      WHEN diff_rows_added+diff_rows_deleted<500 THEN 100 * round((diff_rows_added+diff_rows_deleted) / 100)\n      WHEN diff_rows_added+diff_rows_deleted<5000 THEN 1000 * round((diff_rows_added+diff_rows_deleted) / 1000)\n      WHEN diff_rows_added+diff_rows_deleted<50000 THEN 10000 * round((diff_rows_added+diff_rows_deleted) / 10000)\n      ELSE 50000 * round((diff_rows_added+diff_rows_deleted) / 50000)\n   END as \"Diff size\",\n   PERCENTILE_CONT($percentile) WITHIN GROUP (ORDER BY participants_comments_count) AS \"Participants comments count\"\nFROM pull_request AS pr\n   INNER JOIN aggregations AS pr_aggregations\n                  ON pr.team_name = pr_aggregations.team_name AND pr.project_name = pr_aggregations.project_name\n                     AND pr.repository_name = pr_aggregations.repository_name\n                     AND pr.pull_request_number = pr_aggregations.pull_request_number\n   INNER JOIN actor AS shadowed_author ON shadowed_author.id = pr.author_id\n   INNER JOIN actor AS author ON COALESCE(shadowed_author.merged_with_id, shadowed_author.id)=author.id\nWHERE pr.integrity_errors IS NULL\n   AND diff_rows_added+diff_rows_deleted!=0\n   AND $__timeFilter(LEAST(initial_commit_date, shared_for_review_date)) \n   AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n   AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n   AND (COALESCE($pr_author_role) IS NULL OR COALESCE(author.team_role, pr.author_role) IN ($pr_author_role))\n   AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n   AND ($include_bots_activities OR NOT author.is_bot_user)\n   AND ($include_self_reviews OR pr.has_other_human_approval)\nGROUP BY 1\nORDER BY \"Diff size\"",
-              "refId": "A",
-              "sql": {
-                "columns": [
-                  {
-                    "parameters": [],
-                    "type": "function"
-                  }
-                ],
-                "groupBy": [
-                  {
-                    "property": {
-                      "type": "string"
-                    },
-                    "type": "groupBy"
-                  }
-                ],
-                "limit": 50
-              }
-            }
-          ],
-          "title": "Comments count per PR size",
-          "type": "barchart"
-        },
-        {
-          "datasource": {
-            "type": "postgres",
-            "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
-          },
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "fixedColor": "blue",
-                "mode": "fixed"
-              },
-              "custom": {
-                "axisBorderShow": false,
-                "axisCenteredZero": false,
-                "axisColorMode": "text",
-                "axisLabel": "",
-                "axisPlacement": "auto",
-                "fillOpacity": 80,
-                "gradientMode": "none",
-                "hideFrom": {
-                  "legend": false,
-                  "tooltip": false,
-                  "viz": false
-                },
-                "lineWidth": 1,
-                "scaleDistribution": {
-                  "type": "linear"
-                },
-                "thresholdsStyle": {
-                  "mode": "off"
-                }
-              },
-              "decimals": 2,
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green"
-                  },
-                  {
-                    "color": "#EAB839",
-                    "value": 1800
-                  },
-                  {
-                    "color": "red",
-                    "value": 3600
-                  }
-                ]
-              },
-              "unit": "locale"
-            },
-            "overrides": [
-              {
-                "matcher": {
-                  "id": "byName",
-                  "options": "Approval speed"
-                },
-                "properties": [
-                  {
-                    "id": "unit",
-                    "value": "s"
-                  }
-                ]
-              },
-              {
-                "matcher": {
-                  "id": "byName",
-                  "options": "PRs count"
-                },
-                "properties": [
-                  {
-                    "id": "custom.hideFrom",
-                    "value": {
-                      "legend": false,
-                      "tooltip": true,
-                      "viz": true
-                    }
-                  }
-                ]
-              }
-            ]
-          },
-          "gridPos": {
-            "h": 10,
-            "w": 12,
-            "x": 12,
-            "y": 310
-          },
-          "id": 44,
-          "options": {
-            "barRadius": 0,
-            "barWidth": 0.95,
-            "fullHighlight": false,
-            "groupWidth": 0.7,
-            "legend": {
-              "calcs": [],
-              "displayMode": "list",
-              "placement": "bottom",
-              "showLegend": true
-            },
-            "orientation": "auto",
-            "showValue": "auto",
-            "stacking": "none",
-            "tooltip": {
-              "hideZeros": false,
-              "mode": "single",
-              "sort": "none"
-            },
-            "xField": "Reviewers count",
-            "xTickLabelRotation": 0,
-            "xTickLabelSpacing": 0
-          },
-          "pluginVersion": "12.0.5",
-          "targets": [
-            {
-              "datasource": {
-                "type": "postgres",
-                "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
-              },
-              "editorMode": "code",
-              "format": "table",
-              "rawQuery": true,
-              "rawSql": "WITH aggregations AS\n(SELECT pr.team_name,\n         pr.project_name,\n         pr.repository_name,\n         pr.pull_request_number,\n         SUM(CASE WHEN participant.is_bot_user THEN 0 ELSE pr_participant.comments_count END) AS participants_comments_count,\n         MIN(CASE\n                  WHEN participant.is_bot_user OR pr_participant.first_reaction_date > pr.merged_date OR\n                     pr_participant.first_reaction_date < pr.shared_for_review_date THEN NULL\n                  ELSE pr_participant.first_reaction_date END) AS first_reaction_date,\n         MAX(CASE WHEN participant.is_bot_user THEN NULL ELSE pr_participant.last_approval_date END) AS last_approval_date,\n         CASE WHEN pr.last_commit_date > pr.shared_for_review_date THEN pr.last_commit_date ELSE NULL END AS last_commit_date\n   FROM pull_request AS pr\n            LEFT JOIN pull_request_participant AS pr_participant ON pr.team_name = pr_participant.team_name AND pr.project_name = pr_participant.project_name AND pr.repository_name = pr_participant.repository_name AND pr.pull_request_number = pr_participant.pull_request_number\n            LEFT JOIN actor AS shadowed_participant ON shadowed_participant.id = pr_participant.participant_id\n            LEFT JOIN actor AS participant ON COALESCE(shadowed_participant.merged_with_id, shadowed_participant.id) = participant.id\n   GROUP BY pr.team_name, pr.project_name, pr.repository_name, pr.pull_request_number,\n            pr.last_commit_date, pr.shared_for_review_date\n)\nSELECT\n   requested_reviewers_count  AS \"Reviewers count\",\n   PERCENTILE_CONT($percentile) WITHIN GROUP (ORDER BY participants_comments_count) AS \"Participants comments count\",\n   COUNT(*) AS \"PRs count\"\nFROM pull_request AS pr\n   INNER JOIN aggregations AS pr_aggregations\n                  ON pr.team_name = pr_aggregations.team_name AND pr.project_name = pr_aggregations.project_name\n                     AND pr.repository_name = pr_aggregations.repository_name\n                     AND pr.pull_request_number = pr_aggregations.pull_request_number\n   INNER JOIN actor AS shadowed_author ON shadowed_author.id = pr.author_id\n   INNER JOIN actor AS author ON COALESCE(shadowed_author.merged_with_id, shadowed_author.id)=author.id\nWHERE pr.integrity_errors IS NULL\n   AND $__timeFilter(LEAST(initial_commit_date, shared_for_review_date)) \n   AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n   AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n   AND (COALESCE($pr_author_role) IS NULL OR COALESCE(author.team_role, pr.author_role) IN ($pr_author_role))\n   AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n   AND ($include_bots_activities OR NOT author.is_bot_user)\n   AND ($include_self_reviews OR pr.has_other_human_approval)\nGROUP BY requested_reviewers_count\nORDER BY requested_reviewers_count",
-              "refId": "A",
-              "sql": {
-                "columns": [
-                  {
-                    "parameters": [],
-                    "type": "function"
-                  }
-                ],
-                "groupBy": [
-                  {
-                    "property": {
-                      "type": "string"
-                    },
-                    "type": "groupBy"
-                  }
-                ],
-                "limit": 50
-              }
-            }
-          ],
-          "title": "Comments count per reviewers count",
-          "type": "barchart"
-        }
-      ],
+      "panels": [],
       "title": "Per $group_by_field glance stats",
       "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "light-blue",
+            "mode": "fixed"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 1,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "decimals": 0,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              }
+            ]
+          },
+          "unit": "locale"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 19,
+        "w": 12,
+        "x": 0,
+        "y": 134
+      },
+      "id": 1,
+      "options": {
+        "barRadius": 0,
+        "barWidth": 0.8,
+        "fullHighlight": false,
+        "groupWidth": 0.7,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "orientation": "horizontal",
+        "showValue": "auto",
+        "stacking": "none",
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
+        },
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 0
+      },
+      "pluginVersion": "12.0.8",
+      "targets": [
+        {
+          "dataset": "`stinky-socks`",
+          "datasource": {
+            "type": "postgres",
+            "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "WITH data AS (\n   SELECT \n      CASE WHEN '$group_by_field'='author' \n         THEN\n            CASE \n            WHEN author.is_former_participant THEN CONCAT(CASE WHEN $show_real_names THEN author.login ELSE author.nickname END, ' (former participant)')\n            WHEN author.is_bot_user THEN CONCAT(author.login, ' (bot)')\n            ELSE CASE WHEN $show_real_names THEN author.login ELSE author.nickname END\n            END\n         ELSE pr.repository_name \n      END as grouping_field,\n      COUNT(*) as prs_count\n   FROM pull_request AS pr\n      INNER JOIN actor AS shadowed_author ON shadowed_author.id = pr.author_id\n      INNER JOIN actor AS author ON COALESCE(shadowed_author.merged_with_id, shadowed_author.id)=author.id\n   WHERE pr.integrity_errors IS NULL\n      AND $__timeFilter(LEAST(initial_commit_date, shared_for_review_date)) \n      AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n      AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n      AND (COALESCE($pr_author_role) IS NULL OR COALESCE(author.team_role, pr.author_role) IN ($pr_author_role))\n      AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n      AND ($include_bots_activities OR NOT author.is_bot_user)\n      AND ($include_self_reviews OR pr.has_other_human_approval)\n   GROUP BY 1\n),\nranked_data AS (\n    SELECT \n        grouping_field,\n        prs_count,\n        ROW_NUMBER() OVER (ORDER BY prs_count DESC) AS rank_desc,\n        ROW_NUMBER() OVER (ORDER BY prs_count ASC) AS rank_asc\n    FROM data\n    WHERE prs_count>$min_prs_count_sample_size\n)\nSELECT \n grouping_field AS \"${group_by_field}\",\n prs_count AS \"PRs count\"\nFROM ranked_data\nWHERE rank_desc <= $ranked_samples_size OR rank_asc <= $ranked_samples_size\nORDER BY prs_count;",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [
+                  {
+                    "name": "author",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "name": "author",
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          },
+          "table": "pull_request"
+        }
+      ],
+      "title": "Total PRs count",
+      "type": "barchart"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "light-blue",
+            "mode": "fixed"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 1,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "decimals": 0,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              }
+            ]
+          },
+          "unit": "locale"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "PRs count"
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom",
+                "value": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": true
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 19,
+        "w": 12,
+        "x": 12,
+        "y": 134
+      },
+      "id": 35,
+      "options": {
+        "barRadius": 0,
+        "barWidth": 0.8,
+        "fullHighlight": false,
+        "groupWidth": 0.7,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "orientation": "horizontal",
+        "showValue": "auto",
+        "stacking": "normal",
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
+        },
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 0
+      },
+      "pluginVersion": "12.0.8",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "WITH data AS (\n   SELECT \n      CASE WHEN '$group_by_field'='author' \n         THEN\n            CASE \n            WHEN author.is_former_participant THEN CONCAT(CASE WHEN $show_real_names THEN author.login ELSE author.nickname END, ' (former participant)')\n            WHEN author.is_bot_user THEN CONCAT(author.login, ' (bot)')\n            ELSE CASE WHEN $show_real_names THEN author.login ELSE author.nickname END\n            END\n         ELSE pr.repository_name \n      END as grouping_field,\n      SUM(diff_rows_added+diff_rows_deleted) as total_diff,\n   COUNT(*) AS prs_count\n   FROM pull_request AS pr\n      INNER JOIN actor AS shadowed_author ON shadowed_author.id = pr.author_id\n      INNER JOIN actor AS author ON COALESCE(shadowed_author.merged_with_id, shadowed_author.id)=author.id\n   WHERE pr.integrity_errors IS NULL\n      AND $__timeFilter(LEAST(initial_commit_date, shared_for_review_date)) \n      AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n      AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n      AND (COALESCE($pr_author_role) IS NULL OR COALESCE(author.team_role, pr.author_role) IN ($pr_author_role))\n      AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n      AND ($include_bots_activities OR NOT author.is_bot_user)\n      AND ($include_self_reviews OR pr.has_other_human_approval)\n   GROUP BY 1\n),\nranked_data AS (\n    SELECT \n        grouping_field,\n        prs_count,\n        total_diff,\n        ROW_NUMBER() OVER (ORDER BY total_diff DESC) AS rank_desc,\n        ROW_NUMBER() OVER (ORDER BY total_diff ASC) AS rank_asc\n    FROM data\n    WHERE prs_count>$min_prs_count_sample_size\n)\nSELECT \n grouping_field AS \"${group_by_field}\",\n total_diff AS \"Total diff\",\n prs_count AS \"PRs count\"\nFROM ranked_data\nWHERE rank_desc <= $ranked_samples_size OR rank_asc <= $ranked_samples_size\nORDER BY \"Total diff\";",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "Total changes",
+      "type": "barchart"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "light-blue",
+            "mode": "fixed"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 1,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "decimals": 0,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              }
+            ]
+          },
+          "unit": "locale"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "PRs count"
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom",
+                "value": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": true
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 18,
+        "w": 12,
+        "x": 0,
+        "y": 153
+      },
+      "id": 2,
+      "options": {
+        "barRadius": 0,
+        "barWidth": 0.8,
+        "fullHighlight": false,
+        "groupWidth": 0.7,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "orientation": "horizontal",
+        "showValue": "auto",
+        "stacking": "none",
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
+        },
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 0
+      },
+      "pluginVersion": "12.0.8",
+      "targets": [
+        {
+          "dataset": "`stinky-socks`",
+          "datasource": {
+            "type": "postgres",
+            "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "WITH data AS (\n   SELECT \n      CASE WHEN '$group_by_field'='author' \n         THEN\n            CASE \n            WHEN author.is_former_participant THEN CONCAT(CASE WHEN $show_real_names THEN author.login ELSE author.nickname END, ' (former participant)')\n            WHEN author.is_bot_user THEN CONCAT(author.login, ' (bot)')\n            ELSE CASE WHEN $show_real_names THEN author.login ELSE author.nickname END\n            END\n         ELSE pr.repository_name \n      END as grouping_field,\n      PERCENTILE_CONT($percentile) WITHIN GROUP (ORDER BY diff_rows_added+diff_rows_deleted) as diff_size,\n      COUNT(*) AS prs_count\n   FROM pull_request AS pr\n      INNER JOIN actor AS shadowed_author ON shadowed_author.id = pr.author_id\n      INNER JOIN actor AS author ON COALESCE(shadowed_author.merged_with_id, shadowed_author.id)=author.id\n   WHERE pr.integrity_errors IS NULL\n      AND diff_rows_added+diff_rows_deleted!=0\n      AND $__timeFilter(LEAST(initial_commit_date, shared_for_review_date)) \n      AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n      AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n      AND (COALESCE($pr_author_role) IS NULL OR COALESCE(author.team_role, pr.author_role) IN ($pr_author_role))\n      AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n      AND ($include_bots_activities OR NOT author.is_bot_user)\n      AND ($include_self_reviews OR pr.has_other_human_approval)\n   GROUP BY 1\n),\nranked_data AS (\n    SELECT \n        grouping_field,\n        prs_count,\n        diff_size,\n        ROW_NUMBER() OVER (ORDER BY diff_size DESC) AS rank_desc,\n        ROW_NUMBER() OVER (ORDER BY diff_size ASC) AS rank_asc\n    FROM data\n    WHERE prs_count>$min_prs_count_sample_size\n)\nSELECT \n grouping_field AS \"${group_by_field}\",\n diff_size AS \"Diff size\",\n prs_count AS \"PRs count\"\nFROM ranked_data\nWHERE rank_desc <= $ranked_samples_size OR rank_asc <= $ranked_samples_size\nORDER BY \"Diff size\";",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [
+                  {
+                    "name": "author",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "name": "author",
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          },
+          "table": "pull_request"
+        }
+      ],
+      "title": "PR diff size",
+      "type": "barchart"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "light-blue",
+            "mode": "fixed"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 1,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              }
+            ]
+          },
+          "unit": "s"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "PRs count"
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom",
+                "value": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": true
+                }
+              },
+              {
+                "id": "unit",
+                "value": "locale"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 18,
+        "w": 12,
+        "x": 12,
+        "y": 153
+      },
+      "id": 13,
+      "options": {
+        "barRadius": 0,
+        "barWidth": 0.8,
+        "fullHighlight": false,
+        "groupWidth": 0.7,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "orientation": "horizontal",
+        "showValue": "auto",
+        "stacking": "none",
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
+        },
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 0
+      },
+      "pluginVersion": "12.0.8",
+      "targets": [
+        {
+          "dataset": "`stinky-socks`",
+          "datasource": {
+            "type": "postgres",
+            "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "WITH data AS (\n   SELECT \n      CASE WHEN '$group_by_field'='author' \n         THEN\n            CASE \n            WHEN author.is_former_participant THEN CONCAT(CASE WHEN $show_real_names THEN author.login ELSE author.nickname END, ' (former participant)')\n            WHEN author.is_bot_user THEN CONCAT(author.login, ' (bot)')\n            ELSE CASE WHEN $show_real_names THEN author.login ELSE author.nickname END\n            END\n         ELSE pr.repository_name \n      END as grouping_field,\n      AVG(EXTRACT(EPOCH FROM (merged_date-shared_for_review_date))) AS approval_speed,\n      COUNT(*) AS prs_count\n   FROM pull_request AS pr\n      INNER JOIN actor AS shadowed_author ON shadowed_author.id = pr.author_id\n      INNER JOIN actor AS author ON COALESCE(shadowed_author.merged_with_id, shadowed_author.id)=author.id\n   WHERE pr.integrity_errors IS NULL\n      AND diff_rows_added+diff_rows_deleted!=0\n      AND $__timeFilter(LEAST(initial_commit_date, shared_for_review_date)) \n      AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n      AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n      AND (COALESCE($pr_author_role) IS NULL OR COALESCE(author.team_role, pr.author_role) IN ($pr_author_role))\n      AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n      AND ($include_bots_activities OR NOT author.is_bot_user)\n      AND ($include_self_reviews OR pr.has_other_human_approval)\n   GROUP BY 1\n),\nranked_data AS (\n    SELECT \n        grouping_field,\n        prs_count,\n        approval_speed,\n        ROW_NUMBER() OVER (ORDER BY approval_speed DESC) AS rank_desc,\n        ROW_NUMBER() OVER (ORDER BY approval_speed ASC) AS rank_asc\n    FROM data\n    WHERE prs_count>$min_prs_count_sample_size\n)\nSELECT \n grouping_field AS \"${group_by_field}\",\n approval_speed AS \"Approval speed\",\n prs_count AS \"PRs count\"\nFROM ranked_data\nWHERE rank_desc <= $ranked_samples_size OR rank_asc <= $ranked_samples_size\nORDER BY \"Approval speed\";",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [
+                  {
+                    "name": "author",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "name": "author",
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          },
+          "table": "pull_request"
+        }
+      ],
+      "title": "Usually got approval in",
+      "type": "barchart"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "light-blue",
+            "mode": "fixed"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 1,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "decimals": 2,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              }
+            ]
+          },
+          "unit": "locale"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "PRs count"
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom",
+                "value": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": true
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 18,
+        "w": 12,
+        "x": 0,
+        "y": 171
+      },
+      "id": 14,
+      "options": {
+        "barRadius": 0,
+        "barWidth": 0.8,
+        "fullHighlight": false,
+        "groupWidth": 0.7,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "orientation": "horizontal",
+        "showValue": "auto",
+        "stacking": "none",
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
+        },
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 0
+      },
+      "pluginVersion": "12.0.8",
+      "targets": [
+        {
+          "dataset": "`stinky-socks`",
+          "datasource": {
+            "type": "postgres",
+            "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "WITH data AS (\n   SELECT \n      CASE WHEN '$group_by_field'='author' \n         THEN\n            CASE \n            WHEN author.is_former_participant THEN CONCAT(CASE WHEN $show_real_names THEN author.login ELSE author.nickname END, ' (former participant)')\n            WHEN author.is_bot_user THEN CONCAT(author.login, ' (bot)')\n            ELSE CASE WHEN $show_real_names THEN author.login ELSE author.nickname END\n            END\n         ELSE pr.repository_name \n      END as grouping_field,\n      AVG(requested_reviewers_count) AS reviewers_count,\n      COUNT(*) AS prs_count\n   FROM pull_request AS pr\n      INNER JOIN actor AS shadowed_author ON shadowed_author.id = pr.author_id\n      INNER JOIN actor AS author ON COALESCE(shadowed_author.merged_with_id, shadowed_author.id)=author.id\n   WHERE pr.integrity_errors IS NULL\n      AND diff_rows_added+diff_rows_deleted!=0\n      AND $__timeFilter(LEAST(initial_commit_date, shared_for_review_date)) \n      AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n      AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n      AND (COALESCE($pr_author_role) IS NULL OR COALESCE(author.team_role, pr.author_role) IN ($pr_author_role))\n      AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n      AND ($include_bots_activities OR NOT author.is_bot_user)\n      AND ($include_self_reviews OR pr.has_other_human_approval)\n   GROUP BY 1\n),\nranked_data AS (\n    SELECT \n        grouping_field,\n        prs_count,\n        reviewers_count,\n        ROW_NUMBER() OVER (ORDER BY reviewers_count DESC) AS rank_desc,\n        ROW_NUMBER() OVER (ORDER BY reviewers_count ASC) AS rank_asc\n    FROM data\n    WHERE prs_count>$min_prs_count_sample_size\n)\nSELECT \n grouping_field AS \"${group_by_field}\",\n reviewers_count AS \"Reviewers count\",\n prs_count AS \"PRs count\"\nFROM ranked_data\nWHERE rank_desc <= $ranked_samples_size OR rank_asc <= $ranked_samples_size\nORDER BY \"Reviewers count\";",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [
+                  {
+                    "name": "author",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "name": "author",
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          },
+          "table": "pull_request"
+        }
+      ],
+      "title": "Average reviewers count",
+      "type": "barchart"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "light-blue",
+            "mode": "fixed"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 1,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "decimals": 2,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              }
+            ]
+          },
+          "unit": "locale"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "PRs count"
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom",
+                "value": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": true
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 18,
+        "w": 12,
+        "x": 12,
+        "y": 171
+      },
+      "id": 20,
+      "options": {
+        "barRadius": 0,
+        "barWidth": 0.8,
+        "fullHighlight": false,
+        "groupWidth": 0.7,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "orientation": "horizontal",
+        "showValue": "auto",
+        "stacking": "none",
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
+        },
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 0
+      },
+      "pluginVersion": "12.0.8",
+      "targets": [
+        {
+          "dataset": "`stinky-socks`",
+          "datasource": {
+            "type": "postgres",
+            "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "WITH aggregations AS\n(SELECT pr.team_name,\n         pr.project_name,\n         pr.repository_name,\n         pr.pull_request_number,\n         SUM(CASE WHEN participant.is_bot_user THEN 0 ELSE pr_participant.comments_count END) AS participants_comments_count,\n         MIN(CASE\n                  WHEN participant.is_bot_user OR pr_participant.first_reaction_date > pr.merged_date OR\n                     pr_participant.first_reaction_date < pr.shared_for_review_date THEN NULL\n                  ELSE pr_participant.first_reaction_date END) AS first_reaction_date,\n         MAX(CASE WHEN participant.is_bot_user THEN NULL ELSE pr_participant.last_approval_date END) AS last_approval_date,\n         CASE WHEN pr.last_commit_date > pr.shared_for_review_date THEN pr.last_commit_date ELSE NULL END AS last_commit_date\n   FROM pull_request AS pr\n            LEFT JOIN pull_request_participant AS pr_participant ON pr.team_name = pr_participant.team_name AND pr.project_name = pr_participant.project_name AND pr.repository_name = pr_participant.repository_name AND pr.pull_request_number = pr_participant.pull_request_number\n            LEFT JOIN actor AS shadowed_participant ON shadowed_participant.id = pr_participant.participant_id\n            LEFT JOIN actor AS participant ON COALESCE(shadowed_participant.merged_with_id, shadowed_participant.id) = participant.id\n   GROUP BY pr.team_name, pr.project_name, pr.repository_name, pr.pull_request_number,\n            pr.last_commit_date, pr.shared_for_review_date\n),\ndata AS (\n   SELECT \n      CASE WHEN '$group_by_field'='author' \n         THEN\n            CASE \n            WHEN author.is_former_participant THEN CONCAT(CASE WHEN $show_real_names THEN author.login ELSE author.nickname END, ' (former participant)')\n            WHEN author.is_bot_user THEN CONCAT(author.login, ' (bot)')\n            ELSE CASE WHEN $show_real_names THEN author.login ELSE author.nickname END\n            END\n         ELSE pr.repository_name \n      END as grouping_field,\n      AVG(participants_comments_count) AS participants_comments_count,\n      COUNT(*) AS prs_count\n   FROM pull_request AS pr\n      INNER JOIN aggregations AS pr_aggregations\n                   ON pr.team_name = pr_aggregations.team_name AND pr.project_name = pr_aggregations.project_name\n                       AND pr.repository_name = pr_aggregations.repository_name\n                       AND pr.pull_request_number = pr_aggregations.pull_request_number\n      INNER JOIN actor AS shadowed_author ON shadowed_author.id = pr.author_id\n      INNER JOIN actor AS author ON COALESCE(shadowed_author.merged_with_id, shadowed_author.id)=author.id\n   WHERE pr.integrity_errors IS NULL\n      AND diff_rows_added+diff_rows_deleted!=0\n      AND $__timeFilter(LEAST(initial_commit_date, shared_for_review_date)) \n      AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n      AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n      AND (COALESCE($pr_author_role) IS NULL OR COALESCE(author.team_role, pr.author_role) IN ($pr_author_role))\n      AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n      AND ($include_bots_activities OR NOT author.is_bot_user)\n      AND ($include_self_reviews OR pr.has_other_human_approval)\n   GROUP BY 1\n),\nranked_data AS (\n    SELECT \n        grouping_field,\n        prs_count,\n        participants_comments_count,\n        ROW_NUMBER() OVER (ORDER BY participants_comments_count DESC) AS rank_desc,\n        ROW_NUMBER() OVER (ORDER BY participants_comments_count ASC) AS rank_asc\n    FROM data\n    WHERE prs_count>$min_prs_count_sample_size\n)\nSELECT \n grouping_field AS \"${group_by_field}\",\n participants_comments_count AS \"Participants comments count\",\n prs_count AS \"PRs count\"\nFROM ranked_data\nWHERE rank_desc <= $ranked_samples_size OR rank_asc <= $ranked_samples_size\nORDER BY \"Participants comments count\";",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [
+                  {
+                    "name": "author",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "name": "author",
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          },
+          "table": "pull_request"
+        }
+      ],
+      "title": "Average comments count",
+      "type": "barchart"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "blue",
+            "mode": "fixed"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 1,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "#EAB839",
+                "value": 1800
+              },
+              {
+                "color": "red",
+                "value": 3600
+              }
+            ]
+          },
+          "unit": "locale"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Approval speed"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "s"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "PRs count"
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom",
+                "value": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": true
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 0,
+        "y": 189
+      },
+      "id": 18,
+      "options": {
+        "barRadius": 0,
+        "barWidth": 0.95,
+        "fullHighlight": false,
+        "groupWidth": 0.7,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "orientation": "auto",
+        "showValue": "auto",
+        "stacking": "none",
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
+        },
+        "xField": "Diff size",
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 0
+      },
+      "pluginVersion": "12.0.8",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT\n   CASE\n      WHEN diff_rows_added+diff_rows_deleted<500 THEN 100 * round((diff_rows_added+diff_rows_deleted) / 100)\n      WHEN diff_rows_added+diff_rows_deleted<5000 THEN 1000 * round((diff_rows_added+diff_rows_deleted) / 1000)\n      WHEN diff_rows_added+diff_rows_deleted<50000 THEN 10000 * round((diff_rows_added+diff_rows_deleted) / 10000)\n      ELSE 50000 * round((diff_rows_added+diff_rows_deleted) / 50000)\n   END as \"Diff size\",\n   PERCENTILE_CONT($percentile) WITHIN GROUP (ORDER BY EXTRACT(EPOCH FROM (merged_date-shared_for_review_date))) AS \"Approval speed\",\n   COUNT(*) AS \"PRs count\"\nFROM pull_request AS pr\n   INNER JOIN actor AS shadowed_author ON shadowed_author.id = pr.author_id\n   INNER JOIN actor AS author ON COALESCE(shadowed_author.merged_with_id, shadowed_author.id)=author.id\nWHERE pr.integrity_errors IS NULL\n   AND diff_rows_added+diff_rows_deleted!=0\n   AND $__timeFilter(LEAST(initial_commit_date, shared_for_review_date)) \n   AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n   AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n   AND (COALESCE($pr_author_role) IS NULL OR COALESCE(author.team_role, pr.author_role) IN ($pr_author_role))\n   AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n   AND ($include_bots_activities OR NOT author.is_bot_user)\n   AND ($include_self_reviews OR pr.has_other_human_approval)\nGROUP BY 1\nORDER BY \"Diff size\"",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "Approval time per PR size",
+      "type": "barchart"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "blue",
+            "mode": "fixed"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 1,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "decimals": 2,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "#EAB839",
+                "value": 1800
+              },
+              {
+                "color": "red",
+                "value": 3600
+              }
+            ]
+          },
+          "unit": "locale"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Approval speed"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "s"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "PRs count"
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom",
+                "value": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": true
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 12,
+        "y": 189
+      },
+      "id": 19,
+      "options": {
+        "barRadius": 0,
+        "barWidth": 0.95,
+        "fullHighlight": false,
+        "groupWidth": 0.7,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "orientation": "auto",
+        "showValue": "auto",
+        "stacking": "none",
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        },
+        "xField": "Reviewers count",
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 0
+      },
+      "pluginVersion": "12.0.8",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT\n   requested_reviewers_count  AS \"Reviewers count\",\n   PERCENTILE_CONT($percentile) WITHIN GROUP (ORDER BY EXTRACT(EPOCH FROM (merged_date-shared_for_review_date))) AS \"Approval speed\",\n   COUNT(*) AS \"PRs count\"\nFROM pull_request AS pr\n   INNER JOIN actor AS shadowed_author ON shadowed_author.id = pr.author_id\n   INNER JOIN actor AS author ON COALESCE(shadowed_author.merged_with_id, shadowed_author.id)=author.id\nWHERE pr.integrity_errors IS NULL\n   AND $__timeFilter(LEAST(initial_commit_date, shared_for_review_date)) \n   AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n   AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n   AND (COALESCE($pr_author_role) IS NULL OR COALESCE(author.team_role, pr.author_role) IN ($pr_author_role))\n   AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n   AND ($include_bots_activities OR NOT author.is_bot_user)\n   AND ($include_self_reviews OR pr.has_other_human_approval)\nGROUP BY requested_reviewers_count\nORDER BY requested_reviewers_count",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "Approval time per reviewers count",
+      "type": "barchart"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "blue",
+            "mode": "fixed"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 1,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "#EAB839",
+                "value": 1800
+              },
+              {
+                "color": "red",
+                "value": 3600
+              }
+            ]
+          },
+          "unit": "locale"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "PRs count"
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom",
+                "value": {
+                  "legend": true,
+                  "tooltip": false,
+                  "viz": true
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 0,
+        "y": 199
+      },
+      "id": 30,
+      "options": {
+        "barRadius": 0,
+        "barWidth": 0.95,
+        "fullHighlight": false,
+        "groupWidth": 0.7,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "orientation": "auto",
+        "showValue": "auto",
+        "stacking": "none",
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        },
+        "xField": "Diff size",
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 0
+      },
+      "pluginVersion": "12.0.8",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "WITH aggregations AS\n(SELECT pr.team_name,\n         pr.project_name,\n         pr.repository_name,\n         pr.pull_request_number,\n         SUM(CASE WHEN participant.is_bot_user THEN 0 ELSE pr_participant.comments_count END) AS participants_comments_count,\n         MIN(CASE\n                  WHEN participant.is_bot_user OR pr_participant.first_reaction_date > pr.merged_date OR\n                     pr_participant.first_reaction_date < pr.shared_for_review_date THEN NULL\n                  ELSE pr_participant.first_reaction_date END) AS first_reaction_date,\n         MAX(CASE WHEN participant.is_bot_user THEN NULL ELSE pr_participant.last_approval_date END) AS last_approval_date,\n         CASE WHEN pr.last_commit_date > pr.shared_for_review_date THEN pr.last_commit_date ELSE NULL END AS last_commit_date\n   FROM pull_request AS pr\n            LEFT JOIN pull_request_participant AS pr_participant ON pr.team_name = pr_participant.team_name AND pr.project_name = pr_participant.project_name AND pr.repository_name = pr_participant.repository_name AND pr.pull_request_number = pr_participant.pull_request_number\n            LEFT JOIN actor AS shadowed_participant ON shadowed_participant.id = pr_participant.participant_id\n            LEFT JOIN actor AS participant ON COALESCE(shadowed_participant.merged_with_id, shadowed_participant.id) = participant.id\n   GROUP BY pr.team_name, pr.project_name, pr.repository_name, pr.pull_request_number,\n            pr.last_commit_date, pr.shared_for_review_date\n)\nSELECT\n   CASE\n      WHEN diff_rows_added+diff_rows_deleted<500 THEN 100 * round((diff_rows_added+diff_rows_deleted) / 100)\n      WHEN diff_rows_added+diff_rows_deleted<5000 THEN 1000 * round((diff_rows_added+diff_rows_deleted) / 1000)\n      WHEN diff_rows_added+diff_rows_deleted<50000 THEN 10000 * round((diff_rows_added+diff_rows_deleted) / 10000)\n      ELSE 50000 * round((diff_rows_added+diff_rows_deleted) / 50000)\n   END as \"Diff size\",\n   PERCENTILE_CONT($percentile) WITHIN GROUP (ORDER BY participants_comments_count) AS \"Participants comments count\",\n   COUNT(*) AS \"PRs count\"\nFROM pull_request AS pr\n   INNER JOIN aggregations AS pr_aggregations\n                  ON pr.team_name = pr_aggregations.team_name AND pr.project_name = pr_aggregations.project_name\n                     AND pr.repository_name = pr_aggregations.repository_name\n                     AND pr.pull_request_number = pr_aggregations.pull_request_number\n   INNER JOIN actor AS shadowed_author ON shadowed_author.id = pr.author_id\n   INNER JOIN actor AS author ON COALESCE(shadowed_author.merged_with_id, shadowed_author.id)=author.id\nWHERE pr.integrity_errors IS NULL\n   AND diff_rows_added+diff_rows_deleted!=0\n   AND $__timeFilter(LEAST(initial_commit_date, shared_for_review_date)) \n   AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n   AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n   AND (COALESCE($pr_author_role) IS NULL OR COALESCE(author.team_role, pr.author_role) IN ($pr_author_role))\n   AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n   AND ($include_bots_activities OR NOT author.is_bot_user)\n   AND ($include_self_reviews OR pr.has_other_human_approval)\nGROUP BY 1\nORDER BY \"Diff size\"",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "Comments count per PR size",
+      "type": "barchart"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "blue",
+            "mode": "fixed"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 1,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "decimals": 2,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "#EAB839",
+                "value": 1800
+              },
+              {
+                "color": "red",
+                "value": 3600
+              }
+            ]
+          },
+          "unit": "locale"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Approval speed"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "s"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "PRs count"
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom",
+                "value": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": true
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 12,
+        "y": 199
+      },
+      "id": 44,
+      "options": {
+        "barRadius": 0,
+        "barWidth": 0.95,
+        "fullHighlight": false,
+        "groupWidth": 0.7,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "orientation": "auto",
+        "showValue": "auto",
+        "stacking": "none",
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        },
+        "xField": "Reviewers count",
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 0
+      },
+      "pluginVersion": "12.0.8",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "e22e9e55-8040-415d-97be-c4a6a23429e8"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "WITH aggregations AS\n(SELECT pr.team_name,\n         pr.project_name,\n         pr.repository_name,\n         pr.pull_request_number,\n         SUM(CASE WHEN participant.is_bot_user THEN 0 ELSE pr_participant.comments_count END) AS participants_comments_count,\n         MIN(CASE\n                  WHEN participant.is_bot_user OR pr_participant.first_reaction_date > pr.merged_date OR\n                     pr_participant.first_reaction_date < pr.shared_for_review_date THEN NULL\n                  ELSE pr_participant.first_reaction_date END) AS first_reaction_date,\n         MAX(CASE WHEN participant.is_bot_user THEN NULL ELSE pr_participant.last_approval_date END) AS last_approval_date,\n         CASE WHEN pr.last_commit_date > pr.shared_for_review_date THEN pr.last_commit_date ELSE NULL END AS last_commit_date\n   FROM pull_request AS pr\n            LEFT JOIN pull_request_participant AS pr_participant ON pr.team_name = pr_participant.team_name AND pr.project_name = pr_participant.project_name AND pr.repository_name = pr_participant.repository_name AND pr.pull_request_number = pr_participant.pull_request_number\n            LEFT JOIN actor AS shadowed_participant ON shadowed_participant.id = pr_participant.participant_id\n            LEFT JOIN actor AS participant ON COALESCE(shadowed_participant.merged_with_id, shadowed_participant.id) = participant.id\n   GROUP BY pr.team_name, pr.project_name, pr.repository_name, pr.pull_request_number,\n            pr.last_commit_date, pr.shared_for_review_date\n)\nSELECT\n   requested_reviewers_count  AS \"Reviewers count\",\n   PERCENTILE_CONT($percentile) WITHIN GROUP (ORDER BY participants_comments_count) AS \"Participants comments count\",\n   COUNT(*) AS \"PRs count\"\nFROM pull_request AS pr\n   INNER JOIN aggregations AS pr_aggregations\n                  ON pr.team_name = pr_aggregations.team_name AND pr.project_name = pr_aggregations.project_name\n                     AND pr.repository_name = pr_aggregations.repository_name\n                     AND pr.pull_request_number = pr_aggregations.pull_request_number\n   INNER JOIN actor AS shadowed_author ON shadowed_author.id = pr.author_id\n   INNER JOIN actor AS author ON COALESCE(shadowed_author.merged_with_id, shadowed_author.id)=author.id\nWHERE pr.integrity_errors IS NULL\n   AND $__timeFilter(LEAST(initial_commit_date, shared_for_review_date)) \n   AND (COALESCE($team_name) IS NULL OR pr.team_name IN ($team_name))\n   AND (COALESCE($repository_name) IS NULL OR pr.repository_name IN ($repository_name))\n   AND (COALESCE($pr_author_role) IS NULL OR COALESCE(author.team_role, pr.author_role) IN ($pr_author_role))\n   AND (COALESCE($pr_author) IS NULL OR author.id IN ($pr_author))\n   AND ($include_bots_activities OR NOT author.is_bot_user)\n   AND ($include_self_reviews OR pr.has_other_human_approval)\nGROUP BY requested_reviewers_count\nORDER BY requested_reviewers_count",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "Comments count per reviewers count",
+      "type": "barchart"
     },
     {
       "collapsed": true,
@@ -3476,7 +3479,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 134
+        "y": 209
       },
       "id": 39,
       "panels": [
@@ -3712,7 +3715,7 @@
             "h": 14,
             "w": 24,
             "x": 0,
-            "y": 161
+            "y": 236
           },
           "id": 31,
           "options": {
