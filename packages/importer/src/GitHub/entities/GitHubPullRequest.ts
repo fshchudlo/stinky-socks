@@ -1,15 +1,15 @@
-import {PullRequest} from "../../MetricsDB/entities/PullRequest";
-import {GitHubPullRequestParticipant} from "./GitHubPullRequestParticipant";
-import {ActorFactory} from "../../MetricsDB/ActorFactory";
-import {ActivityTraits} from "./helpers/ActivityTraits";
-import {ImportParams} from "./ImportParams";
+import { PullRequest } from "../../MetricsDB/entities/PullRequest";
+import { GitHubPullRequestParticipant } from "./GitHubPullRequestParticipant";
+import { ActorFactory } from "../../MetricsDB/ActorFactory";
+import { ActivityTraits } from "./helpers/ActivityTraits";
+import { ImportParams } from "./ImportParams";
 import getActivitiesOf from "./helpers/getActivitiesOf";
 import calculatePrSharedForReviewDate from "./helpers/calculatePrSharedForReviewDate";
-import {GitHubUserModel} from "../GitHubAPI.contracts";
-import {calculateRequestedReviewersCount} from "./helpers/calculateRequestedReviewersCount";
-import {mapGithubUserAssociationToActorRole} from "./helpers/mapGithubUserAssociationToActorRole";
-import {getCommentsTimestamps} from "./helpers/getCommentsTimestamps";
-import {GitHubPullRequestActivity} from "./GitHubPullRequestActivity";
+import { GitHubUserModel } from "../GitHubAPI.contracts";
+import { calculateRequestedReviewersCount } from "./helpers/calculateRequestedReviewersCount";
+import { mapGithubUserAssociationToActorRole } from "./helpers/mapGithubUserAssociationToActorRole";
+import { getCommentsTimestamps } from "./helpers/getCommentsTimestamps";
+import { GitHubPullRequestActivity } from "./GitHubPullRequestActivity";
 
 
 export class GitHubPullRequest extends PullRequest {
@@ -110,19 +110,28 @@ export class GitHubPullRequest extends PullRequest {
     private async initializeActivities(model: ImportParams) {
         this.activities = [];
 
-        const commentActivities = model.activities.filter(ActivityTraits.isCommentedEvent).map(comment => {
-            return new GitHubPullRequestActivity(model.teamName, model.pullRequest, comment.event, new Date(comment.created_at), comment.actor.login, comment.body, comment.html_url);
-        });
+        const commentActivities = model.activities
+            .filter(ActivityTraits.isCommentedEvent)
+            .filter(a => !!a.actor)
+            .map(comment => {
+                return new GitHubPullRequestActivity(model.teamName, model.pullRequest, comment.event, new Date(comment.created_at), comment.actor.login, comment.body, comment.html_url);
+            });
         this.activities.push(...commentActivities);
 
-        const lineCommentActivities = model.activities.filter(ActivityTraits.isLineCommentedEvent).flatMap(a => a.comments).filter(c => !!c.user).map(lineComment => {
-            return new GitHubPullRequestActivity(model.teamName, model.pullRequest, "commented", new Date(lineComment.created_at), lineComment.user!.login, lineComment.body, lineComment.html_url);
-        });
+        const lineCommentActivities = model.activities
+            .filter(ActivityTraits.isLineCommentedEvent)
+            .flatMap(a => a.comments)
+            .filter(c => !!c.user)
+            .map(lineComment => {
+                return new GitHubPullRequestActivity(model.teamName, model.pullRequest, "commented", new Date(lineComment.created_at), lineComment.user!.login, lineComment.body, lineComment.html_url);
+            });
         this.activities.push(...lineCommentActivities);
 
-        const commitActivities = model.activities.filter(ActivityTraits.isCommitedEvent).map(commit => {
-            return new GitHubPullRequestActivity(model.teamName, model.pullRequest, commit.event, new Date(commit.committer.date), commit.committer.name, commit.message, commit.html_url);
-        });
+        const commitActivities = model.activities
+            .filter(ActivityTraits.isCommitedEvent)
+            .map(commit => {
+                return new GitHubPullRequestActivity(model.teamName, model.pullRequest, commit.event, new Date(commit.committer.date), commit.committer.name, commit.message, commit.html_url);
+            });
         this.activities.push(...commitActivities);
 
 
@@ -133,14 +142,19 @@ export class GitHubPullRequest extends PullRequest {
             });
         this.activities.push(...reviewActivities);
 
-        const readyForReviewActivities = model.activities.filter(ActivityTraits.isReadyForReviewEvent).map(event => {
-            return new GitHubPullRequestActivity(model.teamName, model.pullRequest, event.event, new Date(event.created_at), event.actor.login, null, null);
-        });
+        const readyForReviewActivities = model.activities
+            .filter(ActivityTraits.isReadyForReviewEvent)
+            .filter(a => !!a.actor)
+            .map(event => {
+                return new GitHubPullRequestActivity(model.teamName, model.pullRequest, event.event, new Date(event.created_at), event.actor.login, null, null);
+            });
         this.activities.push(...readyForReviewActivities);
 
-        const mergeActivities = model.activities.filter(ActivityTraits.isConsistentMergedEvent).map(merge => {
-            return new GitHubPullRequestActivity(model.teamName, model.pullRequest, merge.event, new Date(merge.created_at), merge.actor.login, null, null);
-        });
+        const mergeActivities = model.activities
+            .filter(ActivityTraits.isConsistentMergedEvent)
+            .map(merge => {
+                return new GitHubPullRequestActivity(model.teamName, model.pullRequest, merge.event, new Date(merge.created_at), merge.actor.login, null, null);
+            });
         this.activities.push(...mergeActivities);
 
         return this;
