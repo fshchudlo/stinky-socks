@@ -48,7 +48,7 @@ async function importGithubAppInstallationProjects() {
 }
 
 async function importGithubPublicProjects() {
-    if (githubPublicProjectsImportConfig.apiTokens.length==0) {
+    if (githubPublicProjectsImportConfig.apiTokens.length == 0) {
         console.log(`None of the GitHub API tokens specified. Skipping the import.`);
         return;
     }
@@ -58,7 +58,7 @@ async function importGithubPublicProjects() {
         await ActorFactory.preloadCacheByTeam(team.teamName);
         const tokensRotator = new PersonalTokensRotator(githubPublicProjectsImportConfig.apiTokens);
         const gitHubAPI = new GitHubAPI(tokensRotator);
-        for (const {} of githubPublicProjectsImportConfig.apiTokens) {
+        for (const { } of githubPublicProjectsImportConfig.apiTokens) {
             await gitHubAPI.triggerTokenRateLimitVerification();
         }
         await importGitHubPullRequests(team, gitHubAPI);
@@ -72,10 +72,17 @@ async function importGitHubPullRequests(team: TeamImportSettings, gitHubAPI: Git
     for (const gitHubProject of team.gitHubProjects || []) {
         console.group(`🔁 Importing Github pull requests for the '${gitHubProject.owner}' project`);
 
-        await new GitHubPullRequestsImporter(gitHubAPI, team.teamName, gitHubProject).importPullRequests();
+        try {
+            await new GitHubPullRequestsImporter(gitHubAPI, team.teamName, gitHubProject).importPullRequests();
 
-        console.log(`🔁 Import of Github pull requests for the '${gitHubProject.owner}' project completed`);
-        console.groupEnd();
+            console.log(`🔁 Import of Github pull requests for the '${gitHubProject.owner}' project completed`);
+        }
+        catch (error) {
+            console.error(`💥 Error while importing Github pull requests for the '${gitHubProject.owner}' project: `, error);
+        }
+        finally {
+            console.groupEnd();
+        }
     }
     console.timeEnd(timelogLabel);
 }

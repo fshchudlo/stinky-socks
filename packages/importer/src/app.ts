@@ -22,10 +22,10 @@ async function runDataImports() {
 
 function logErrorAndExit(error: any) {
     console.error(error);
-    // I wasn't able to understand why, but an app degradates with "socket hang up" and is not able to run after that.
+    // I wasn't able to understand why, but sometimes an app degradate with a "socket hang up" error and is not able to recover it's work after that.
     // For such cases we crash-and-restart a container, but only after a minute to avoid ddos-ing GitHub API 
     setTimeout(() => {
-        console.error("Exiting due to error:", error);
+        console.error("Exiting due to an unhandled error.");
         process.exit(1);
     }, 60 * 1000);
 }
