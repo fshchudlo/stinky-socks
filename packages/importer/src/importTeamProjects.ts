@@ -66,7 +66,7 @@ async function importGithubPublicProjects() {
 }
 
 async function importGitHubPullRequests(team: TeamImportSettings, gitHubAPI: GitHubAPI) {
-    const timelogLabel = `🎉 GitHub pull requests import completed for ${team.teamName}!`;
+    const timelogLabel = `GitHub pull requests import is completed for ${team.teamName}!`;
     console.time(timelogLabel);
 
     for (const gitHubProject of team.gitHubProjects || []) {
@@ -75,7 +75,7 @@ async function importGitHubPullRequests(team: TeamImportSettings, gitHubAPI: Git
         try {
             await new GitHubPullRequestsImporter(gitHubAPI, team.teamName, gitHubProject).importPullRequests();
 
-            console.log(`🔁 Import of Github pull requests for the '${gitHubProject.owner}' project completed`);
+            console.log(`🎉 Import of Github pull requests for the '${gitHubProject.owner}' project is completed`);
         }
         catch (error) {
             console.error(`💥 Error while importing Github pull requests for the '${gitHubProject.owner}' project: `, error);
