@@ -32,7 +32,7 @@ export class PersonalTokensRotator implements GitHubCredentialsEmitter {
             const waitTime = nextTokenToUse.resetTimestamp - Date.now();
 
             console.log(`🫸 The GitHub API rate limit exceeded. Waiting for ${convertMillisecondsToHumanReadableTime(waitTime)}...`);
-            await new Promise(resolve => setTimeout(resolve, waitTime < 0 ? 0 : waitTime));
+            await new Promise(resolve => setTimeout(resolve, Math.max(0, waitTime)));
             console.log(`💃 The GitHub API rate limit is updated. Let's move on...`);
         }
         return Promise.resolve(this.getHeaderValue(nextTokenToUse.token));
