@@ -9,12 +9,6 @@ scrape_configs:
     relabel_configs:
       - target_label: container_name
         replacement: 'stinky-socks-importer'
-  - job_name: 'postgres'
-    static_configs:
-      - targets: ['postgres-exporter:9187']
-    relabel_configs:
-      - target_label: container_name
-        replacement: 'postgres'
 
   - job_name: 'grafana'
     static_configs:

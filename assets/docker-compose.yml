@@ -16,17 +16,6 @@ services:
     volumes:
       - stinky_socks_postgres_data:/var/lib/postgresql
   
-  postgres-exporter:
-    image: wrouesnel/postgres_exporter:latest
-    container_name: "stinky-socks-postgres-exporter"
-    restart: always
-    environment:
-      DATA_SOURCE_NAME: "postgresql://${POSTGRES_USER_NAME}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?sslmode=disable"
-    ports:
-      - "9187:9187"
-    networks:
-      - stinky_socks_network
-
   loki:
     image: grafana/loki
     container_name: "stinky-socks-loki"
