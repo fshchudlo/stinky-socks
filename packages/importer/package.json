@@ -23,12 +23,12 @@
     "migration:revert": "ts-node ../../node_modules/typeorm/cli.js migration:revert -d src/MetricsDB/MetricsDB.ts"
   },
   "dependencies": {
-    "axios": "1.13.2",
+    "axios": "1.13.3",
     "axios-retry": "4.5.0",
     "cache-manager": "7.2.8",
     "dotenv": "17.2.3",
     "jsonwebtoken": "^9.0.3",
-    "pg": "8.17.1",
+    "pg": "8.17.2",
     "reflect-metadata": "0.2.2",
     "ts-node": "10.9.2",
     "typeorm": "0.3.28",
