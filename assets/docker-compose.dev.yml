@@ -16,9 +16,9 @@ services:
       - NODE_ENV=production
       - DB_HOST=postgres
       - DB_PORT=5432
-      - DB_PASSWORD=${POSTGRES_PASSWORD}
-      - DB_USERNAME=${POSTGRES_USER_NAME}
-      - DB_NAME=${POSTGRES_DB}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_NAME=${DB_NAME}
 
       # Use this section to import metrics from the public Github repos
       - GITHUB_PUBLIC_API_TOKENS=${GITHUB_PUBLIC_API_TOKENS}

@@ -10,7 +10,7 @@ const grafanaTeam: TeamImportSettings = {
     teamName: "Grafana",
     gitHubProjects: [{
         owner: "grafana",
-        repositoriesSelector: async () => Promise.resolve(["grafana"])
+        repositoriesSelector: async () => Promise.resolve(["grafana", "grafana-foundation-sdk"])
     }]
 };
 
