@@ -51,7 +51,6 @@
     - `PullRequestParticipant`
     - `PullRequestActivity`
     - `Actor`
-  - Migration: `src/MetricsDB/migrations/1760263908570-initial_migration.ts`.
 - Identity mapping:
   - `ActorFactory` caches/fetches actors per team and auto-generates unique nicknames.
 - Rate-limit handling:
@@ -144,6 +143,17 @@
 - ESLint uses `typescript-eslint` recommended config; `no-explicit-any` is disabled.
 - Jest config at repo root uses `ts-jest` and Node environment.
 - Formatting configured via `.prettierrc` (4 spaces, print width 140).
+
+## Database Structure Management
+- Source of truth for DB schema is TypeORM entities in `packages/importer/src/MetricsDB/entities`.
+- Do not hand-write migration SQL when normal schema diffs are needed; generate migrations with TypeORM.
+- Migration generation command (from repo root):
+  - `npm run migration:generate --workspace=packages/importer ./src/MetricsDB/migrations/<MIGRATION_NAME>`
+- Migration execution commands:
+  - `npm run migration:run --workspace=packages/importer`
+  - `npm run migration:revert --workspace=packages/importer`
+- Prerequisite: PostgreSQL from local stack must be running and reachable with env from `packages/importer/.env` (see README `Managing database structure` and local setup).
+- Migrations auto-run on importer start because datasource sets `migrationsRun: true`.
 
 ## Suggested Areas for Future Agents
 - Add pre-commit/CI secret-scanning to prevent accidental secret commits.

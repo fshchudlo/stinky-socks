@@ -5,6 +5,9 @@ import { PullRequestParticipant } from "./entities/PullRequestParticipant";
 import { SnakeNamingStrategy } from "typeorm-naming-strategies";
 import { Actor } from "./entities/Actor";
 import { PullRequestActivity } from "./entities/PullRequestActivity";
+import { BuildRun } from "./entities/BuildRun";
+import { BuildCommit } from "./entities/BuildCommit";
+import { BuildRunTest } from "./entities/BuildRunTest";
 
 class MetricsDataSource extends DataSource {
     constructor() {
@@ -15,7 +18,7 @@ class MetricsDataSource extends DataSource {
             username: AppConfig.MetricsDB.DB_USERNAME,
             password: AppConfig.MetricsDB.DB_PASSWORD,
             database: AppConfig.MetricsDB.DB_NAME,
-            entities: [PullRequest, PullRequestParticipant, Actor, PullRequestActivity],
+            entities: [PullRequest, PullRequestParticipant, Actor, PullRequestActivity, BuildRun, BuildCommit, BuildRunTest],
             namingStrategy: new SnakeNamingStrategy(),
             synchronize: false,
             migrations: ["src/MetricsDB/migrations/*.ts"],
