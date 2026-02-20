@@ -10,7 +10,7 @@ const grafanaTeam: TeamImportSettings = {
     teamName: "Grafana",
     gitHubProjects: [{
         owner: "grafana",
-        repositoriesSelector: async () => Promise.resolve(["grafana", "grafana-foundation-sdk"])
+        repositoriesSelector: async () => Promise.resolve(["grafana-foundation-sdk", "grafana"])
     }]
 };
 
@@ -41,5 +41,5 @@ const vmTeam: TeamImportSettings = {
 const tokens = (process.env.GITHUB_PUBLIC_API_TOKENS as string)?.split(' ')||[];
 export const githubPublicProjectsImportConfig = {
     apiTokens: tokens,
-    teams: [vmTeam, clickHouseTeam, kubernetesTeam, grafanaTeam]
+    teams: [grafanaTeam, vmTeam, clickHouseTeam, kubernetesTeam]
 };
