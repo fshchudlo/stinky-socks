@@ -7,3 +7,4 @@ coverage
 /build-and-publish.sh
 /**/http-client.private.env.json
 .DS_Store
+/**/test-results.json

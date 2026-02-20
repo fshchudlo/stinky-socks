@@ -30,7 +30,7 @@ jobs:
 
     - name: Test
       run: |
-        mkdir -p ci-artifacts
+        mkdir -p packages/*/ci-artifacts
         npm run test -- --json --outputFile=./ci-artifacts/test-results.json
 
     - name: Upload test report
@@ -38,4 +38,4 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: test-results-${{ github.run_id }}
-        path: ci-artifacts/test-results.json
+        path: '**/ci-artifacts/test-results.json'

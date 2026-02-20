@@ -15,7 +15,7 @@
   "scripts": {
     "start": "npm run start --workspace=packages",
     "build": "npm run build --workspace=packages",
-    "test": "npm run test --workspace=packages",
+    "test": "npm run test --workspace=packages --",
     "lint": "eslint ./packages --fix",
     "docker:init": "docker-compose -p stinky-socks -f assets/docker-compose.yml up -d",
     "docker:destroy": "docker-compose -p stinky-socks -f assets/docker-compose.yml down -v",
