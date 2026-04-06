@@ -2,28 +2,28 @@ import { Repository } from "typeorm";
 import { PullRequest } from "../MetricsDB/entities/PullRequest";
 import { MetricsDB } from "../MetricsDB/MetricsDB";
 import { GitlabAPI } from "./api/GitlabAPI";
-import { GitlabNamespaceModel, GitlabProjectModel, GitlabPullRequestModel } from "./GitlabAPI.contracts";
+import { GitlabProjectModel, GitlabPullRequestModel } from "./GitlabAPI.contracts";
 import { GitlabPullRequest } from "./entities/GitlabPullRequest";
 import normalizeGitlabPayload from "./entities/helpers/normalizeGitlabPayload";
 import { teamNameResolverFn } from "./entities/ImportParams";
 
 export class GitlabPullRequestsImporter {
     private readonly gitlabAPI: GitlabAPI;
-    private readonly project: GitlabNamespaceModel;
+    private readonly projectSearch: string | undefined;
     private readonly repository: Repository<PullRequest>;
     private readonly teamNameResolverFn: teamNameResolverFn;
 
-    constructor(gitlabAPI: GitlabAPI, project: GitlabNamespaceModel, teamNameResolverFn: teamNameResolverFn) {
+    constructor(gitlabAPI: GitlabAPI, projectSearch: string | undefined, teamNameResolverFn: teamNameResolverFn) {
         this.gitlabAPI = gitlabAPI;
-        this.project = project;
+        this.projectSearch = projectSearch;
         this.teamNameResolverFn = teamNameResolverFn;
         this.repository = MetricsDB.getRepository(PullRequest);
     }
 
     async importPullRequests() {
-        const repositories = await this.gitlabAPI.getNamespaceProjects(this.project.id);
+        const repositories = await this.gitlabAPI.getProjects(this.projectSearch);
 
-        for (const gitlabRepository of repositories) {
+        for (const gitlabRepository of repositories.filter(r => r.name === this.projectSearch)) {
             console.group(`🔁 Importing pull requests for the '${gitlabRepository.path_with_namespace}' repository`);
 
             const timelogLabel = `✅ '${gitlabRepository.path_with_namespace}' pull requests import completed`;
@@ -98,4 +98,3 @@ export class GitlabPullRequestsImporter {
         }
     }
 }
-

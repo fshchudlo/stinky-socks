@@ -100,15 +100,11 @@ async function importGitlabProjects() {
     const timelogLabel = `🎉 Gitlab pull requests import completed!`;
     console.time(timelogLabel);
 
-    const projects = await gitlabAPI.getNamespaces(gitlabProjectsImportConfig.namespaceSearch);
+    await new GitlabPullRequestsImporter(
+        gitlabAPI,
+        gitlabProjectsImportConfig.projectSearch,
+        gitlabProjectsImportConfig.resolveTeamName
+    ).importPullRequests();
 
-    for (const gitlabProject of projects || []) {
-        console.group(`🔁 Importing Gitlab pull requests for the '${gitlabProject.name}' project`);
-
-        await new GitlabPullRequestsImporter(gitlabAPI, gitlabProject, gitlabProjectsImportConfig.resolveTeamName).importPullRequests();
-
-        console.log(`🔁 Import of Gitlab pull requests for the '${gitlabProject.name}' project completed`);
-        console.groupEnd();
-    }
     console.timeEnd(timelogLabel);
 }

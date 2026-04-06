@@ -1,7 +1,6 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
 import {
     GitlabFileDiffModel,
-    GitlabNamespaceModel,
     GitlabProjectModel,
     GitlabPullRequestActivityModel,
     GitlabPullRequestCommitModel,
@@ -20,17 +19,15 @@ export class GitlabAPI {
         });
     }
 
-    async getNamespaces(search: string | undefined = undefined) {
+    async getProjects(search: string | undefined = undefined) {
         const params = {
             membership: true,
-            search: search
+            search,
+            search_namespaces: true,
+            simple: true
         };
 
-        return await this.getFullList<GitlabNamespaceModel>("/namespaces", params);
-    }
-
-    async getNamespaceProjects(namespaceId: number) {
-        return await this.getFullList<GitlabProjectModel>(`groups/${namespaceId}/projects`);
+        return await this.getFullList<GitlabProjectModel>("/projects", params);
     }
 
     async getMergedMergeRequests(projectId: number, pageNumber: number, pageSize: number) {

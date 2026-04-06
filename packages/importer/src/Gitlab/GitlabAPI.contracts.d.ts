@@ -1,12 +1,4 @@
 /*
-* This is the project in more classic terms
-* */
-export type GitlabNamespaceModel = {
-    id: number;
-    name: string;
-};
-
-/*
 * This is the repository in more classic terms
 * */
 export type GitlabProjectModel = {

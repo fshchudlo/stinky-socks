@@ -6,10 +6,7 @@ describe("GitlabAPI 𝑰𝒏𝒕𝒆𝒈𝒓𝒂𝒕𝒊𝒐𝒏 Test", () => {
     it.skip("should fetch pull requests history", async () => {
         const sut = new GitlabAPI(gitlabProjectsImportConfig.url, gitlabProjectsImportConfig.apiToken);
 
-        const projects = await sut.getNamespaces(gitlabProjectsImportConfig.namespaceSearch);
-        expect(projects).not.toHaveLength(0);
-
-        const repositories = await sut.getNamespaceProjects(projects[0].id);
+        const repositories = await sut.getProjects(gitlabProjectsImportConfig.projectSearch);
         expect(repositories).not.toHaveLength(0);
 
         const pullRequestsHistory = await sut.getMergedMergeRequests(repositories[0].id, 1, 10);

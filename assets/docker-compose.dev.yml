@@ -26,7 +26,7 @@ services:
       # Use this section to import metrics from the Gitlab on-prem installation
       - GITLAB_INSTANCE_URL=${GITLAB_INSTANCE_URL}
       - GITLAB_API_TOKEN=${GITLAB_API_TOKEN}
-      - GITLAB_NAMESPACES_SEARCH=${GITLAB_NAMESPACES_SEARCH}
+      - GITLAB_PROJECTS_SEARCH=${GITLAB_PROJECTS_SEARCH}
 
       # Use this section to import metrics from the Github enterprise repos not available publicly
       - STINKY_SOCKS_GITHUB_APP_ID=${STINKY_SOCKS_GITHUB_APP_ID}

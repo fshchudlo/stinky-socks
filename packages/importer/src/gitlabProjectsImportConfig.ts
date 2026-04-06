@@ -4,7 +4,7 @@ import { GitlabProjectModel } from "./Gitlab/GitlabAPI.contracts";
 export const gitlabProjectsImportConfig = {
     url: process.env.GITLAB_INSTANCE_URL as string,
     apiToken: process.env.GITLAB_API_TOKEN as string,
-    namespaceSearch: (process.env.GITLAB_NAMESPACES_SEARCH || undefined) as string | undefined,
+    projectSearch: (process.env.GITLAB_PROJECTS_SEARCH || undefined) as string | undefined,
     resolveTeamName: (project: GitlabProjectModel, gitlabUserId: number): string => {
         {
             const monitoringTeamUserIds = [980, 25, 142, 318, 581, 66, 210, 1013];
