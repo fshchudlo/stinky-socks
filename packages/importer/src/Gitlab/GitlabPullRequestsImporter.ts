@@ -21,32 +21,32 @@ export class GitlabPullRequestsImporter {
     }
 
     async importPullRequests() {
-        const repositories = await this.gitlabAPI.getProjects(this.projectSearch);
+        const projects = await this.gitlabAPI.getProjects(this.projectSearch);
 
-        for (const gitlabRepository of repositories.filter(r => r.name === this.projectSearch)) {
-            console.group(`🔁 Importing pull requests for the '${gitlabRepository.path_with_namespace}' repository`);
+        for (const project of projects.filter(r => r.name === this.projectSearch)) {
+            console.group(`🔁 Importing pull requests for the '${project.path_with_namespace}' repository`);
 
-            const timelogLabel = `✅ '${gitlabRepository.path_with_namespace}' pull requests import completed`;
+            const timelogLabel = `✅ '${project.path_with_namespace}' pull requests import completed`;
             console.time(timelogLabel);
-            await this.importRepositoryPullRequests(gitlabRepository);
+            await this.importProjectPullRequests(project);
             console.timeEnd(timelogLabel);
 
             console.groupEnd();
         }
     }
 
-    private async importRepositoryPullRequests(gitlabRepository: GitlabProjectModel) {
-        const importedPRsCount = await MetricsDB.getPRsCount(gitlabRepository.namespace.name, gitlabRepository.name, null);
-        const lastUpdateDateOfStoredPRs: Date | null = await MetricsDB.getPRsMaxDate("updatedDate", gitlabRepository.namespace.name, gitlabRepository.namespace.name, gitlabRepository.name);
+    private async importProjectPullRequests(gitlabProject: GitlabProjectModel) {
+        const importedPRsCount = await MetricsDB.getPRsCount(gitlabProject.namespace.name, gitlabProject.name, null);
+        const lastUpdateDateOfStoredPRs: Date | null = await MetricsDB.getPRsMaxDate("updatedDate", gitlabProject.namespace.name, gitlabProject.namespace.name, gitlabProject.name);
 
         const pageSize = 100;
         let pageNumber = importedPRsCount > pageSize ? Math.floor(importedPRsCount / pageSize) : 1;
 
         while (true) {
-            const timelogLabel = `💾 ${gitlabRepository.path_with_namespace}: successfully processed pull requests #${(pageSize * (pageNumber - 1)).toLocaleString()}-${(pageSize * pageNumber).toLocaleString()}.`;
+            const timelogLabel = `💾 ${gitlabProject.path_with_namespace}: successfully processed pull requests #${(pageSize * (pageNumber - 1)).toLocaleString()}-${(pageSize * pageNumber).toLocaleString()}.`;
             console.time(timelogLabel);
 
-            const pullRequestsChunk = await this.gitlabAPI.getMergedMergeRequests(gitlabRepository.id, pageNumber, pageSize);
+            const pullRequestsChunk = await this.gitlabAPI.getMergedMergeRequests(gitlabProject.id, pageNumber, pageSize);
 
             for (const pullRequest of pullRequestsChunk) {
                 if (lastUpdateDateOfStoredPRs != null && new Date(pullRequest.updated_at) <= lastUpdateDateOfStoredPRs) {
@@ -57,7 +57,7 @@ export class GitlabPullRequestsImporter {
                     continue;
                 }
 
-                await this.savePullRequest(gitlabRepository, pullRequest);
+                await this.savePullRequest(gitlabProject, pullRequest);
             }
             console.timeEnd(timelogLabel);
 
@@ -69,18 +69,18 @@ export class GitlabPullRequestsImporter {
         }
     }
 
-    private async savePullRequest(repository: GitlabProjectModel, pullRequest: GitlabPullRequestModel) {
+    private async savePullRequest(project: GitlabProjectModel, pullRequest: GitlabPullRequestModel) {
         try {
             const [commits, activities, changes] = await Promise.all([
-                this.gitlabAPI.getMergeRequestCommits(repository.id, pullRequest.iid),
-                this.gitlabAPI.getMergeRequestNotes(repository.id, pullRequest.iid),
-                this.gitlabAPI.getMergeRequestChanges(repository.id, pullRequest.iid)
+                this.gitlabAPI.getMergeRequestCommits(project.id, pullRequest.iid),
+                this.gitlabAPI.getMergeRequestNotes(project.id, pullRequest.iid),
+                this.gitlabAPI.getMergeRequestChanges(project.id, pullRequest.iid)
             ]);
             const pullRequestEntity = await new GitlabPullRequest().init(await normalizeGitlabPayload({
-                    teamName: this.teamNameResolverFn ? this.teamNameResolverFn(repository, pullRequest.author.id) : repository.namespace.name,
+                    teamName: this.teamNameResolverFn ? this.teamNameResolverFn(project, pullRequest.author.id) : project.namespace.name,
                     teamNameResolverFn:this.teamNameResolverFn,
                     pullRequest,
-                    repository,
+                    repository: project,
                     commits,
                     activities,
                     changes
