@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "target": "es2022",
-    "module": "commonjs",
+    "module": "preserve",
     "esModuleInterop": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
@@ -11,17 +11,27 @@
     "strictNullChecks": true,
     "strictPropertyInitialization": false,
     "sourceMap": true,
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
+    "rootDir": ".",
     "outDir": "./dist",
-    "paths": {
-      "*": [
-        "./node_modules/*"
-      ]
-    },
+    "types": [
+      "node",
+      "jest",
+      "express",
+      "express-session",
+      "passport",
+      "passport-github2",
+      "jsonwebtoken"
+    ],
     "typeRoots": [
       "./node_modules/@types",
       "./types"
     ]
+  },
+  "ts-node": {
+    "compilerOptions": {
+      "module": "commonjs"
+    }
   },
   "include": [
     "./**/*.ts"
