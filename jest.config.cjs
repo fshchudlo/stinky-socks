@@ -1,6 +1,5 @@
-import { Config } from '@jest/types';
-
-const config: Config.InitialOptions = {
+/** @type {import('jest').Config} */
+module.exports = {
     clearMocks: true,
     testMatch: [
         './**/*.test[s].ts',
@@ -12,5 +11,3 @@ const config: Config.InitialOptions = {
     detectOpenHandles: true,
     testTimeout: 50000
 };
-
-export default config;

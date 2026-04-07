@@ -10,21 +10,21 @@
     "github"
   ],
   "scripts": {
-    "start": "ts-node src/app.ts",
+    "start": "node --require ts-node/register/transpile-only src/app.ts",
     "build": "tsc -p ../../tsconfig.json",
-    "test": "jest --config ../../jest.config.ts",
-    "test:coverage": "jest --config ../../jest.config.ts --coverage",
-    "test:update-snapshots": "jest --config ../../jest.config.ts --updateSnapshot"
+    "test": "jest --config ../../jest.config.cjs",
+    "test:coverage": "jest --config ../../jest.config.cjs --coverage",
+    "test:update-snapshots": "jest --config ../../jest.config.cjs --updateSnapshot"
   },
   "dependencies": {
     "@types/express": "5.0.6",
     "@types/express-session": "^1.18.2",
     "@types/passport": "1.0.17",
     "@types/passport-github2": "1.2.9",
-    "axios": "1.13.6",
+    "axios": "1.14.0",
     "express": "5.2.1",
     "express-session": "1.19.0",
-    "express-rate-limit": "8.3.1",
+    "express-rate-limit": "8.3.2",
     "passport": "0.7.0",
     "passport-github2": "0.1.12"
   }
