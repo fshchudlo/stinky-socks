@@ -26,12 +26,12 @@
     "axios": "1.20.0",
     "axios-retry": "4.5.0",
     "cache-manager": "7.2.9",
-    "dotenv": "18.0.5",
+    "dotenv": "18.0.7",
     "jsonwebtoken": "^9.0.3",
     "pg": "8.23.1",
     "reflect-metadata": "0.2.2",
     "ts-node": "10.9.2",
-    "typeorm": "1.1.1",
+    "typeorm": "1.1.2",
     "typeorm-naming-strategies": "4.1.0"
   }
 }
